@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>LabScriptor</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <header class="app-header">
+        <div>
+            <h1>LabScriptor</h1>
+            <p>Laboratory Process & Observation Assistant</p>
+        </div>
+
+        <div class="status">
+
+            <span
+                id="headerStatusDot"
+                class="status-dot"
+            ></span>
+
+            <span id="headerStatusText">
+                Ready
+            </span>
+
+        </div>
+    </header>
+
+
+    <main class="main-container">
+
+        <!-- Process Section -->
+        <section class="process-section">
+
+            <div class="section-header">
+                <div>
+                    <h2>Laboratory Process</h2>
+                    <p>Set up your experiment and manage the process timer.</p>
+                </div>
+            </div>
+
+
+            <div class="experiment-input">
+
+                <label for="experimentName">
+                    Experiment Name
+                </label>
+
+                <input
+                    type="text"
+                    id="experimentName"
+                    placeholder="Enter experiment name"
+                >
+
+            </div>
+
+
+            <div class="experiment-controls">
+
+                <button
+                    id="startExperimentButton"
+                    class="primary-button"
+                >
+                    Start Experiment
+                </button>
+
+                <button
+                    id="finishExperimentButton"
+                    class="secondary-button"
+                    disabled
+                >
+                    Finish Experiment
+                </button>
+
+                <button
+                    id="newExperimentButton"
+                    class="secondary-button"
+                >
+                    New Experiment
+                </button>
+
+            </div>
+
+
+            <p id="experimentStatus" class="experiment-status">
+                No experiment started.
+            </p>
+
+
+            <div class="timer-container">
+
+                <p class="timer-label">Process Timer</p>
+
+                <div id="timer" class="timer">
+                    00:00:00
+                </div>
+
+                <div class="timer-controls">
+                    <button id="startButton" class="primary-button">
+                        Start
+                    </button>
+
+                    <button id="pauseButton" class="secondary-button">
+                        Pause
+                    </button>
+
+                    <button id="resetButton" class="secondary-button">
+                        Reset
+                    </button>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Observation Section -->
+        <section class="observation-section">
+
+            <div class="section-header">
+                <div>
+                    <h2>Observations</h2>
+                    <p>Record important observations during your laboratory process.</p>
+                </div>
+            </div>
+
+
+            <div class="voice-container">
+
+                <button id="voiceButton" class="voice-button">
+                    🎙 Start Voice Recording
+                </button>
+
+                <div class="voice-info">
+
+                    <p id="voiceStatus" class="voice-status">
+                        Voice recording is currently inactive.
+                    </p>
+
+                    <p id="voiceHint" class="voice-hint">
+                        Click the button and speak your observation.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="observation-input">
+
+                <label for="observationText">
+                    Observation
+                </label>
+
+                <textarea
+                    id="observationText"
+                    placeholder="Record your laboratory observation..."
+                    rows="6"
+                    maxlength="1000"
+                ></textarea>
+
+                <div
+                    id="observationCharacterCount"
+                    class="character-count"
+                >
+                    0 / 1000
+                </div>
+
+            </div>
+
+
+            <div class="observation-actions">
+
+                <button
+                    id="saveObservationButton"
+                    class="primary-button"
+                >
+                    Save Observation
+                </button>
+
+            </div>
+
+
+            <!-- Observation History -->
+            <div class="observation-history">
+
+                <div class="history-header">
+                    <h3>Observation History</h3>
+
+                    <span id="observationCount">
+                        0 observations
+                    </span>
+                </div>
+
+                <div id="observationList" class="observation-list">
+
+                    <p class="empty-message">
+                        No observations recorded yet.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Experiment Summary -->
+            <section class="summary-section">
+
+                <div class="section-header">
+
+                    <div>
+                        <h2>Experiment Summary</h2>
+
+                        <p>
+                            Review the details and observations recorded during your laboratory process.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <!-- Review Status -->
+
+                <div
+                    id="reviewBanner"
+                    class="review-banner"
+                >
+
+                    <div class="review-icon">
+                        ✓
+                    </div>
+
+                    <div class="review-message">
+
+                        <strong id="reviewTitle">
+                            Experiment in progress
+                        </strong>
+
+                        <p id="reviewDescription">
+                            Continue recording observations while the experiment is active.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Summary Cards -->
+
+                <div class="summary-grid">
+
+                    <div class="summary-card">
+
+                        <span class="summary-label">
+                            Experiment
+                        </span>
+
+                        <span
+                            id="summaryExperimentName"
+                            class="summary-value"
+                        >
+                            -
+                        </span>
+
+                    </div>
+
+
+                    <div class="summary-card">
+
+                        <span class="summary-label">
+                            Status
+                        </span>
+
+                        <span
+                            id="summaryStatus"
+                            class="summary-value"
+                        >
+                            No experiment
+                        </span>
+
+                    </div>
+
+
+                    <div class="summary-card">
+
+                        <span class="summary-label">
+                            Process Duration
+                        </span>
+
+                        <span
+                            id="summaryDuration"
+                            class="summary-value"
+                        >
+                            00:00:00
+                        </span>
+
+                    </div>
+
+
+                    <div class="summary-card">
+
+                        <span class="summary-label">
+                            Observations
+                        </span>
+
+                        <span
+                            id="summaryObservationCount"
+                            class="summary-value"
+                        >
+                            0
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Final Review -->
+
+                <div class="final-review">
+
+                    <div class="final-review-header">
+
+                        <div>
+
+                            <h3>
+                                Final Review
+                            </h3>
+
+                            <p>
+                                Confirm that the experiment information and observations have been recorded.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="review-checklist">
+
+                        <div class="review-check">
+
+                            <span
+                                id="reviewExperimentCheck"
+                                class="review-check-icon"
+                            >
+                                ○
+                            </span>
+
+                            <span>
+                                Experiment information recorded
+                            </span>
+
+                        </div>
+
+
+                        <div class="review-check">
+
+                            <span
+                                id="reviewTimerCheck"
+                                class="review-check-icon"
+                            >
+                                ○
+                            </span>
+
+                            <span>
+                                Process duration recorded
+                            </span>
+
+                        </div>
+
+
+                        <div class="review-check">
+
+                            <span
+                                id="reviewObservationCheck"
+                                class="review-check-icon"
+                            >
+                                ○
+                            </span>
+
+                            <span>
+                                Observations reviewed
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+    </main>
+
+
+    <script src="../js/app.js"></script>
+
+</body>
+</html>
