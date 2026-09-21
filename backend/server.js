@@ -9,7 +9,7 @@ const { createClient } = require("@supabase/supabase-js");
 const processSessionRoutes = require("./routes/processSessionRoutes");
 const observationRoutes = require("./routes/observationRoutes"); 
 const timerEventRoutes = require("./routes/timerEventRoutes");
-
+const userRoutes = require("./routes/userRoutes");
 
 // CREATE APP
 
@@ -66,6 +66,7 @@ app.get("/api/test-database", async function (req, res) {
 app.use("/api/process-sessions", processSessionRoutes);
 app.use("/api/observations", observationRoutes);
 app.use("/api/timer-events", timerEventRoutes);
+app.use("/api/users", userRoutes);
 
 
 // START SERVER

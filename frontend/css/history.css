@@ -1,0 +1,107 @@
+body {
+    margin: 0;
+
+    font-family: Arial, sans-serif;
+
+    background-color: #f4f6f8;
+}
+
+.history-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 20px 40px;
+
+    background-color: white;
+
+    border-bottom: 1px solid #ddd;
+}
+
+.history-header h1 {
+    margin: 0;
+}
+
+.history-header p {
+    margin: 5px 0 0;
+
+    color: #666;
+}
+
+.header-actions {
+    display: flex;
+
+    gap: 10px;
+}
+
+.header-actions button {
+    padding: 10px 16px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+}
+
+.history-container {
+    max-width: 1000px;
+
+    margin: 40px auto;
+
+    padding: 0 20px;
+}
+
+.history-section h2 {
+    margin-bottom: 8px;
+}
+
+#historyMessage {
+    color: #666;
+}
+
+.experiment-card {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 20px;
+
+    margin-bottom: 12px;
+
+    background-color: white;
+
+    border: 1px solid #ddd;
+
+    border-radius: 10px;
+}
+
+.experiment-info h3 {
+    margin: 0 0 8px;
+}
+
+.experiment-info p {
+    margin: 4px 0;
+
+    color: #666;
+}
+
+.experiment-status {
+    margin-top: 8px;
+
+    font-weight: bold;
+}
+
+.view-button {
+    padding: 10px 16px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+}

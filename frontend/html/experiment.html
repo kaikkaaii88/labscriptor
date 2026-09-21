@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>LabScriptor Experiment Details</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/experiment.css"
+    >
+
+</head>
+
+<body>
+
+    <header class="experiment-header">
+
+        <div>
+
+            <h1>LabScriptor</h1>
+
+            <p>
+                Experiment Details
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <button id="historyButton">
+                Back to History
+            </button>
+
+            <button id="logoutButton">
+                Logout
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <main class="experiment-container">
+
+        <section class="details-section">
+
+            <h2 id="experimentName">
+                Loading experiment...
+            </h2>
+
+            <p id="experimentStatus">
+                Loading status...
+            </p>
+
+
+            <div class="details-grid">
+
+                <div class="detail-card">
+
+                    <h3>Start Time</h3>
+
+                    <p id="startTime">
+                        -
+                    </p>
+
+                </div>
+
+
+                <div class="detail-card">
+
+                    <h3>End Time</h3>
+
+                    <p id="endTime">
+                        -
+                    </p>
+
+                </div>
+
+
+                <div class="detail-card">
+
+                    <h3>Duration</h3>
+
+                    <p id="duration">
+                        -
+                    </p>
+
+                </div>
+
+
+                <div class="detail-card">
+
+                    <h3>Observations</h3>
+
+                    <p id="observationCount">
+                        -
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="observations-section">
+
+            <h2>Recorded Observations</h2>
+
+            <p id="observationMessage">
+                Loading observations...
+            </p>
+
+            <div id="observationList">
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../js/experiment.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>LabScriptor History</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/history.css"
+    >
+
+</head>
+
+<body>
+
+    <header class="history-header">
+
+        <div>
+
+            <h1>LabScriptor</h1>
+
+            <p>
+                Experiment History
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <button id="homeButton">
+                New Experiment
+            </button>
+
+            <button id="logoutButton">
+                Logout
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <main class="history-container">
+
+        <section class="history-section">
+
+            <h2>Previous Experiments</h2>
+
+            <p id="historyMessage">
+                Loading experiments...
+            </p>
+
+            <div id="experimentList">
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../js/history.js"></script>
+
+</body>
+
+</html>

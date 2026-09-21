@@ -1,0 +1,167 @@
+body {
+    margin: 0;
+
+    font-family: Arial, sans-serif;
+
+    background-color: #f4f6f8;
+}
+
+.experiment-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 20px 40px;
+
+    background-color: white;
+
+    border-bottom: 1px solid #ddd;
+}
+
+.experiment-header h1 {
+    margin: 0;
+}
+
+.experiment-header p {
+    margin: 5px 0 0;
+
+    color: #666;
+}
+
+.header-actions {
+    display: flex;
+
+    gap: 10px;
+}
+
+.header-actions button {
+    padding: 10px 16px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+}
+
+.experiment-container {
+    max-width: 1000px;
+
+    margin: 40px auto;
+
+    padding: 0 20px;
+}
+
+.details-section,
+.observations-section {
+    margin-bottom: 30px;
+
+    padding: 25px;
+
+    background-color: white;
+
+    border: 1px solid #ddd;
+
+    border-radius: 10px;
+}
+
+.details-section h2 {
+    margin-top: 0;
+
+    margin-bottom: 8px;
+}
+
+#experimentStatus {
+    color: #666;
+
+    margin-bottom: 25px;
+}
+
+.details-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 15px;
+}
+
+.detail-card {
+    padding: 20px;
+
+    background-color: #f8f9fa;
+
+    border: 1px solid #e1e1e1;
+
+    border-radius: 8px;
+}
+
+.detail-card h3 {
+    margin: 0 0 10px;
+
+    font-size: 14px;
+
+    color: #666;
+}
+
+.detail-card p {
+    margin: 0;
+
+    font-size: 18px;
+
+    font-weight: bold;
+}
+
+#observationMessage {
+    color: #666;
+}
+
+.observation-card {
+    padding: 18px;
+
+    margin-bottom: 12px;
+
+    background-color: #f8f9fa;
+
+    border-left: 4px solid #555;
+
+    border-radius: 6px;
+}
+
+.observation-meta {
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 8px;
+
+    font-size: 13px;
+
+    color: #666;
+}
+
+.observation-text {
+    margin: 0;
+
+    line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+
+    .experiment-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+
+        padding: 20px;
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+}

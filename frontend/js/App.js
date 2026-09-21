@@ -4,9 +4,20 @@ const startButton = document.getElementById("startButton");
 const pauseButton = document.getElementById("pauseButton");
 const resetButton = document.getElementById("resetButton");
 
+const SUPABASE_URL = "https://wxoisxojhqelzmeqhoml.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_HmZbJeN7C7bHRoPcDHSj1A_WxKjoHdy";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
+
 let elapsedSeconds = 0;
 let timerInterval = null;
 let currentSessionId = null;
+let currentUserId = null;
 let timerStarted = false;
 
 
@@ -14,25 +25,12 @@ let timerStarted = false;
    START PROCESS TIMER
    ========================= */
 
-/* =========================
-   START PROCESS TIMER
-   ========================= */
-
-/* =========================
-   START PROCESS TIMER
-   ========================= */
-
 async function startProcessTimer(eventType) {
-
     if (timerInterval !== null) {
-
-        return;
-
+        return false;
     }
 
-
     if (currentSessionId === null) {
-
         console.error(
             "Cannot start timer because no process session exists."
         );
@@ -41,32 +39,26 @@ async function startProcessTimer(eventType) {
             "Unable to start timer because no process session exists."
         );
 
-        return;
-
+        return false;
     }
-
 
     const timerEventCreated =
         await createTimerEvent(eventType);
 
-
     if (timerEventCreated === false) {
-
-        return;
-
+        return false;
     }
 
+    timerInterval =
+        setInterval(function () {
+            elapsedSeconds++;
 
-    timerInterval = setInterval(function () {
+            updateTimerDisplay();
+            updateExperimentSummary();
 
-        elapsedSeconds++;
+        }, 1000);
 
-        updateTimerDisplay();
-
-        updateExperimentSummary();
-
-    }, 1000);
-
+    return true;
 }
 
 /* =========================
@@ -93,90 +85,84 @@ function updateTimerDisplay() {
    START / RESUME TIMER
    ========================= */
 
-startButton.addEventListener("click", async function () {
+startButton.addEventListener(
+    "click",
+    async function () {
 
-    if (experimentActive === false) {
+        if (experimentActive === false) {
 
-        alert(
-            "Please start an experiment first."
-        );
+            alert(
+                "Please start an experiment first."
+            );
 
-        return;
+            return;
+        }
 
+        if (timerInterval !== null) {
+            return;
+        }
+
+        let timerStartedSuccessfully = false;
+
+        if (timerStarted === false) {
+
+            timerStartedSuccessfully =
+                await startProcessTimer("START");
+
+        } else {
+
+            timerStartedSuccessfully =
+                await startProcessTimer("RESUME");
+        }
+
+        if (
+            timerStartedSuccessfully === true
+        ) {
+            timerStarted = true;
+        }
     }
-
-
-    if (timerInterval !== null) {
-
-        return;
-
-    }
-
-
-    if (timerStarted === false) {
-
-        await startProcessTimer("START");
-
-        timerStarted = true;
-
-    } else {
-
-        await startProcessTimer("RESUME");
-
-    }
-
-
-    startButton.textContent =
-        "▶ Start";
-
-});
+);
 
 
 /* =========================
    PAUSE TIMER
    ========================= */
 
-pauseButton.addEventListener("click", async function () {
+pauseButton.addEventListener(
+    "click",
+    async function () {
 
-    if (timerInterval === null) {
+        if (experimentActive === false) {
+            return;
+        }
 
-        return;
+        if (timerInterval === null) {
+            return;
+        }
 
+        if (currentSessionId === null) {
+
+            console.error(
+                "Cannot pause timer because no process session exists."
+            );
+
+            return;
+        }
+
+        const timerEventCreated =
+            await createTimerEvent("PAUSE");
+
+        if (timerEventCreated === false) {
+            return;
+        }
+
+        clearInterval(timerInterval);
+
+        timerInterval = null;
+
+        updateExperimentSummary();
     }
-
-
-    if (currentSessionId === null) {
-
-        console.error(
-            "Cannot pause timer because no process session exists."
-        );
-
-        return;
-
-    }
-
-
-    const timerEventCreated =
-        await createTimerEvent("PAUSE");
-
-
-    if (timerEventCreated === false) {
-
-        return;
-
-    }
-
-
-    clearInterval(timerInterval);
-
-    timerInterval = null;
-
-    startButton.textContent =
-    "▶ Resume";
-
-    updateExperimentSummary();
-
-});
+);
 
 
 /* =========================
@@ -254,6 +240,9 @@ const headerStatusDot =
 const headerStatusText =
     document.getElementById("headerStatusText");
 
+const historyButton =
+    document.getElementById("historyButton");
+
 const reviewBanner =
     document.getElementById("reviewBanner");
 
@@ -272,6 +261,15 @@ const reviewTimerCheck =
 const reviewObservationCheck =
     document.getElementById("reviewObservationCheck");
 
+
+historyButton.addEventListener(
+    "click",
+    function () {
+
+        window.location.href =
+            "history.html";
+    }
+);
 
 
 /* =========================
@@ -488,56 +486,180 @@ function updateExperimentSummary() {
    START EXPERIMENT
    ========================= */
 
-startExperimentButton.addEventListener("click", async function () {
+startExperimentButton.addEventListener(
+    "click",
+    async function () {
 
-    const name =
-        experimentName.value.trim();
+        const name =
+            experimentName.value.trim();
 
-    if (name === "") {
+        if (name === "") {
+            alert(
+                "Please enter an experiment name before starting."
+            );
 
-        alert(
-            "Please enter an experiment name before starting."
+            return;
+        }
+
+        if (experimentActive === true) {
+            return;
+        }
+
+        experimentActive = true;
+
+        experimentName.disabled = true;
+
+        startExperimentButton.disabled = true;
+
+        finishExperimentButton.disabled = false;
+
+        observationText.disabled = false;
+
+        saveObservationButton.disabled = false;
+
+        experimentStatus.textContent =
+            "Experiment active: " + name;
+
+        experimentStatus.classList.add(
+            "active"
         );
 
-        return;
+        experimentStatus.classList.remove(
+            "finished"
+        );
 
+        elapsedSeconds = 0;
+
+        updateTimerDisplay();
+
+        updateExperimentSummary();
+
+        const sessionCreated =
+            await createProcessSession();
+
+        if (sessionCreated === false) {
+
+            experimentActive = false;
+
+            experimentName.disabled = false;
+
+            startExperimentButton.disabled = false;
+
+            finishExperimentButton.disabled = true;
+
+            observationText.disabled = true;
+
+            saveObservationButton.disabled = true;
+
+            experimentStatus.textContent =
+                "No experiment started.";
+
+            experimentStatus.classList.remove(
+                "active"
+            );
+
+            return;
+        }
+
+        const timerStartedSuccessfully =
+            await startProcessTimer("START");
+
+        if (
+            timerStartedSuccessfully === false
+        ) {
+
+            experimentActive = false;
+
+            experimentName.disabled = false;
+
+            startExperimentButton.disabled = false;
+
+            finishExperimentButton.disabled = true;
+
+            observationText.disabled = true;
+
+            saveObservationButton.disabled = true;
+
+            experimentStatus.textContent =
+                "Unable to start experiment.";
+
+            experimentStatus.classList.remove(
+                "active"
+            );
+
+            return;
+        }
+
+        timerStarted = true;
     }
+);
 
 
-    if (experimentActive === true) {
+/* =========================
+   FINISH EXPERIMENT
+   ========================= */
 
-        return;
+finishExperimentButton.addEventListener(
+    "click",
+    async function () {
 
-    }
+        if (experimentActive === false) {
+            return;
+        }
 
+        const confirmation =
+            confirm(
+                "Finish this experiment? You will no longer be able to record observations until a new experiment is started."
+            );
 
-    experimentActive = true;
+        if (confirmation === false) {
+            return;
+        }
 
+        if (currentSessionId === null) {
+            alert(
+                "No process session is currently active."
+            );
 
-    experimentName.disabled = true;
+            return;
+        }
 
-    startExperimentButton.disabled = true;
+        if (isRecording === true && recognition) {
 
-    finishExperimentButton.disabled = false;
+            recognition.stop();
 
+            voiceStatus.textContent =
+                "Voice recording stopped.";
 
-    experimentStatus.textContent =
-        "Experiment active: " + name;
+            voiceHint.textContent =
+                "The experiment has been completed.";
 
-    experimentStatus.classList.add("active");
+        }
 
-    experimentStatus.classList.remove("finished");
+        const timerEventCreated =
+            await createTimerEvent("STOP");
 
+        if (timerEventCreated === false) {
+            return;
+        }
 
-    /* Create database process session */
+        const sessionCompleted =
+            await completeProcessSession();
 
-    const sessionCreated =
-        await createProcessSession();
+        if (sessionCompleted === false) {
+            return;
+        }
 
+        if (timerInterval !== null) {
 
-    if (sessionCreated === false) {
+            clearInterval(timerInterval);
+
+            timerInterval = null;
+        }
 
         experimentActive = false;
+
+        timerStarted = false;
 
         experimentName.disabled = false;
 
@@ -545,110 +667,25 @@ startExperimentButton.addEventListener("click", async function () {
 
         finishExperimentButton.disabled = true;
 
+        observationText.disabled = true;
+
+        saveObservationButton.disabled = true;
+
         experimentStatus.textContent =
-            "No experiment started.";
+            "Experiment finished: " +
+            experimentName.value;
 
-        experimentStatus.classList.remove("active");
-
-        return;
-
-    }
-
-
-    /* Start process timer */
-
-    await startProcessTimer("START");
-
-    timerStarted = true;
-
-});
-
-
-/* =========================
-   FINISH EXPERIMENT
-   ========================= */
-
-finishExperimentButton.addEventListener("click", async function () {
-
-    if (experimentActive === false) {
-
-        return;
-
-    }
-
-
-    const confirmation =
-        confirm(
-            "Finish this experiment? You will no longer be able to record observations until a new experiment is started."
+        experimentStatus.classList.remove(
+            "active"
         );
 
+        experimentStatus.classList.add(
+            "finished"
+        );
 
-    if (confirmation === false) {
-
-        return;
-
+        updateExperimentSummary();
     }
-
-
-    if (currentSessionId !== null) {
-
-        const timerEventCreated =
-            await createTimerEvent("STOP");
-
-
-        if (timerEventCreated === false) {
-
-            return;
-
-        }
-
-    }
-
-    /* Complete process session */
-
-    const sessionCompleted =
-        await completeProcessSession();
-
-
-    if (sessionCompleted === false) {
-
-        return;
-
-    }
-
-    clearInterval(timerInterval);
-
-    timerInterval = null;
-
-    experimentActive = false;
-
-
-    experimentName.disabled = false;
-
-    startExperimentButton.disabled = false;
-
-    finishExperimentButton.disabled = true;
-
-
-    observationText.disabled = true;
-
-    saveObservationButton.disabled = true;
-
-
-    experimentStatus.textContent =
-        "Experiment finished: " +
-        experimentName.value;
-
-
-    experimentStatus.classList.remove("active");
-
-    experimentStatus.classList.add("finished");
-
-
-    updateExperimentSummary();
-
-});
-
+);
 
 /* =========================
    NEW EXPERIMENT
@@ -697,6 +734,10 @@ newExperimentButton.addEventListener("click", function () {
     /* Reset experiment state */
 
     experimentActive = false;
+
+    currentSessionId = null;
+
+    timerStarted = false;
 
 
     /* Clear experiment name */
@@ -798,9 +839,6 @@ observationText.addEventListener("input", function () {
 
 });
 
-/* =========================
-   SAVE OBSERVATION
-   ========================= */
 
 /* =========================
    SAVE OBSERVATION
@@ -1069,9 +1107,14 @@ function displayObservations() {
    VOICE INPUT
    ========================= */
 
-const voiceButton = document.getElementById("voiceButton");
-const voiceStatus = document.getElementById("voiceStatus");
-const voiceHint = document.getElementById("voiceHint");
+const voiceButton =
+    document.getElementById("voiceButton");
+
+const voiceStatus =
+    document.getElementById("voiceStatus");
+
+const voiceHint =
+    document.getElementById("voiceHint");
 
 let recognition;
 let isRecording = false;
@@ -1083,11 +1126,13 @@ let isRecording = false;
 
 if ("SpeechRecognition" in window) {
 
-    recognition = new SpeechRecognition();
+    recognition =
+        new SpeechRecognition();
 
 } else if ("webkitSpeechRecognition" in window) {
 
-    recognition = new webkitSpeechRecognition();
+    recognition =
+        new webkitSpeechRecognition();
 
 } else {
 
@@ -1109,8 +1154,11 @@ if ("SpeechRecognition" in window) {
 if (recognition) {
 
     recognition.continuous = true;
+
     recognition.interimResults = true;
+
     recognition.lang = "en-US";
+
     recognition.maxAlternatives = 1;
 
 
@@ -1118,183 +1166,278 @@ if (recognition) {
        START / STOP RECORDING
        ========================= */
 
-    voiceButton.addEventListener("click", function () {
+    voiceButton.addEventListener(
+        "click",
+        function () {
 
-        if (experimentActive === false) {
+            if (experimentActive === false) {
 
-            alert(
-                "Please start an experiment before using voice recording."
-            );
-
-            return;
-
-        }
-
-        if (isRecording === false) {
-
-            try {
-
-                recognition.start();
-
-                isRecording = true;
-
-                voiceButton.textContent =
-                    "⏹ Stop Voice Recording";
-
-                voiceButton.classList.add("recording");
-
-                voiceButton.classList.remove("success");
-
-                voiceStatus.textContent =
-                    "Listening...";
-
-                voiceHint.textContent =
-                    "Speak clearly about your laboratory observation.";
-
-            } catch (error) {
-
-                console.log(
-                    "Could not start speech recognition:",
-                    error
+                alert(
+                    "Please start an experiment before using voice recording."
                 );
+
+                return;
+            }
+
+
+            if (isRecording === false) {
+
+                try {
+
+                    recognition.start();
+
+                    isRecording = true;
+
+                    voiceButton.textContent =
+                        "⏹ Stop Voice Recording";
+
+                    voiceButton.classList.add(
+                        "recording"
+                    );
+
+                    voiceButton.classList.remove(
+                        "success"
+                    );
+
+                    voiceStatus.textContent =
+                        "Listening...";
+
+                    voiceHint.textContent =
+                        "Speak clearly about your laboratory observation.";
+
+                } catch (error) {
+
+                    console.error(
+                        "Could not start speech recognition:",
+                        error
+                    );
+
+                    isRecording = false;
+
+                    voiceStatus.textContent =
+                        "Unable to start voice recording.";
+
+                    voiceHint.textContent =
+                        "Please try again.";
+
+                }
+
+            } else {
+
+                recognition.stop();
 
             }
 
-        } else {
-
-            recognition.stop();
-
         }
-
-    });
+    );
 
 
     /* =========================
        SPEECH START
        ========================= */
 
-    recognition.onspeechstart = function () {
+    recognition.onspeechstart =
+        function () {
 
-        console.log("Speech detected.");
+            console.log(
+                "Speech detected."
+            );
 
-        voiceStatus.textContent =
-            "Recording your observation...";
+            voiceStatus.textContent =
+                "Recording your observation...";
 
-        voiceHint.textContent =
-            "Continue speaking or click Stop when finished.";
+            voiceHint.textContent =
+                "Continue speaking or click Stop when finished.";
 
-    };
+        };
 
 
     /* =========================
        SPEECH RESULT
        ========================= */
 
-    recognition.onresult = function (event) {
+    recognition.onresult =
+        function (event) {
 
-        let transcript = "";
+            let transcript = "";
 
-        for (
-            let i = event.resultIndex;
-            i < event.results.length;
-            i++
-        ) {
+
+            for (
+                let i = event.resultIndex;
+                i < event.results.length;
+                i++
+            ) {
+
+                transcript =
+                    transcript +
+                    event.results[i][0].transcript;
+
+            }
+
 
             transcript =
-                transcript +
-                event.results[i][0].transcript;
+                transcript.trim();
 
-        }
 
-        console.log(
-            "Speech result:",
-            transcript
-        );
+            console.log(
+                "Speech result:",
+                transcript
+            );
 
-        observationText.value = transcript;
 
-        voiceStatus.textContent =
-            "Observation captured.";
+            if (transcript !== "") {
 
-        voiceHint.textContent =
-            "Review the text before saving.";
+                observationText.value =
+                    transcript;
 
-        voiceButton.classList.remove("recording");
 
-        voiceButton.classList.add("success");
+                observationCharacterCount.textContent =
+                    observationText.value.length +
+                    " / 1000";
 
-    };
+
+                voiceStatus.textContent =
+                    "Observation captured.";
+
+                voiceHint.textContent =
+                    "Review the text before saving.";
+
+
+                voiceButton.classList.remove(
+                    "recording"
+                );
+
+                voiceButton.classList.add(
+                    "success"
+                );
+
+            }
+
+        };
 
 
     /* =========================
        SPEECH END
        ========================= */
 
-    recognition.onend = function () {
+    recognition.onend =
+        function () {
 
-        console.log("Speech recognition ended.");
+            console.log(
+                "Speech recognition ended."
+            );
 
-        isRecording = false;
+            isRecording = false;
 
-        voiceButton.textContent =
-            "🎙 Start Voice Recording";
+            voiceButton.textContent =
+                "🎙 Start Voice Recording";
 
-        voiceButton.classList.remove("recording");
+            voiceButton.classList.remove(
+                "recording"
+            );
 
-    };
+        };
 
 
     /* =========================
        SPEECH ERROR
        ========================= */
 
-    recognition.onerror = function (event) {
+    recognition.onerror =
+        function (event) {
 
-        console.log(
-            "Speech recognition error:",
-            event.error
-        );
+            console.error(
+                "Speech recognition error:",
+                event.error
+            );
 
-        isRecording = false;
+            isRecording = false;
 
-        voiceButton.textContent =
-            "🎙 Start Voice Recording";
+            voiceButton.textContent =
+                "🎙 Start Voice Recording";
 
-        voiceButton.classList.remove("recording");
+            voiceButton.classList.remove(
+                "recording"
+            );
 
-        voiceButton.classList.remove("success");
+            voiceButton.classList.remove(
+                "success"
+            );
 
-        if (event.error === "no-speech") {
 
-            voiceStatus.textContent =
-                "No speech detected.";
+            if (event.error === "no-speech") {
 
-        } else if (event.error === "not-allowed") {
+                voiceStatus.textContent =
+                    "No speech detected.";
 
-            voiceStatus.textContent =
-                "Microphone permission was denied.";
+                voiceHint.textContent =
+                    "Please try recording again.";
 
-        } else if (event.error === "audio-capture") {
+            } else if (event.error === "not-allowed") {
 
-            voiceStatus.textContent =
-                "No microphone was detected.";
+                voiceStatus.textContent =
+                    "Microphone permission was denied.";
 
-        } else {
+                voiceHint.textContent =
+                    "Please allow microphone access and try again.";
 
-            voiceStatus.textContent =
-                "Voice input could not be completed.";
+            } else if (event.error === "audio-capture") {
 
-        }
+                voiceStatus.textContent =
+                    "No microphone was detected.";
 
-        voiceHint.textContent =
-            "Please try recording again.";
+                voiceHint.textContent =
+                    "Check your microphone and try again.";
 
-    };
+            } else if (event.error === "network") {
+
+                voiceStatus.textContent =
+                    "Network error during voice recognition.";
+
+                voiceHint.textContent =
+                    "Check your internet connection and try again.";
+
+            } else {
+
+                voiceStatus.textContent =
+                    "Voice input could not be completed.";
+
+                voiceHint.textContent =
+                    "Please try recording again.";
+
+            }
+
+        };
 
 }
 
 
+/* =========================
+   CREATE PROCESS SESSION
+   ========================= */
+
 async function createProcessSession() {
+
+    if (currentUserId === null) {
+
+        alert(
+            "Unable to start the experiment because you are not logged in."
+        );
+
+        return false;
+    }
+
+    const name =
+        experimentName.value.trim();
+
+    if (name === "") {
+
+        alert(
+            "Please enter an experiment name before starting."
+        );
+
+        return false;
+    }
 
     try {
 
@@ -1309,73 +1452,101 @@ async function createProcessSession() {
                     },
 
                     body: JSON.stringify({
-                        user_id: 1,
-                        process_name: experimentName.value.trim(),
-                        description: "LabScriptor process session",
-                        start_time: new Date().toISOString(),
-                        status: "active"
+                        user_id: currentUserId,
+                        process_name: name,
+                        description: ""
                     })
                 }
             );
 
+        if (!response.ok) {
+
+            let errorMessage =
+                "Unable to create the process session.";
+
+            try {
+
+                const errorData =
+                    await response.json();
+
+                if (errorData.message) {
+
+                    errorMessage =
+                        errorData.message;
+                }
+
+            } catch (parseError) {
+
+                console.log(
+                    "Could not read server error response.",
+                    parseError
+                );
+            }
+
+            console.error(
+                "Create process session failed:",
+                response.status,
+                errorMessage
+            );
+
+            alert(errorMessage);
+
+            return false;
+        }
 
         const data =
             await response.json();
 
 
-        if (!response.ok) {
+        /* =========================
+           CHECK SERVER RESPONSE
+           ========================= */
+
+        if (
+            !data.process_session ||
+            !data.process_session.session_id
+        ) {
 
             console.error(
-                "Failed to create process session:",
+                "Invalid process session response:",
                 data
             );
 
             alert(
-                "Failed to create process session: " +
-                data.message
+                "The experiment could not be started because the server returned invalid data."
             );
 
             return false;
-
         }
 
+
+        /* =========================
+           SAVE SESSION ID
+           ========================= */
 
         currentSessionId =
             data.process_session.session_id;
 
-
         console.log(
             "Process session created:",
-            data.process_session
-        );
-
-
-        console.log(
-            "Current session ID:",
             currentSessionId
         );
 
-
         return true;
-
 
     } catch (error) {
 
         console.error(
-            "Error creating process session:",
+            "Network error while creating process session:",
             error
         );
 
-
         alert(
-            "Unable to connect to the LabScriptor backend."
+            "Unable to connect to the LabScriptor server. Please make sure the backend is running."
         );
 
-
         return false;
-
     }
-
 }
 
 
@@ -1384,6 +1555,15 @@ async function createProcessSession() {
    ========================= */
 
 async function createTimerEvent(eventType) {
+
+    if (currentSessionId === null) {
+
+        alert(
+            "Unable to record the timer event because no experiment session exists."
+        );
+
+        return false;
+    }
 
     try {
 
@@ -1399,60 +1579,69 @@ async function createTimerEvent(eventType) {
 
                     body: JSON.stringify({
                         session_id: currentSessionId,
-                        event_type: eventType,
-                        event_time: new Date().toISOString()
+                        event_type: eventType
                     })
                 }
             );
 
+        if (!response.ok) {
+
+            let errorMessage =
+                "Unable to save the timer event.";
+
+            try {
+
+                const errorData =
+                    await response.json();
+
+                if (errorData.message) {
+
+                    errorMessage =
+                        errorData.message;
+                }
+
+            } catch (parseError) {
+
+                console.log(
+                    "Could not read server error response.",
+                    parseError
+                );
+            }
+
+            console.error(
+                "Create timer event failed:",
+                response.status,
+                errorMessage
+            );
+
+            alert(errorMessage);
+
+            return false;
+        }
 
         const data =
             await response.json();
 
-
-        if (!response.ok) {
-
-            console.error(
-                "Failed to create timer event:",
-                data
-            );
-
-            alert(
-                "Failed to create timer event: " +
-                data.message
-            );
-
-            return false;
-
-        }
-
-
         console.log(
             "Timer event created:",
-            data.timer_event
+            data
         );
 
-
         return true;
-
 
     } catch (error) {
 
         console.error(
-            "Error creating timer event:",
+            "Network error while creating timer event:",
             error
         );
 
-
         alert(
-            "Unable to connect to the LabScriptor backend."
+            "Unable to connect to the LabScriptor server. The timer event was not saved."
         );
 
-
         return false;
-
     }
-
 }
 
 
@@ -1462,18 +1651,16 @@ async function createTimerEvent(eventType) {
 
 async function completeProcessSession() {
 
+    if (currentSessionId === null) {
+
+        alert(
+            "Unable to finish the experiment because no process session exists."
+        );
+
+        return false;
+    }
+
     try {
-
-        if (currentSessionId === null) {
-
-            console.error(
-                "Cannot complete process session because no session exists."
-            );
-
-            return false;
-
-        }
-
 
         const response =
             await fetch(
@@ -1487,61 +1674,70 @@ async function completeProcessSession() {
                     },
 
                     body: JSON.stringify({
-                        end_time:
-                            new Date().toISOString(),
-
-                        status:
-                            "completed"
+                        status: "completed",
+                        end_time: new Date().toISOString()
                     })
                 }
             );
 
+        if (!response.ok) {
+
+            let errorMessage =
+                "Unable to complete the experiment.";
+
+            try {
+
+                const errorData =
+                    await response.json();
+
+                if (errorData.message) {
+
+                    errorMessage =
+                        errorData.message;
+                }
+
+            } catch (parseError) {
+
+                console.log(
+                    "Could not read server error response.",
+                    parseError
+                );
+            }
+
+            console.error(
+                "Complete process session failed:",
+                response.status,
+                errorMessage
+            );
+
+            alert(errorMessage);
+
+            return false;
+        }
 
         const data =
             await response.json();
 
-
-        if (!response.ok) {
-
-            console.error(
-                "Failed to complete process session:",
-                data
-            );
-
-            alert(
-                "Failed to complete process session: " +
-                data.message
-            );
-
-            return false;
-
-        }
-
-
         console.log(
             "Process session completed:",
-            data.process_session
+            data
         );
 
-
         return true;
-
 
     } catch (error) {
 
         console.error(
-            "Error completing process session:",
+            "Network error while completing process session:",
             error
         );
 
         alert(
-            "Unable to connect to the LabScriptor backend."
+            "Unable to connect to the LabScriptor server. The experiment could not be completed."
         );
 
         return false;
-
     }
-
 }
 
 
@@ -1550,6 +1746,24 @@ async function completeProcessSession() {
    ========================= */
 
 async function createObservation(observation) {
+
+    if (currentSessionId === null) {
+
+        alert(
+            "Unable to save the observation because no experiment session exists."
+        );
+
+        return false;
+    }
+
+    if (observation.trim() === "") {
+
+        alert(
+            "Please enter an observation before saving."
+        );
+
+        return false;
+    }
 
     try {
 
@@ -1564,68 +1778,70 @@ async function createObservation(observation) {
                     },
 
                     body: JSON.stringify({
-                        session_id:
-                            currentSessionId,
-
-                        observation:
-                            observation,
-
-                        recorded_at:
-                            new Date().toISOString()
+                        session_id: currentSessionId,
+                        observation: observation
                     })
                 }
             );
 
+        if (!response.ok) {
+
+            let errorMessage =
+                "Unable to save the observation.";
+
+            try {
+
+                const errorData =
+                    await response.json();
+
+                if (errorData.message) {
+
+                    errorMessage =
+                        errorData.message;
+                }
+
+            } catch (parseError) {
+
+                console.log(
+                    "Could not read server error response.",
+                    parseError
+                );
+            }
+
+            console.error(
+                "Create observation failed:",
+                response.status,
+                errorMessage
+            );
+
+            alert(errorMessage);
+
+            return false;
+        }
 
         const data =
             await response.json();
 
-
-        if (!response.ok) {
-
-            console.error(
-                "Failed to create observation:",
-                data
-            );
-
-
-            alert(
-                "Failed to save observation: " +
-                data.message
-            );
-
-
-            return false;
-
-        }
-
-
         console.log(
             "Observation created:",
-            data.observation
+            data
         );
 
-
         return true;
-
 
     } catch (error) {
 
         console.error(
-            "Error creating observation:",
+            "Network error while creating observation:",
             error
         );
 
-
         alert(
-            "Unable to connect to the LabScriptor backend."
+            "Unable to connect to the LabScriptor server. The observation was not saved."
         );
 
-
         return false;
-
     }
-
 }
 
 
@@ -1837,3 +2053,75 @@ async function loadProcessSession(sessionId) {
     }
 
 }
+
+
+
+async function loadCurrentUser() {
+    try {
+        const result =
+            await supabaseClient.auth.getUser();
+
+        const user =
+            result.data.user;
+
+        const error =
+            result.error;
+
+        if (error || !user) {
+            console.error(
+                "No authenticated user found:",
+                error
+            );
+
+            window.location.href =
+                "login.html";
+
+            return false;
+        }
+
+        const response =
+            await fetch(
+                "http://localhost:3000/api/users/" +
+                encodeURIComponent(user.email)
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            console.error(
+                "Failed to load LabScriptor user:",
+                data
+            );
+
+            alert(
+                "Unable to load your LabScriptor account."
+            );
+
+            return false;
+        }
+
+        currentUserId =
+            data.user.user_id;
+
+        console.log(
+            "Current LabScriptor user:",
+            data.user
+        );
+
+        return true;
+
+    } catch (error) {
+        console.error(
+            "Error loading current user:",
+            error
+        );
+
+        alert(
+            "Unable to connect to the LabScriptor backend."
+        );
+
+        return false;
+    }
+}
+loadCurrentUser();
