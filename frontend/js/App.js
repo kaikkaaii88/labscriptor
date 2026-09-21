@@ -6,15 +6,51 @@ const resetButton = document.getElementById("resetButton");
 
 let elapsedSeconds = 0;
 let timerInterval = null;
+let currentSessionId = null;
+let timerStarted = false;
 
 
 /* =========================
    START PROCESS TIMER
    ========================= */
 
-function startProcessTimer() {
+/* =========================
+   START PROCESS TIMER
+   ========================= */
+
+/* =========================
+   START PROCESS TIMER
+   ========================= */
+
+async function startProcessTimer(eventType) {
 
     if (timerInterval !== null) {
+
+        return;
+
+    }
+
+
+    if (currentSessionId === null) {
+
+        console.error(
+            "Cannot start timer because no process session exists."
+        );
+
+        alert(
+            "Unable to start timer because no process session exists."
+        );
+
+        return;
+
+    }
+
+
+    const timerEventCreated =
+        await createTimerEvent(eventType);
+
+
+    if (timerEventCreated === false) {
 
         return;
 
@@ -54,10 +90,10 @@ function updateTimerDisplay() {
 
 
 /* =========================
-   START TIMER
+   START / RESUME TIMER
    ========================= */
 
-startButton.addEventListener("click", function () {
+startButton.addEventListener("click", async function () {
 
     if (experimentActive === false) {
 
@@ -70,7 +106,28 @@ startButton.addEventListener("click", function () {
     }
 
 
-    startProcessTimer();
+    if (timerInterval !== null) {
+
+        return;
+
+    }
+
+
+    if (timerStarted === false) {
+
+        await startProcessTimer("START");
+
+        timerStarted = true;
+
+    } else {
+
+        await startProcessTimer("RESUME");
+
+    }
+
+
+    startButton.textContent =
+        "▶ Start";
 
 });
 
@@ -79,9 +136,31 @@ startButton.addEventListener("click", function () {
    PAUSE TIMER
    ========================= */
 
-pauseButton.addEventListener("click", function () {
+pauseButton.addEventListener("click", async function () {
 
     if (timerInterval === null) {
+
+        return;
+
+    }
+
+
+    if (currentSessionId === null) {
+
+        console.error(
+            "Cannot pause timer because no process session exists."
+        );
+
+        return;
+
+    }
+
+
+    const timerEventCreated =
+        await createTimerEvent("PAUSE");
+
+
+    if (timerEventCreated === false) {
 
         return;
 
@@ -91,6 +170,9 @@ pauseButton.addEventListener("click", function () {
     clearInterval(timerInterval);
 
     timerInterval = null;
+
+    startButton.textContent =
+    "▶ Resume";
 
     updateExperimentSummary();
 
@@ -406,7 +488,7 @@ function updateExperimentSummary() {
    START EXPERIMENT
    ========================= */
 
-startExperimentButton.addEventListener("click", function () {
+startExperimentButton.addEventListener("click", async function () {
 
     const name =
         experimentName.value.trim();
@@ -447,8 +529,37 @@ startExperimentButton.addEventListener("click", function () {
     experimentStatus.classList.remove("finished");
 
 
+    /* Create database process session */
+
+    const sessionCreated =
+        await createProcessSession();
+
+
+    if (sessionCreated === false) {
+
+        experimentActive = false;
+
+        experimentName.disabled = false;
+
+        startExperimentButton.disabled = false;
+
+        finishExperimentButton.disabled = true;
+
+        experimentStatus.textContent =
+            "No experiment started.";
+
+        experimentStatus.classList.remove("active");
+
+        return;
+
+    }
+
+
     /* Start process timer */
-    startProcessTimer();
+
+    await startProcessTimer("START");
+
+    timerStarted = true;
 
 });
 
@@ -457,7 +568,7 @@ startExperimentButton.addEventListener("click", function () {
    FINISH EXPERIMENT
    ========================= */
 
-finishExperimentButton.addEventListener("click", function () {
+finishExperimentButton.addEventListener("click", async function () {
 
     if (experimentActive === false) {
 
@@ -479,10 +590,35 @@ finishExperimentButton.addEventListener("click", function () {
     }
 
 
+    if (currentSessionId !== null) {
+
+        const timerEventCreated =
+            await createTimerEvent("STOP");
+
+
+        if (timerEventCreated === false) {
+
+            return;
+
+        }
+
+    }
+
+    /* Complete process session */
+
+    const sessionCompleted =
+        await completeProcessSession();
+
+
+    if (sessionCompleted === false) {
+
+        return;
+
+    }
+
     clearInterval(timerInterval);
 
     timerInterval = null;
-
 
     experimentActive = false;
 
@@ -493,6 +629,7 @@ finishExperimentButton.addEventListener("click", function () {
 
     finishExperimentButton.disabled = true;
 
+
     observationText.disabled = true;
 
     saveObservationButton.disabled = true;
@@ -502,6 +639,7 @@ finishExperimentButton.addEventListener("click", function () {
         "Experiment finished: " +
         experimentName.value;
 
+
     experimentStatus.classList.remove("active");
 
     experimentStatus.classList.add("finished");
@@ -510,6 +648,7 @@ finishExperimentButton.addEventListener("click", function () {
     updateExperimentSummary();
 
 });
+
 
 /* =========================
    NEW EXPERIMENT
@@ -663,7 +802,11 @@ observationText.addEventListener("input", function () {
    SAVE OBSERVATION
    ========================= */
 
-saveObservationButton.addEventListener("click", function () {
+/* =========================
+   SAVE OBSERVATION
+   ========================= */
+
+saveObservationButton.addEventListener("click", async function () {
 
     if (experimentActive === false) {
 
@@ -675,7 +818,20 @@ saveObservationButton.addEventListener("click", function () {
 
     }
 
-    const observation = observationText.value.trim();
+
+    if (currentSessionId === null) {
+
+        alert(
+            "No process session is currently active."
+        );
+
+        return;
+
+    }
+
+
+    const observation =
+        observationText.value.trim();
 
 
     if (observation === "") {
@@ -699,12 +855,24 @@ saveObservationButton.addEventListener("click", function () {
 
     }
 
-    /* Get current process timer */
 
-    const hours = Math.floor(elapsedSeconds / 3600);
+    const observationSaved = await createObservation(observation);
+
+
+    if (observationSaved === false) {
+
+        return;
+
+    }
+
+
+    const hours =
+        Math.floor(elapsedSeconds / 3600);
 
     const minutes =
-        Math.floor((elapsedSeconds % 3600) / 60);
+        Math.floor(
+            (elapsedSeconds % 3600) / 60
+        );
 
     const seconds =
         elapsedSeconds % 60;
@@ -726,29 +894,29 @@ saveObservationButton.addEventListener("click", function () {
         formattedSeconds;
 
 
-    /* Create observation */
-
     const newObservation = {
-        text: observation,
-        processTime: processTime
+
+        text:
+            observation,
+
+        processTime:
+            processTime
+
     };
 
 
-    /* Add observation to list */
-
     observations.push(newObservation);
+
+
+    observationText.value = "";
+
+    observationCharacterCount.textContent =
+        "0 / 1000";
+
 
     updateExperimentSummary();
 
-
-    /* Display updated observations */
-
     displayObservations();
-
-
-    /* Clear textarea */
-
-    observationText.value = "";
 
 });
 
@@ -1122,5 +1290,550 @@ if (recognition) {
             "Please try recording again.";
 
     };
+
+}
+
+
+async function createProcessSession() {
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:3000/api/process-sessions",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        user_id: 1,
+                        process_name: experimentName.value.trim(),
+                        description: "LabScriptor process session",
+                        start_time: new Date().toISOString(),
+                        status: "active"
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Failed to create process session:",
+                data
+            );
+
+            alert(
+                "Failed to create process session: " +
+                data.message
+            );
+
+            return false;
+
+        }
+
+
+        currentSessionId =
+            data.process_session.session_id;
+
+
+        console.log(
+            "Process session created:",
+            data.process_session
+        );
+
+
+        console.log(
+            "Current session ID:",
+            currentSessionId
+        );
+
+
+        return true;
+
+
+    } catch (error) {
+
+        console.error(
+            "Error creating process session:",
+            error
+        );
+
+
+        alert(
+            "Unable to connect to the LabScriptor backend."
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================
+   CREATE TIMER EVENT
+   ========================= */
+
+async function createTimerEvent(eventType) {
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:3000/api/timer-events",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        event_type: eventType,
+                        event_time: new Date().toISOString()
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Failed to create timer event:",
+                data
+            );
+
+            alert(
+                "Failed to create timer event: " +
+                data.message
+            );
+
+            return false;
+
+        }
+
+
+        console.log(
+            "Timer event created:",
+            data.timer_event
+        );
+
+
+        return true;
+
+
+    } catch (error) {
+
+        console.error(
+            "Error creating timer event:",
+            error
+        );
+
+
+        alert(
+            "Unable to connect to the LabScriptor backend."
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================
+   COMPLETE PROCESS SESSION
+   ========================= */
+
+async function completeProcessSession() {
+
+    try {
+
+        if (currentSessionId === null) {
+
+            console.error(
+                "Cannot complete process session because no session exists."
+            );
+
+            return false;
+
+        }
+
+
+        const response =
+            await fetch(
+                "http://localhost:3000/api/process-sessions/" +
+                currentSessionId,
+                {
+                    method: "PATCH",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        end_time:
+                            new Date().toISOString(),
+
+                        status:
+                            "completed"
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Failed to complete process session:",
+                data
+            );
+
+            alert(
+                "Failed to complete process session: " +
+                data.message
+            );
+
+            return false;
+
+        }
+
+
+        console.log(
+            "Process session completed:",
+            data.process_session
+        );
+
+
+        return true;
+
+
+    } catch (error) {
+
+        console.error(
+            "Error completing process session:",
+            error
+        );
+
+        alert(
+            "Unable to connect to the LabScriptor backend."
+        );
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================
+   CREATE OBSERVATION
+   ========================= */
+
+async function createObservation(observation) {
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:3000/api/observations",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        session_id:
+                            currentSessionId,
+
+                        observation:
+                            observation,
+
+                        recorded_at:
+                            new Date().toISOString()
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Failed to create observation:",
+                data
+            );
+
+
+            alert(
+                "Failed to save observation: " +
+                data.message
+            );
+
+
+            return false;
+
+        }
+
+
+        console.log(
+            "Observation created:",
+            data.observation
+        );
+
+
+        return true;
+
+
+    } catch (error) {
+
+        console.error(
+            "Error creating observation:",
+            error
+        );
+
+
+        alert(
+            "Unable to connect to the LabScriptor backend."
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================
+   LOAD OBSERVATIONS
+   ========================= */
+
+async function loadObservations() {
+
+    try {
+
+        if (currentSessionId === null) {
+
+            console.error(
+                "Cannot load observations because no process session exists."
+            );
+
+            return false;
+
+        }
+
+
+        const response =
+            await fetch(
+                "http://localhost:3000/api/observations/" +
+                currentSessionId
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Failed to load observations:",
+                data
+            );
+
+
+            alert(
+                "Failed to load observations: " +
+                data.message
+            );
+
+
+            return false;
+
+        }
+
+
+        observations = [];
+
+
+        data.observations.forEach(
+            function (observation) {
+
+                const recordedTime =
+                    new Date(
+                        observation.recorded_at
+                    );
+
+
+                const processTime =
+                    recordedTime.toLocaleTimeString();
+
+
+                const newObservation = {
+
+                    text:
+                        observation.observation,
+
+                    processTime:
+                        processTime
+
+                };
+
+
+                observations.push(
+                    newObservation
+                );
+
+            }
+        );
+
+
+        displayObservations();
+
+        updateExperimentSummary();
+
+
+        console.log(
+            "Observations loaded:",
+            data.observations
+        );
+
+
+        return true;
+
+
+    } catch (error) {
+
+        console.error(
+            "Error loading observations:",
+            error
+        );
+
+
+        alert(
+            "Unable to connect to the LabScriptor backend."
+        );
+
+
+        return false;
+
+    }
+
+}
+
+/* =========================
+   LOAD PROCESS SESSION
+   ========================= */
+
+async function loadProcessSession(sessionId) {
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:3000/api/process-sessions/" +
+                sessionId
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Failed to load process session:",
+                data
+            );
+
+
+            alert(
+                "Failed to load process session: " +
+                data.message
+            );
+
+
+            return false;
+
+        }
+
+
+        const session =
+            data.process_session;
+
+
+        currentSessionId =
+            session.session_id;
+
+
+        experimentName.value =
+            session.process_name;
+
+
+        if (session.status === "active") {
+
+            experimentActive = true;
+
+        } else {
+
+            experimentActive = false;
+
+        }
+
+
+        await loadObservations();
+
+
+        console.log(
+            "Process session loaded:",
+            session
+        );
+
+
+        return true;
+
+
+    } catch (error) {
+
+        console.error(
+            "Error loading process session:",
+            error
+        );
+
+
+        alert(
+            "Unable to connect to the LabScriptor backend."
+        );
+
+
+        return false;
+
+    }
 
 }

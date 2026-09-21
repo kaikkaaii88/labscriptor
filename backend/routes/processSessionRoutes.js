@@ -137,6 +137,85 @@ router.get("/:id", async function (req, res) {
     }
 });
 
+
+// UPDATE PROCESS SESSION
+
+router.patch("/:id", async function (req, res) {
+
+    try {
+
+        const supabase =
+            req.app.locals.supabase;
+
+        const sessionId =
+            req.params.id;
+
+        const endTime =
+            req.body.end_time;
+
+        const status =
+            req.body.status;
+
+
+        if (!endTime || !status) {
+
+            return res.status(400).json({
+                message: "end_time and status are required"
+            });
+
+        }
+
+
+        const { data, error } =
+            await supabase
+                .from("process_sessions")
+                .update({
+                    end_time: endTime,
+                    status: status
+                })
+                .eq("session_id", sessionId)
+                .select()
+                .single();
+
+
+        if (error) {
+
+            console.error(
+                "Supabase error:",
+                error
+            );
+
+            return res.status(500).json({
+                message:
+                    "Failed to update process session",
+                error: error.message
+            });
+
+        }
+
+
+        res.json({
+            message:
+                "Process session updated successfully",
+            process_session: data
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Server error:",
+            error
+        );
+
+        res.status(500).json({
+            message:
+                "Internal server error"
+        });
+
+    }
+
+});
+
 // EXPORT ROUTER
 
 module.exports = router;
