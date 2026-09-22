@@ -195,7 +195,7 @@ async function loadExperiments(
 }
 
 
-function displayExperiments(
+async function displayExperiments(
     experiments
 ) {
 
@@ -216,7 +216,7 @@ function displayExperiments(
         " experiment(s) found.";
 
     experiments.forEach(
-        function (experiment) {
+        async function (experiment) {
 
             const card =
                 document.createElement(
@@ -310,7 +310,62 @@ function displayExperiments(
             info.appendChild(status);
 
 
+            const imageSection =
+                document.createElement(
+                    "div"
+                );
+
+            imageSection.className =
+                "history-images";
+
+
+            const imageTitle =
+                document.createElement(
+                    "h4"
+                );
+
+            imageTitle.textContent =
+                "Images";
+
+
+            imageSection.appendChild(
+                imageTitle
+            );
+
+
+            const imageContainer =
+                document.createElement(
+                    "div"
+                );
+
+            imageContainer.className =
+                "history-image-container";
+
+
+            const loadingMessage =
+                document.createElement(
+                    "p"
+                );
+
+            loadingMessage.textContent =
+                "Loading images...";
+
+
+            imageContainer.appendChild(
+                loadingMessage
+            );
+
+
+            imageSection.appendChild(
+                imageContainer
+            );
+
+
             card.appendChild(info);
+
+            card.appendChild(
+                imageSection
+            );
 
             card.appendChild(viewButton);
 
@@ -318,8 +373,182 @@ function displayExperiments(
             experimentList.appendChild(
                 card
             );
-        }
+
+
+            loadHistoryImages(
+                experiment.session_id,
+                imageContainer
+            );
+                    }
     );
+}
+
+function formatFileName(
+    fileName
+) {
+
+    if (
+        fileName.length > 23
+    ) {
+
+        return (
+            fileName.substring(
+                0,
+                20
+            ) +
+            "..."
+        );
+    }
+
+    return fileName;
+}
+
+
+/* =========================
+   LOAD HISTORY IMAGES
+   ========================= */
+
+async function loadHistoryImages(
+    sessionId,
+    imageContainer
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:3000/api/images/" +
+                sessionId
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Failed to load images."
+            );
+
+        }
+
+
+        imageContainer.innerHTML = "";
+
+
+        if (
+            !data.images ||
+            data.images.length === 0
+        ) {
+
+            const noImagesMessage =
+                document.createElement(
+                    "p"
+                );
+
+            noImagesMessage.textContent =
+                "No images uploaded.";
+
+            noImagesMessage.className =
+                "no-images-message";
+
+            imageContainer.appendChild(
+                noImagesMessage
+            );
+
+            return;
+        }
+
+
+        data.images.forEach(
+            function (image) {
+
+                const imageItem =
+                    document.createElement(
+                        "div"
+                    );
+
+                imageItem.className =
+                    "history-image-item";
+
+
+                const imageElement =
+                    document.createElement(
+                        "img"
+                    );
+
+                imageElement.src =
+                    image.image_url;
+
+                imageElement.alt =
+                    image.file_name;
+
+
+                const fileName =
+                    document.createElement(
+                        "p"
+                    );
+
+                fileName.textContent =
+                    formatFileName(
+                        image.file_name
+                    );
+
+                const recordedTime =
+                    document.createElement(
+                        "p"
+                    );
+
+                recordedTime.textContent =
+                    new Date(
+                        image.recorded_at
+                    ).toLocaleTimeString();
+
+
+                imageItem.appendChild(
+                    imageElement
+                );
+
+                imageItem.appendChild(
+                    fileName
+                );
+
+                imageItem.appendChild(
+                    recordedTime
+                );
+
+
+                imageContainer.appendChild(
+                    imageItem
+                );
+
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Load history images error:",
+            error
+        );
+
+        imageContainer.innerHTML = "";
+
+        const errorMessage =
+            document.createElement(
+                "p"
+            );
+
+        errorMessage.textContent =
+            "Unable to load images.";
+
+        imageContainer.appendChild(
+            errorMessage
+        );
+
+    }
 }
 
 

@@ -49,6 +49,16 @@ const observationList =
         "observationList"
     );
 
+const imageMessage =
+    document.getElementById(
+        "imageMessage"
+    );
+
+const imageList =
+    document.getElementById(
+        "imageList"
+    );
+
 const historyButton =
     document.getElementById(
         "historyButton"
@@ -175,6 +185,9 @@ async function loadExperiment(
             sessionId
         );
 
+        await loadExperimentImages(
+            sessionId
+        );
 
         return true;
 
@@ -514,6 +527,205 @@ function displayObservations(
             observationList.appendChild(
                 card
             );
+        }
+    );
+}
+
+
+/* =========================
+   LOAD EXPERIMENT IMAGES
+   ========================= */
+
+async function loadExperimentImages(
+    sessionId
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:3000/api/images/" +
+                sessionId
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Failed to load images:",
+                data
+            );
+
+            imageMessage.textContent =
+                "Unable to load images.";
+
+            return false;
+        }
+
+
+        const images =
+            data.images;
+
+
+        displayExperimentImages(
+            images
+        );
+
+
+        return true;
+
+
+    } catch (error) {
+
+        console.error(
+            "Error loading images:",
+            error
+        );
+
+        imageMessage.textContent =
+            "Unable to connect to the LabScriptor backend.";
+
+        return false;
+    }
+}
+
+
+/* =========================
+   DISPLAY EXPERIMENT IMAGES
+   ========================= */
+
+function displayExperimentImages(
+    images
+) {
+
+    imageList.innerHTML =
+        "";
+
+
+    if (
+        !images ||
+        images.length === 0
+    ) {
+
+        imageMessage.textContent =
+            "No images uploaded.";
+
+        return;
+    }
+
+
+    imageMessage.textContent =
+        images.length +
+        " image(s) uploaded.";
+
+
+    images.forEach(
+        function (image, index) {
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "experiment-image-card";
+
+
+            const imageElement =
+                document.createElement(
+                    "img"
+                );
+
+            imageElement.src =
+                image.image_url;
+
+            imageElement.alt =
+                image.file_name;
+
+
+            const imageNumber =
+                document.createElement(
+                    "h3"
+                );
+
+            imageNumber.textContent =
+                "Image " +
+                (index + 1);
+
+
+            const fileName =
+                document.createElement(
+                    "p"
+                );
+
+            let displayFileName =
+                image.file_name;
+
+            if (
+                displayFileName.length > 25
+            ) {
+
+                displayFileName =
+                    displayFileName.substring(
+                        0,
+                        22
+                    ) +
+                    "...";
+            }
+
+            fileName.textContent =
+                "File: " +
+                displayFileName;
+
+
+            const recordedTime =
+                document.createElement(
+                    "p"
+                );
+
+
+            if (
+                image.recorded_at
+            ) {
+
+                recordedTime.textContent =
+                    "Recorded: " +
+                    new Date(
+                        image.recorded_at
+                    ).toLocaleString();
+
+            } else {
+
+                recordedTime.textContent =
+                    "Recorded: Time unavailable";
+            }
+
+
+            card.appendChild(
+                imageNumber
+            );
+
+            card.appendChild(
+                imageElement
+            );
+
+            card.appendChild(
+                fileName
+            );
+
+            card.appendChild(
+                recordedTime
+            );
+
+
+            imageList.appendChild(
+                card
+            );
+
         }
     );
 }

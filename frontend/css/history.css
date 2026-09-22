@@ -105,3 +105,44 @@ body {
 
     cursor: pointer;
 }
+
+/* =========================
+   HISTORY IMAGES
+   ========================= */
+
+.history-images {
+    margin-top: 16px;
+}
+
+.history-images h4 {
+    margin: 0 0 10px 0;
+}
+
+.history-image-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.history-image-item {
+    width: 150px;
+}
+
+.history-image-item img {
+    width: 150px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    display: block;
+}
+
+.history-image-item p {
+    margin: 5px 0 0 0;
+    font-size: 13px;
+}
+
+.no-images-message {
+    margin: 0;
+    font-size: 14px;
+}
