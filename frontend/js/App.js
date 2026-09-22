@@ -1792,7 +1792,9 @@ async function createProcessSession() {
                     body: JSON.stringify({
                         user_id: currentUserId,
                         process_name: name,
-                        description: ""
+                        description: "",
+                        start_time: new Date().toISOString(),
+                        status: "active"
                     })
                 }
             );
