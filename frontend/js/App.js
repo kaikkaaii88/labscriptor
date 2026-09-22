@@ -464,7 +464,10 @@ function updateExperimentSummary() {
     }
 
 
-    if (observations.length > 0) {
+    if (
+        observations.length > 0 ||
+        imageList.querySelector("img") !== null
+    ) {
 
         reviewObservationCheck.textContent =
             "✓";
