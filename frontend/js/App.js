@@ -16,7 +16,7 @@ const supabaseClient =
 
 let elapsedSeconds = 0;
 let timerInterval = null;
-let currentSessionId = null;
+let currentSessionId = localStorage.getItem("labscriptorSessionId");
 let currentUserId = null;
 let timerStarted = false;
 
@@ -603,7 +603,14 @@ finishExperimentButton.addEventListener(
     "click",
     async function () {
 
-        if (experimentActive === false) {
+        if (
+            experimentActive === false ||
+            currentSessionId === null
+        ) {
+            alert(
+                "There is no active experiment to finish."
+            );
+
             return;
         }
 
@@ -735,7 +742,28 @@ newExperimentButton.addEventListener("click", function () {
 
     experimentActive = false;
 
-    currentSessionId = null;
+    localStorage.removeItem(
+        "labscriptorSessionId"
+    );
+
+    imageList.innerHTML =
+        "<p class=\"empty-message\">" +
+        "No images recorded yet." +
+        "</p>";
+
+    imagePreview.src = "";
+    imagePreview.style.display = "none";
+
+    imagePreviewMessage.style.display = "block";
+    imagePreviewMessage.textContent =
+        "No image selected.";
+
+    selectedImage = null;
+
+    uploadImageButton.disabled = true;
+
+    imageStatus.textContent =
+        "No image selected.";
 
     timerStarted = false;
 
@@ -823,6 +851,31 @@ const observationList = document.getElementById("observationList");
 const observationCount = document.getElementById("observationCount");
 
 let observations = [];
+
+
+/* =========================
+   IMAGE ELEMENTS
+   ========================= */
+
+const imageInput =
+    document.getElementById("imageInput");
+
+const imagePreview =
+    document.getElementById("imagePreview");
+
+const imagePreviewMessage =
+    document.getElementById("imagePreviewMessage");
+
+const uploadImageButton =
+    document.getElementById("uploadImageButton");
+
+const imageStatus =
+    document.getElementById("imageStatus");
+
+const imageList =
+    document.getElementById("imageList");
+
+let selectedImage = null;
 
 
 /* =========================
@@ -1101,6 +1154,291 @@ function displayObservations() {
 
 }
 
+
+/* =========================
+   IMAGE PREVIEW
+   ========================= */
+
+imageInput.addEventListener(
+    "change",
+    function () {
+
+        const file =
+            imageInput.files[0];
+
+        if (!file) {
+
+            selectedImage = null;
+
+            imagePreview.style.display =
+                "none";
+
+            imagePreviewMessage.style.display =
+                "block";
+
+            imagePreviewMessage.textContent =
+                "No image selected.";
+
+            uploadImageButton.disabled =
+                true;
+
+            imageStatus.textContent =
+                "No image selected.";
+
+            return;
+        }
+
+
+        if (!file.type.startsWith("image/")) {
+
+            selectedImage = null;
+
+            imagePreview.style.display =
+                "none";
+
+            imagePreviewMessage.style.display =
+                "block";
+
+            imagePreviewMessage.textContent =
+                "Please select an image file.";
+
+            uploadImageButton.disabled =
+                true;
+
+            imageStatus.textContent =
+                "Invalid file type.";
+
+            return;
+        }
+
+
+        selectedImage = file;
+
+
+        const imageUrl =
+            URL.createObjectURL(file);
+
+
+        imagePreview.src =
+            imageUrl;
+
+        imagePreview.style.display =
+            "block";
+
+        imagePreviewMessage.style.display =
+            "none";
+
+
+        uploadImageButton.disabled =
+            false;
+
+
+        imageStatus.textContent =
+            "Image selected. Ready to upload.";
+
+    }
+);
+
+
+/* =========================
+   IMAGE UPLOAD
+   ========================= */
+
+uploadImageButton.addEventListener(
+    "click",
+    async function () {
+
+        if (!selectedImage) {
+            imageStatus.textContent =
+                "Please select an image first.";
+
+            return;
+        }
+
+        if (!currentSessionId) {
+            imageStatus.textContent =
+                "Please start an experiment first.";
+
+            return;
+        }
+
+        uploadImageButton.disabled = true;
+
+        imageStatus.textContent =
+            "Uploading image...";
+
+        try {
+
+            const formData =
+                new FormData();
+
+            formData.append(
+                "image",
+                selectedImage
+            );
+
+            formData.append(
+                "session_id",
+                currentSessionId
+            );
+
+            const response =
+                await fetch(
+                    "http://localhost:3000/api/images",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message ||
+                    "Failed to upload image"
+                );
+            }
+
+            imageStatus.textContent =
+                "Image uploaded successfully.";
+
+            loadExperimentImages(
+                currentSessionId
+            );
+
+            console.log(
+                "Uploaded image:",
+                data
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Image upload error:",
+                error
+            );
+
+            imageStatus.textContent =
+                "Failed to upload image.";
+
+            uploadImageButton.disabled =
+                false;
+
+        }
+
+    }
+);
+
+/* =========================
+   LOAD EXPERIMENT IMAGES
+   ========================= */
+
+async function loadExperimentImages(sessionId) {
+
+    if (!sessionId) {
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:3000/api/images/" +
+                sessionId
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message ||
+                "Failed to load images"
+            );
+        }
+
+        displayExperimentImages(
+            data.images
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Load images error:",
+            error
+        );
+
+        imageList.innerHTML =
+            "<p>Unable to load experiment images.</p>";
+    }
+}
+
+
+function displayExperimentImages(images) {
+
+    imageList.innerHTML = "";
+
+    if (!images || images.length === 0) {
+
+        imageList.innerHTML =
+            "<p class=\"empty-message\">" +
+            "No images recorded yet." +
+            "</p>";
+
+        return;
+    }
+
+    images.forEach(function (image) {
+
+        const imageItem =
+            document.createElement("div");
+
+        imageItem.className =
+            "image-list-item";
+
+        const imageElement =
+            document.createElement("img");
+
+        imageElement.src =
+            image.image_url;
+
+        imageElement.alt =
+            image.file_name;
+
+        const fileName =
+            document.createElement("p");
+
+        fileName.textContent =
+            image.file_name;
+
+        const recordedTime =
+            document.createElement("p");
+
+        recordedTime.textContent =
+            new Date(
+                image.recorded_at
+            ).toLocaleTimeString();
+
+        imageItem.appendChild(
+            imageElement
+        );
+
+        imageItem.appendChild(
+            fileName
+        );
+
+        imageItem.appendChild(
+            recordedTime
+        );
+
+        imageList.appendChild(
+            imageItem
+        );
+
+    });
+}
 
 
 /* =========================
@@ -1526,6 +1864,11 @@ async function createProcessSession() {
 
         currentSessionId =
             data.process_session.session_id;
+
+        localStorage.setItem(
+            "labscriptorSessionId",
+            currentSessionId
+        );
 
         console.log(
             "Process session created:",
@@ -2007,6 +2350,10 @@ async function loadProcessSession(sessionId) {
         currentSessionId =
             session.session_id;
 
+        localStorage.setItem(
+            "labscriptorSessionId",
+            currentSessionId
+        );
 
         experimentName.value =
             session.process_name;
@@ -2016,15 +2363,61 @@ async function loadProcessSession(sessionId) {
 
             experimentActive = true;
 
+            experimentName.disabled = true;
+
+            startExperimentButton.disabled = true;
+
+            finishExperimentButton.disabled = false;
+
+            observationText.disabled = false;
+
+            saveObservationButton.disabled = false;
+
+            experimentStatus.textContent =
+                "Experiment active: " +
+                session.process_name;
+
+            experimentStatus.classList.add(
+                "active"
+            );
+
+            experimentStatus.classList.remove(
+                "finished"
+            );
+
         } else {
 
             experimentActive = false;
 
-        }
+            experimentName.disabled = false;
 
+            startExperimentButton.disabled = false;
+
+            finishExperimentButton.disabled = true;
+
+            observationText.disabled = true;
+
+            saveObservationButton.disabled = true;
+
+            experimentStatus.textContent =
+                "Experiment finished: " +
+                session.process_name;
+
+            experimentStatus.classList.remove(
+                "active"
+            );
+
+            experimentStatus.classList.add(
+                "finished"
+            );
+
+        }
 
         await loadObservations();
 
+        await loadExperimentImages(
+            currentSessionId
+        );
 
         console.log(
             "Process session loaded:",
@@ -2124,4 +2517,25 @@ async function loadCurrentUser() {
         return false;
     }
 }
-loadCurrentUser();
+
+
+async function initializeLabScriptor() {
+
+    const userLoaded =
+        await loadCurrentUser();
+
+    if (userLoaded === false) {
+        return;
+    }
+
+    if (currentSessionId !== null) {
+
+        await loadProcessSession(
+            currentSessionId
+        );
+
+    }
+
+}
+
+initializeLabScriptor();

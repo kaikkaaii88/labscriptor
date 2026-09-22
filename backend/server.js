@@ -10,6 +10,7 @@ const processSessionRoutes = require("./routes/processSessionRoutes");
 const observationRoutes = require("./routes/observationRoutes"); 
 const timerEventRoutes = require("./routes/timerEventRoutes");
 const userRoutes = require("./routes/userRoutes");
+const imageRoutes = require("./routes/imageRoutes");
 
 // CREATE APP
 
@@ -67,7 +68,7 @@ app.use("/api/process-sessions", processSessionRoutes);
 app.use("/api/observations", observationRoutes);
 app.use("/api/timer-events", timerEventRoutes);
 app.use("/api/users", userRoutes);
-
+app.use("/api/images", imageRoutes);
 
 // START SERVER
 

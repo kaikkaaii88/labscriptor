@@ -218,6 +218,88 @@
 
             </div>
 
+                        <!-- Experiment Images -->
+
+            <section class="experiment-images">
+
+                <div class="section-header">
+
+                    <div>
+                        <h2>Experiment Images</h2>
+
+                        <p>
+                            Capture or upload images related to this experiment.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="image-controls">
+
+                    <label
+                        for="imageInput"
+                        class="image-upload-button"
+                    >
+                        📷 Capture / Choose Image
+                    </label>
+
+                    <input
+                        type="file"
+                        id="imageInput"
+                        accept="image/*"
+                        capture="environment"
+                    >
+
+                </div>
+
+
+                <div
+                    id="imagePreviewContainer"
+                    class="image-preview-container"
+                >
+
+                    <p id="imagePreviewMessage">
+                        No image selected.
+                    </p>
+
+                    <img
+                        id="imagePreview"
+                        src=""
+                        alt="Selected experiment image"
+                    >
+
+                </div>
+
+
+                <div class="image-upload-actions">
+
+                    <button
+                        type="button"
+                        id="uploadImageButton"
+                        disabled
+                    >
+                        Upload Image
+                    </button>
+
+                    <p
+                        id="imageStatus"
+                        class="image-status"
+                    >
+                        No image selected.
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="imageList"
+                    class="image-list"
+                >
+
+                </div>
+
+            </section>
 
             <!-- Experiment Summary -->
             <section class="summary-section">
@@ -405,7 +487,9 @@
 
                 </div>
 
-            </section>
+        </section>
+
+        
 
     </main>
 

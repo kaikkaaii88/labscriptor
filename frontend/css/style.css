@@ -1049,3 +1049,132 @@ input:disabled::placeholder {
     color: #8a919a;
     font-size: 11px;
 }
+
+
+
+/* EXPERIMENT IMAGES */
+
+.experiment-images {
+    margin-top: 30px;
+    padding: 24px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background-color: #ffffff;
+}
+
+
+.experiment-images .section-header {
+    margin-bottom: 20px;
+}
+
+
+.experiment-images .section-header h2 {
+    margin-bottom: 6px;
+}
+
+
+.experiment-images .section-header p {
+    margin: 0;
+}
+
+
+.image-controls {
+    margin-bottom: 20px;
+}
+
+
+.image-upload-button {
+    display: inline-block;
+    padding: 12px 18px;
+    border: 1px solid #000000;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+
+#imageInput {
+    display: none;
+}
+
+
+.image-preview-container {
+    width: 100%;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+
+#imagePreviewMessage {
+    margin: 0;
+}
+
+
+#imagePreview {
+    display: none;
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+}
+
+
+.image-upload-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+
+#uploadImageButton {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+
+#uploadImageButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+
+.image-status {
+    margin: 0;
+}
+
+
+.image-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+}
+
+
+.image-list-item {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+    overflow: hidden;
+}
+
+
+.image-list-item img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.image-list-item p {
+    margin: 6px 0 0 0;
+    font-size: 14px;
+}
