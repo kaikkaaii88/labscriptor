@@ -10,13 +10,15 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Login | LabScriptor</title>
+    <title>Create Account | LabScriptor</title>
 
     <link rel="stylesheet" href="/css/common.css">
-    <link rel="stylesheet" href="/css/login.css">
+    <link rel="stylesheet" href="/css/register.css">
 
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/footer.css">
+
+    <script src="/js/register.js"></script>
 
 </head>
 
@@ -33,7 +35,7 @@
 
 
     <!-- ========================================
-         LOGIN PAGE
+         REGISTER PAGE
          ======================================== -->
 
     <main class="auth-page">
@@ -48,18 +50,19 @@
                 <div class="introduction-content">
 
                     <p class="introduction-label">
-                        LABORATORY PROCESS MANAGEMENT
+                        GET STARTED WITH LABSCRIPTOR
                     </p>
 
                     <h1>
-                        Manage your laboratory
-                        processes with ease.
+                        Keep your laboratory
+                        work organised.
                     </h1>
 
                     <p class="introduction-description">
-                        LabScriptor helps laboratory personnel
-                        record process sessions, track timers,
-                        and capture observations in one place.
+                        Create your LabScriptor account and
+                        manage laboratory process sessions,
+                        timers, observations, and records
+                        in one place.
                     </p>
 
 
@@ -74,12 +77,12 @@
                             <div>
 
                                 <h3>
-                                    Process Timer
+                                    Track Processes
                                 </h3>
 
                                 <p>
-                                    Track laboratory process
-                                    duration accurately.
+                                    Keep track of process duration
+                                    during laboratory work.
                                 </p>
 
                             </div>
@@ -96,12 +99,12 @@
                             <div>
 
                                 <h3>
-                                    Voice Observations
+                                    Capture Observations
                                 </h3>
 
                                 <p>
-                                    Record observations while
-                                    keeping your hands available.
+                                    Record important observations
+                                    using voice or text.
                                 </p>
 
                             </div>
@@ -118,12 +121,12 @@
                             <div>
 
                                 <h3>
-                                    Process Records
+                                    Review Records
                                 </h3>
 
                                 <p>
-                                    Keep laboratory information
-                                    organised for later reference.
+                                    Access previous process sessions
+                                    when you need them.
                                 </p>
 
                             </div>
@@ -147,17 +150,34 @@
                     <div class="auth-card-header">
 
                         <h2>
-                            Welcome back
+                            Create your account
                         </h2>
 
                         <p>
-                            Sign in to your LabScriptor account.
+                            Set up your LabScriptor account to begin.
                         </p>
 
                     </div>
 
 
-                    <form id="loginForm">
+                    <form id="registerForm">
+
+
+                        <div class="form-group">
+
+                            <label for="name">
+                                Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="name"
+                                placeholder="Enter your name"
+                                autocomplete="name"
+                                required
+                            >
+
+                        </div>
 
 
                         <div class="form-group">
@@ -179,30 +199,17 @@
 
                         <div class="form-group">
 
-                            <div class="password-label-row">
-
-                                <label for="password">
-                                    Password
-                                </label>
-
-                                <a
-                                    href="#"
-                                    id="forgotPassword"
-                                    class="forgot-password"
-                                >
-                                    Forgot password?
-                                </a>
-
-                            </div>
-
+                            <label for="password">
+                                Password
+                            </label>
 
                             <div class="password-input-container">
 
                                 <input
                                     type="password"
                                     id="password"
-                                    placeholder="Enter your password"
-                                    autocomplete="current-password"
+                                    placeholder="Create a password"
+                                    autocomplete="new-password"
                                     required
                                 >
 
@@ -219,17 +226,46 @@
                         </div>
 
 
+                        <div class="form-group">
+
+                            <label for="confirmPassword">
+                                Confirm Password
+                            </label>
+
+                            <div class="password-input-container">
+
+                                <input
+                                    type="password"
+                                    id="confirmPassword"
+                                    placeholder="Confirm your password"
+                                    autocomplete="new-password"
+                                    required
+                                >
+
+                                <button
+                                    type="button"
+                                    id="toggleConfirmPassword"
+                                    class="password-toggle"
+                                >
+                                    Show
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
                         <button
                             type="submit"
-                            id="loginButton"
+                            id="registerButton"
                             class="auth-button"
                         >
-                            Login
+                            Create Account
                         </button>
 
 
                         <p
-                            id="loginMessage"
+                            id="registerMessage"
                             class="auth-message"
                         ></p>
 
@@ -243,10 +279,10 @@
 
                     <p class="account-link">
 
-                        Don't have an account?
+                        Already have an account?
 
-                        <a href="/html/register.html">
-                            Create an account
+                        <a href="/html/login.html">
+                            Login
                         </a>
 
                     </p>
@@ -271,14 +307,12 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script src="/js/login.js"></script>
+    <script src="/js/register.js"></script>
 
     <script src="/js/navbar.js"></script>
     <script src="/js/footer.js"></script>
 
 
-
 </body>
 
 </html>
-

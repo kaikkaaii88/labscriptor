@@ -1,128 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>LabScriptor</title>
 
-    <link rel="stylesheet" href="../css/style.css">
+    <link
+        rel="stylesheet"
+        href="/css/index.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/common.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/navbar.css"
+    >
+
+    <link rel="stylesheet" href="/css/footer.css">
+
 </head>
+
 
 <body>
 
-    <header class="app-header">
-        <div>
-            <h1>LabScriptor</h1>
-            <p>Laboratory Process & Observation Assistant</p>
-        </div>
 
-        <div class="header-actions">
+    <!-- ========================================
+         NAVBAR
+         ======================================== -->
 
-    <button
-        id="historyButton"
-        class="secondary-button"
-    >
-        Experiment History
-    </button>
-
-    <div class="status">
-
-            <span
-                id="headerStatusDot"
-                class="status-dot"
-            ></span>
-
-            <span id="headerStatusText">
-                Ready
-            </span>
-
-        </div>
-
-    </div>
-    </header>
+    <div id="navbar"></div>
 
 
-    <main class="main-container">
 
-        <!-- Process Section -->
-        <section class="process-section">
+    <!-- ========================================
+         MAIN CONTENT
+         ======================================== -->
 
-            <div class="section-header">
-                <div>
-                    <h2>Laboratory Process</h2>
-                    <p>Set up your experiment and manage the process timer.</p>
-                </div>
-            </div>
+    <main>
 
+        <section class="hero">
 
-            <div class="experiment-input">
+            <div class="hero-content">
 
-                <label for="experimentName">
-                    Experiment Name
-                </label>
+                <p class="hero-label">
+                    Laboratory Process Management
+                </p>
 
-                <input
-                    type="text"
-                    id="experimentName"
-                    placeholder="Enter experiment name"
-                >
+                <h1>
+                    Record, track and manage
+                    laboratory processes with ease.
+                </h1>
 
-            </div>
-
-
-            <div class="experiment-controls">
-
-                <button
-                    id="startExperimentButton"
-                    class="primary-button"
-                >
-                    Start Experiment
-                </button>
-
-                <button
-                    id="finishExperimentButton"
-                    class="secondary-button"
-                    disabled
-                >
-                    Finish Experiment
-                </button>
-
-                <button
-                    id="newExperimentButton"
-                    class="secondary-button"
-                >
-                    New Experiment
-                </button>
-
-            </div>
+                <p class="hero-description">
+                    LabScriptor helps laboratory personnel
+                    manage process sessions, track timers,
+                    and record observations in one place.
+                </p>
 
 
-            <p id="experimentStatus" class="experiment-status">
-                No experiment started.
-            </p>
+                <div class="hero-buttons">
 
+                    <a
+                        href="/html/login.html"
+                        class="primary-button"
+                    >
+                        Login
+                    </a>
 
-            <div class="timer-container">
+                    <a
+                        href="/html/register.html"
+                        class="secondary-button"
+                    >
+                        Create Account
+                    </a>
 
-                <p class="timer-label">Process Timer</p>
-
-                <div id="timer" class="timer">
-                    00:00:00
                 </div>
 
-                <div class="timer-controls">
-                    <button id="startButton" class="primary-button">
-                        Start
-                    </button>
+            </div>
 
-                    <button id="pauseButton" class="secondary-button">
-                        Pause
-                    </button>
 
-                    <button id="resetButton" class="secondary-button">
-                        Reset
-                    </button>
+            <div class="hero-visual">
+
+                <div class="visual-card">
+
+                    <div class="visual-header">
+
+                        <span class="visual-title">
+                            LabScriptor
+                        </span>
+
+                        <span class="status-indicator">
+                            Active
+                        </span>
+
+                    </div>
+
+
+                    <div class="timer-display">
+                        01:30
+                    </div>
+
+
+                    <div class="visual-divider"></div>
+
+
+                    <div class="observation">
+
+                        <span class="observation-label">
+                            Observation
+                        </span>
+
+                        <p>
+                            Chemical reacted well.
+                        </p>
+
+                    </div>
+
                 </div>
 
             </div>
@@ -130,372 +134,137 @@
         </section>
 
 
-        <!-- Observation Section -->
-        <section class="observation-section">
 
-            <div class="section-header">
-                <div>
-                    <h2>Observations</h2>
-                    <p>Record important observations during your laboratory process.</p>
-                </div>
-            </div>
+        <!-- ========================================
+             FEATURES
+             ======================================== -->
 
+        <section class="features">
 
-            <div class="voice-container">
+            <div class="section-heading">
 
-                <button id="voiceButton" class="voice-button">
-                    🎙 Start Voice Recording
-                </button>
+                <p class="section-label">
+                    Features
+                </p>
 
-                <div class="voice-info">
+                <h2>
+                    Designed for laboratory workflows
+                </h2>
 
-                    <p id="voiceStatus" class="voice-status">
-                        Voice recording is currently inactive.
-                    </p>
-
-                    <p id="voiceHint" class="voice-hint">
-                        Click the button and speak your observation.
-                    </p>
-
-                </div>
+                <p>
+                    Keep important process information organised
+                    while carrying out laboratory work.
+                </p>
 
             </div>
 
 
-            <div class="observation-input">
-
-                <label for="observationText">
-                    Observation
-                </label>
-
-                <textarea
-                    id="observationText"
-                    placeholder="Record your laboratory observation..."
-                    rows="6"
-                    maxlength="1000"
-                ></textarea>
-
-                <div
-                    id="observationCharacterCount"
-                    class="character-count"
-                >
-                    0 / 1000
-                </div>
-
-            </div>
+            <div class="feature-grid">
 
 
-            <div class="observation-actions">
+                <article class="feature-card">
 
-                <button
-                    id="saveObservationButton"
-                    class="primary-button"
-                >
-                    Save Observation
-                </button>
+                    <div class="feature-icon">
+                        ⏱
+                    </div>
 
-            </div>
+                    <h3>
+                        Process Timer
+                    </h3>
 
-
-            <!-- Observation History -->
-            <div class="observation-history">
-
-                <div class="history-header">
-                    <h3>Observation History</h3>
-
-                    <span id="observationCount">
-                        0 observations
-                    </span>
-                </div>
-
-                <div id="observationList" class="observation-list">
-
-                    <p class="empty-message">
-                        No observations recorded yet.
+                    <p>
+                        Track the duration of laboratory
+                        processes with an easy-to-use timer.
                     </p>
 
-                </div>
+                </article>
+
+
+
+                <article class="feature-card">
+
+                    <div class="feature-icon">
+                        🎙
+                    </div>
+
+                    <h3>
+                        Voice Observations
+                    </h3>
+
+                    <p>
+                        Record observations using your voice
+                        while keeping your hands available
+                        for laboratory work.
+                    </p>
+
+                </article>
+
+
+
+                <article class="feature-card">
+
+                    <div class="feature-icon">
+                        📝
+                    </div>
+
+                    <h3>
+                        Process Records
+                    </h3>
+
+                    <p>
+                        Keep process sessions and observations
+                        organised for later reference.
+                    </p>
+
+                </article>
+
 
             </div>
-
-                        <!-- Experiment Images -->
-
-            <section class="experiment-images">
-
-                <div class="section-header">
-
-                    <div>
-                        <h2>Experiment Images</h2>
-
-                        <p>
-                            Capture or upload images related to this experiment.
-                        </p>
-                    </div>
-
-                </div>
-
-
-                <div class="image-controls">
-
-                    <label
-                        for="imageInput"
-                        class="image-upload-button"
-                    >
-                        📷 Capture / Choose Image
-                    </label>
-
-                    <input
-                        type="file"
-                        id="imageInput"
-                        accept="image/*"
-                        capture="environment"
-                    >
-
-                </div>
-
-
-                <div
-                    id="imagePreviewContainer"
-                    class="image-preview-container"
-                >
-
-                    <p id="imagePreviewMessage">
-                        No image selected.
-                    </p>
-
-                    <img
-                        id="imagePreview"
-                        src=""
-                        alt="Selected experiment image"
-                    >
-
-                </div>
-
-
-                <div class="image-upload-actions">
-
-                    <button
-                        type="button"
-                        id="uploadImageButton"
-                        disabled
-                    >
-                        Upload Image
-                    </button>
-
-                    <p
-                        id="imageStatus"
-                        class="image-status"
-                    >
-                        No image selected.
-                    </p>
-
-                </div>
-
-
-                <div
-                    id="imageList"
-                    class="image-list"
-                >
-
-                </div>
-
-            </section>
-
-            <!-- Experiment Summary -->
-            <section class="summary-section">
-
-                <div class="section-header">
-
-                    <div>
-                        <h2>Experiment Summary</h2>
-
-                        <p>
-                            Review the details and observations recorded during your laboratory process.
-                        </p>
-                    </div>
-
-                </div>
-
-
-                <!-- Review Status -->
-
-                <div
-                    id="reviewBanner"
-                    class="review-banner"
-                >
-
-                    <div class="review-icon">
-                        ✓
-                    </div>
-
-                    <div class="review-message">
-
-                        <strong id="reviewTitle">
-                            Experiment in progress
-                        </strong>
-
-                        <p id="reviewDescription">
-                            Continue recording observations while the experiment is active.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Summary Cards -->
-
-                <div class="summary-grid">
-
-                    <div class="summary-card">
-
-                        <span class="summary-label">
-                            Experiment
-                        </span>
-
-                        <span
-                            id="summaryExperimentName"
-                            class="summary-value"
-                        >
-                            -
-                        </span>
-
-                    </div>
-
-
-                    <div class="summary-card">
-
-                        <span class="summary-label">
-                            Status
-                        </span>
-
-                        <span
-                            id="summaryStatus"
-                            class="summary-value"
-                        >
-                            No experiment
-                        </span>
-
-                    </div>
-
-
-                    <div class="summary-card">
-
-                        <span class="summary-label">
-                            Process Duration
-                        </span>
-
-                        <span
-                            id="summaryDuration"
-                            class="summary-value"
-                        >
-                            00:00:00
-                        </span>
-
-                    </div>
-
-
-                    <div class="summary-card">
-
-                        <span class="summary-label">
-                            Observations
-                        </span>
-
-                        <span
-                            id="summaryObservationCount"
-                            class="summary-value"
-                        >
-                            0
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Final Review -->
-
-                <div class="final-review">
-
-                    <div class="final-review-header">
-
-                        <div>
-
-                            <h3>
-                                Final Review
-                            </h3>
-
-                            <p>
-                                Confirm that the experiment information and observations have been recorded.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="review-checklist">
-
-                        <div class="review-check">
-
-                            <span
-                                id="reviewExperimentCheck"
-                                class="review-check-icon"
-                            >
-                                ○
-                            </span>
-
-                            <span>
-                                Experiment information recorded
-                            </span>
-
-                        </div>
-
-
-                        <div class="review-check">
-
-                            <span
-                                id="reviewTimerCheck"
-                                class="review-check-icon"
-                            >
-                                ○
-                            </span>
-
-                            <span>
-                                Process duration recorded
-                            </span>
-
-                        </div>
-
-
-                        <div class="review-check">
-
-                            <span
-                                id="reviewObservationCheck"
-                                class="review-check-icon"
-                            >
-                                ○
-                            </span>
-
-                            <span>
-                                Observations reviewed
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </div>
 
         </section>
 
-        
+
+
+        <!-- ========================================
+             CALL TO ACTION
+             ======================================== -->
+
+        <section class="cta-section">
+
+            <div class="cta-content">
+
+                <h2>
+                    Start managing your laboratory processes.
+                </h2>
+
+                <p>
+                    Create your LabScriptor account to get started.
+                </p>
+
+                <a
+                    href="/html/register.html"
+                    class="primary-button"
+                >
+                    Create Account
+                </a>
+
+            </div>
+
+        </section>
 
     </main>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../js/app.js"></script>
+
+    <!-- ========================================
+         FOOTER
+         ======================================== -->
+
+    <div id="footer"></div>
+
+    <script src="/js/navbar.js"></script>
+    <script src="/js/footer.js"></script>
 
 </body>
+
 </html>

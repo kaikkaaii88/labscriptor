@@ -42,7 +42,7 @@ body {
 
     min-height: 650px;
 
-    margin: 0px auto;
+    margin: 40px auto;
 
     padding: 0 32px;
 
@@ -202,7 +202,7 @@ body {
    ======================================== */
 
 .auth-card-header {
-    margin-bottom: 30px;
+    margin-bottom: 28px;
 }
 
 
@@ -232,7 +232,7 @@ body {
    ======================================== */
 
 .form-group {
-    margin-bottom: 21px;
+    margin-bottom: 18px;
 }
 
 
@@ -292,34 +292,6 @@ body {
    PASSWORD
    ======================================== */
 
-.password-label-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-
-.password-label-row label {
-    margin-bottom: 8px;
-}
-
-
-.forgot-password {
-    margin-bottom: 8px;
-
-    color: #4f46e5;
-
-    text-decoration: none;
-
-    font-size: 12px;
-}
-
-
-.forgot-password:hover {
-    text-decoration: underline;
-}
-
-
 .password-input-container {
     position: relative;
 }
@@ -361,6 +333,8 @@ body {
 
 .auth-button {
     width: 100%;
+
+    margin-top: 4px;
 
     padding: 13px 20px;
 
@@ -428,7 +402,7 @@ body {
 
     gap: 12px;
 
-    margin: 24px 0;
+    margin: 22px 0;
 }
 
 

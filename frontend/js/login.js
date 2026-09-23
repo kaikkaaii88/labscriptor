@@ -80,7 +80,7 @@ loginForm.addEventListener(
         );
 
         window.location.href =
-            "index.html";
+            "process.html";
     }
 );
 
