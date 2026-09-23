@@ -12,6 +12,12 @@
 
     <title>LabScriptor History</title>
 
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
     <link
         rel="stylesheet"
         href="../css/history.css"
@@ -21,26 +27,60 @@
 
 <body>
 
+    <!-- =========================
+         HEADER
+         ========================= -->
+
     <header class="history-header">
 
-        <div>
+        <!-- LabScriptor Branding -->
+        <div class="app-brand">
 
-            <h1>LabScriptor</h1>
+            <span class="app-brand-icon">
+                <i class="fa-solid fa-flask"></i>
+            </span>
 
-            <p>
-                Experiment History
-            </p>
+            <div class="app-brand-text">
+
+                <span class="app-brand-name">
+                    LabScriptor
+                </span>
+
+                <span class="app-brand-subtitle">
+                    Experiment History
+                </span>
+
+            </div>
 
         </div>
 
+
+        <!-- Header Actions -->
         <div class="header-actions">
 
-            <button id="homeButton">
-                New Experiment
+            <button
+                id="homeButton"
+                class="secondary-button"
+            >
+                <i class="fa-solid fa-plus"></i>
+
+                <span>
+                    New Experiment
+                </span>
+
             </button>
 
-            <button id="logoutButton">
-                Logout
+
+            <button
+                id="logoutButton"
+                class="logout-button"
+            >
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                <span>
+                    Logout
+                </span>
+
             </button>
 
         </div>
@@ -48,33 +88,115 @@
     </header>
 
 
+    <!-- =========================
+         MAIN CONTENT
+         ========================= -->
+
     <main class="history-container">
+
+
+        <!-- =========================
+             PAGE INTRODUCTION
+             ========================= -->
+
+        <section class="history-introduction">
+
+            <div>
+
+                <p class="page-eyebrow">
+                    LABORATORY RECORDS
+                </p>
+
+                <h1>
+                    Experiment History
+                </h1>
+
+                <p class="page-description">
+                    View and review your previously recorded laboratory experiments.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             EXPERIMENT HISTORY
+             ========================= -->
 
         <section class="history-section">
 
-            <h2>Previous Experiments</h2>
+            <div class="section-heading">
 
-            <p id="historyMessage">
-                Loading experiments...
-            </p>
+                <div>
+
+                    <h2>
+                        Previous Experiments
+                    </h2>
+
+                    <p>
+                        Your recorded laboratory processes.
+                    </p>
+
+                </div>
+
+                <span
+                    id="historyMessage"
+                    class="history-message"
+                >
+                    Loading experiments...
+                </span>
+
+            </div>
+
 
             <div id="experimentList">
             </div>
 
         </section>
 
+
+        <!-- =========================
+             EXPERIMENT IMAGES
+             ========================= -->
+
         <section class="images-section">
 
-            <h2>Experiment Images</h2>
+            <div class="section-heading">
 
-            <p id="imageMessage">
+                <div>
+
+                    <h2>
+                        Experiment Images
+                    </h2>
+
+                    <p>
+                        Images captured and uploaded during your experiments.
+                    </p>
+
+                </div>
+
+                <div class="section-icon">
+                    <i class="fa-solid fa-images"></i>
+                </div>
+
+            </div>
+
+
+            <p
+                id="imageMessage"
+                class="image-message"
+            >
                 Loading images...
             </p>
+
 
             <div id="imageList">
             </div>
 
         </section>
+
+
     </main>
 
 
@@ -85,3 +207,4 @@
 </body>
 
 </html>
+

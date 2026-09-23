@@ -1,148 +1,206 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <title>LabScriptor Experiment Details</title>
+<title>LabScriptor Experiment Details</title>
 
-    <link
-        rel="stylesheet"
-        href="../css/experiment.css"
-    >
+<link
+    rel="stylesheet"
+    href="../css/experiment.css"
+>
+
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+>
+
 
 </head>
 
 <body>
 
-    <header class="experiment-header">
 
-        <div>
+<header class="experiment-header">
 
-            <h1>LabScriptor</h1>
+    <!-- Left: LabScriptor Branding -->
+    <div class="app-brand">
 
-            <p>
+        <span class="app-brand-icon">
+            <i class="fa-solid fa-flask"></i>
+        </span>
+
+        <div class="app-brand-text">
+
+            <span class="app-brand-name">
+                LabScriptor
+            </span>
+
+            <span class="app-brand-subtitle">
                 Experiment Details
-            </p>
+            </span>
 
         </div>
 
-        <div class="header-actions">
+    </div>
 
-            <button id="historyButton">
-                Back to History
-            </button>
 
-            <button id="logoutButton">
+    <!-- Centre: Experiment Status -->
+    <div class="header-center">
+
+        <div class="status">
+
+            <span class="status-dot"></span>
+
+            <span>
+                Experiment Details
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- Right: Header Actions -->
+    <div class="header-actions">
+
+        <button
+            id="historyButton"
+            class="secondary-button"
+        >
+
+            <i class="fa-solid fa-clock-rotate-left"></i>
+
+            <span>
+                Experiment History
+            </span>
+
+        </button>
+
+
+        <button
+            id="logoutButton"
+            class="logout-button"
+        >
+
+            <i class="fa-solid fa-right-from-bracket"></i>
+
+            <span>
                 Logout
-            </button>
+            </span>
+
+        </button>
+
+    </div>
+
+</header>
+
+
+<main class="experiment-container">
+
+    <section class="details-section">
+
+        <h2 id="experimentName">
+            Loading experiment...
+        </h2>
+
+        <p id="experimentStatus">
+            Loading status...
+        </p>
+
+
+        <div class="details-grid">
+
+            <div class="detail-card">
+
+                <h3>Start Time</h3>
+
+                <p id="startTime">
+                    -
+                </p>
+
+            </div>
+
+
+            <div class="detail-card">
+
+                <h3>End Time</h3>
+
+                <p id="endTime">
+                    -
+                </p>
+
+            </div>
+
+
+            <div class="detail-card">
+
+                <h3>Duration</h3>
+
+                <p id="duration">
+                    -
+                </p>
+
+            </div>
+
+
+            <div class="detail-card">
+
+                <h3>Observations</h3>
+
+                <p id="observationCount">
+                    -
+                </p>
+
+            </div>
 
         </div>
 
-    </header>
+    </section>
 
 
-    <main class="experiment-container">
+    <section class="observations-section">
 
-        <section class="details-section">
+        <h2>Recorded Observations</h2>
 
-            <h2 id="experimentName">
-                Loading experiment...
-            </h2>
+        <p id="observationMessage">
+            Loading observations...
+        </p>
 
-            <p id="experimentStatus">
-                Loading status...
-            </p>
+        <div id="observationList">
+        </div>
 
-
-            <div class="details-grid">
-
-                <div class="detail-card">
-
-                    <h3>Start Time</h3>
-
-                    <p id="startTime">
-                        -
-                    </p>
-
-                </div>
+    </section>
 
 
-                <div class="detail-card">
+    <section class="images-section">
 
-                    <h3>End Time</h3>
+        <h2>Experiment Images</h2>
 
-                    <p id="endTime">
-                        -
-                    </p>
+        <p id="imageMessage">
+            Loading images...
+        </p>
 
-                </div>
+        <div id="imageList">
+        </div>
 
+    </section>
 
-                <div class="detail-card">
-
-                    <h3>Duration</h3>
-
-                    <p id="duration">
-                        -
-                    </p>
-
-                </div>
+</main>
 
 
-                <div class="detail-card">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-                    <h3>Observations</h3>
+<script src="../js/experiment.js"></script>
 
-                    <p id="observationCount">
-                        -
-                    </p>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <section class="observations-section">
-
-            <h2>Recorded Observations</h2>
-
-            <p id="observationMessage">
-                Loading observations...
-            </p>
-
-            <div id="observationList">
-            </div>
-
-        </section>
-
-        <section class="images-section">
-
-            <h2>Experiment Images</h2>
-
-            <p id="imageMessage">
-                Loading images...
-            </p>
-
-            <div id="imageList">
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <script src="../js/experiment.js"></script>
 
 </body>
 

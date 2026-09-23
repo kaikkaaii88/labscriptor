@@ -14,6 +14,19 @@ const supabaseClient =
         SUPABASE_PUBLISHABLE_KEY
     );
 
+const headerTimer = document.getElementById("headerTimer");
+const mainTimer = document.getElementById("timer");
+
+window.addEventListener("scroll", function () {
+
+    if (window.scrollY > 100) {
+        headerTimer.classList.add("visible");
+    } else {
+        headerTimer.classList.remove("visible");
+    }
+
+});
+
 let elapsedSeconds = 0;
 let timerInterval = null;
 let currentSessionId = localStorage.getItem("labscriptorSessionId");
@@ -74,10 +87,13 @@ function updateTimerDisplay() {
     const formattedMinutes = String(minutes).padStart(2, "0");
     const formattedSeconds = String(seconds).padStart(2, "0");
 
-    timerDisplay.textContent =
+    const formattedTime =
         formattedHours + ":" +
         formattedMinutes + ":" +
         formattedSeconds;
+
+    timerDisplay.textContent = formattedTime;
+    headerTimer.textContent = formattedTime;
 }
 
 
@@ -368,7 +384,7 @@ function updateExperimentSummary() {
     if (experimentActive === true) {
 
         headerStatusText.textContent =
-            "Experiment Active";
+            "Experiment In Progress";
 
         headerStatusDot.classList.add("active");
 
@@ -395,33 +411,46 @@ function updateExperimentSummary() {
 
     if (experimentActive === true) {
 
-        reviewBanner.classList.remove("completed");
+        headerStatusText.textContent =
+            "Experiment Active";
 
-        reviewTitle.textContent =
-            "Experiment in progress";
+        headerStatusDot.classList.add("active");
 
-        reviewDescription.textContent =
-            "Continue recording observations while the experiment is active.";
+        headerStatusDot.parentElement.classList.add("active");
+
+        headerStatusDot.parentElement.classList.remove(
+            "completed"
+        );
 
     } else if (name !== "") {
 
-        reviewBanner.classList.add("completed");
+        headerStatusText.textContent =
+            "Completed";
 
-        reviewTitle.textContent =
-            "Experiment completed";
+        headerStatusDot.classList.remove("active");
 
-        reviewDescription.textContent =
-            "The experiment has been completed. Review the recorded information below.";
+        headerStatusDot.parentElement.classList.remove(
+            "active"
+        );
+
+        headerStatusDot.parentElement.classList.add(
+            "completed"
+        );
 
     } else {
 
-        reviewBanner.classList.remove("completed");
+        headerStatusText.textContent =
+            "Ready";
 
-        reviewTitle.textContent =
-            "No experiment to review";
+        headerStatusDot.classList.remove("active");
 
-        reviewDescription.textContent =
-            "Start an experiment to begin recording laboratory information.";
+        headerStatusDot.parentElement.classList.remove(
+            "active"
+        );
+
+        headerStatusDot.parentElement.classList.remove(
+            "completed"
+        );
 
     }
 

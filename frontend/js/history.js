@@ -35,7 +35,7 @@ homeButton.addEventListener(
     function () {
 
         window.location.href =
-            "index.html";
+            "process.html";
     }
 );
 

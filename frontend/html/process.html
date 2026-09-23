@@ -6,40 +6,94 @@
 
     <title>LabScriptor</title>
 
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
     <link rel="stylesheet" href="../css/process.css">
 </head>
 
 <body>
 
     <header class="app-header">
-        <div>
-            <h1>LabScriptor</h1>
-            <p>Laboratory Process & Observation Assistant</p>
-        </div>
 
-        <div class="header-actions">
+        <!-- Left: LabScriptor Branding -->
+        <div class="app-brand">
 
-    <button
-        id="historyButton"
-        class="secondary-button"
-    >
-        Experiment History
-    </button>
-
-    <div class="status">
-
-            <span
-                id="headerStatusDot"
-                class="status-dot"
-            ></span>
-
-            <span id="headerStatusText">
-                Ready
+            <span class="app-brand-icon">
+                <i class="fa-solid fa-flask"></i>
             </span>
 
+            <div class="app-brand-text">
+
+                <span class="app-brand-name">
+                    LabScriptor
+                </span>
+
+                <span class="app-brand-subtitle">
+                    Experiment History
+                </span>
+
+            </div>
+
         </div>
 
-    </div>
+
+        <!-- Centre: Timer + Status -->
+        <div class="header-center">
+
+            <div
+                id="headerTimer"
+                class="header-timer"
+            >
+                00:00:00
+            </div>
+
+            <div class="status">
+
+                <span
+                    id="headerStatusDot"
+                    class="status-dot"
+                ></span>
+
+                <span id="headerStatusText">
+                    Ready
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- Right: Header Actions -->
+        <div class="header-right">
+
+            <button
+                id="historyButton"
+                class="secondary-button"
+            >
+                <i class="fa-solid fa-clock-rotate-left"></i>
+
+                <span>
+                    Experiment History
+                </span>
+            </button>
+
+
+            <button
+                id="logoutButton"
+                class="logout-button"
+            >
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                <span>
+                    Logout
+                </span>
+            </button>
+
+        </div>
+
     </header>
 
 
