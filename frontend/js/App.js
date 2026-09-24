@@ -38,7 +38,33 @@ function formatSingaporeTime(
             second: "2-digit",
             hour12: true
         }
-    ) + " (GMT+8)";
+    );
+}
+
+// FORMAT FILE NAME
+
+function formatFileName(
+    fileName
+) {
+
+    if (!fileName) {
+        return "Unknown file";
+    }
+
+    if (
+        fileName.length > 19
+    ) {
+
+        return (
+            fileName.substring(
+                0,
+                22
+            ) +
+            "..."
+        );
+    }
+
+    return fileName;
 }
 
 const headerTimer = document.getElementById("headerTimer");
@@ -1470,7 +1496,9 @@ function displayExperimentImages(images) {
             document.createElement("p");
 
         fileName.textContent =
-            image.file_name;
+            formatFileName(
+                image.file_name
+            );
 
         const recordedTime =
             document.createElement("p");
