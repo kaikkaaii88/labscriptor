@@ -45,6 +45,8 @@ const logoutButton =
         "logoutButton"
     );
 
+const brandIcon =
+    document.querySelector(".app-brand-icon");
 
 // NAVIGATION
 
@@ -87,6 +89,27 @@ logoutButton.addEventListener(
     }
 );
 
+
+// NAVIGATION
+
+brandIcon.addEventListener(
+    "click",
+    function() {
+
+        window.location.href =
+            "process.html";
+    }
+);
+
+
+homeButton.addEventListener(
+    "click",
+    function() {
+
+        window.location.href =
+            "process.html";
+    }
+);
 
 // LOAD CURRENT USER
 

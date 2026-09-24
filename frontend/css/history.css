@@ -1240,3 +1240,21 @@ body {
         font-size: 22px;
     }
 }
+
+.app-brand-icon {
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        transform 0.1s ease;
+}
+
+.app-brand-icon:hover {
+    background-color: #374151;
+
+    transform: translateY(-1px);
+}
+
+.app-brand-icon:active {
+    transform: translateY(1px);
+}

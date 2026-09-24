@@ -47,21 +47,13 @@ body {
 
     justify-content: space-between;
 
-    min-height: 68px;
+    min-height: 72px;
 
     padding: 0 32px;
 
-    background-color:
-        rgba(255, 255, 255, 0.94);
+    background-color: white;
 
-    border-bottom:
-        1px solid #e5e7eb;
-
-    box-shadow:
-        0 1px 3px rgba(15, 23, 42, 0.04);
-
-    backdrop-filter:
-        blur(12px);
+    border-bottom: 1px solid #e5e7eb;
 }
 
 
@@ -89,19 +81,19 @@ body {
 
     justify-content: center;
 
-    width: 36px;
+    width: 34px;
 
-    height: 36px;
+    height: 34px;
+
+    flex-shrink: 0;
+
+    border-radius: 8px;
 
     background-color: #111827;
 
-    border-radius: 9px;
-
     color: white;
 
-    font-size: 17px;
-
-    flex-shrink: 0;
+    font-size: 16px;
 }
 
 
@@ -114,7 +106,7 @@ body {
 
     flex-direction: column;
 
-    justify-content: center;
+    gap: 2px;
 }
 
 
@@ -125,11 +117,9 @@ body {
 .app-brand-name {
     color: #111827;
 
-    font-size: 16px;
+    font-size: 19px;
 
-    font-weight: 750;
-
-    line-height: 1.2;
+    font-weight: 700;
 
     letter-spacing: -0.3px;
 }
@@ -140,17 +130,11 @@ body {
    ========================= */
 
 .app-brand-subtitle {
-    margin-top: 2px;
-
     color: #9ca3af;
 
-    font-size: 10px;
+    font-size: 11px;
 
-    font-weight: 600;
-
-    line-height: 1.2;
-
-    letter-spacing: 0.15px;
+    font-weight: 500;
 }
 
 
@@ -162,6 +146,8 @@ body {
     display: flex;
 
     align-items: center;
+
+    justify-content: flex-end;
 
     gap: 8px;
 }
@@ -178,9 +164,9 @@ body {
 
     justify-content: center;
 
-    min-height: 36px;
+    gap: 8px;
 
-    padding: 8px 14px;
+    padding: 10px 15px;
 
     border-radius: 8px;
 
@@ -198,9 +184,9 @@ body {
         background-color 0.15s ease,
         border-color 0.15s ease,
         color 0.15s ease,
-        transform 0.1s ease,
-        box-shadow 0.15s ease;
+        transform 0.1s ease;
 }
+
 
 .header-right button:active {
     transform: translateY(1px);
@@ -221,13 +207,11 @@ body {
     color: white;
 }
 
+
 .edit-mode-button:hover {
     background-color: #374151;
 
     border-color: #374151;
-
-    box-shadow:
-        0 2px 6px rgba(17, 24, 39, 0.12);
 }
 
 
@@ -242,6 +226,7 @@ body {
 
     color: #374151;
 }
+
 
 #historyButton:hover {
     background-color: #e5e7eb;
@@ -264,12 +249,13 @@ body {
     color: #6b7280;
 }
 
+
 #logoutButton:hover {
-    background-color: #fef2f2;
+    background-color: #f9fafb;
 
-    border-color: #fecaca;
+    border-color: #e5e7eb;
 
-    color: #b91c1c;
+    color: #374151;
 }
 
 
@@ -984,13 +970,13 @@ body {
 @media (max-width: 700px) {
 
     .app-header {
-        min-height: auto;
+        min-height: 64px;
 
-        padding: 13px 18px;
+        padding: 0 18px;
     }
 
-    .header-left h1 {
-        font-size: 18px;
+    .app-brand-subtitle {
+        display: none;
     }
 
     .header-right {
@@ -998,11 +984,7 @@ body {
     }
 
     .header-right button {
-        min-height: 34px;
-
-        padding: 7px 10px;
-
-        font-size: 12px;
+        padding: 9px 11px;
     }
 
     .experiment-page {
@@ -1071,12 +1053,16 @@ body {
         padding: 12px 14px;
     }
 
+    .app-brand-name {
+        font-size: 17px;
+    }
+
     .header-right {
         gap: 5px;
     }
 
     .header-right button {
-        padding: 7px 9px;
+        padding: 9px 10px;
     }
 
     .edit-mode-button {
@@ -1138,7 +1124,6 @@ body {
         height: 200px;
     }
 }
-
 
 /* =========================
    IMAGE VIEWER
@@ -1314,4 +1299,22 @@ body {
 
         font-size: 22px;
     }
+}
+
+.app-brand-icon {
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        transform 0.1s ease;
+}
+
+.app-brand-icon:hover {
+    background-color: #374151;
+
+    transform: translateY(-1px);
+}
+
+.app-brand-icon:active {
+    transform: translateY(1px);
 }

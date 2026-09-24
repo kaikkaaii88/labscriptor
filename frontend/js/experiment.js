@@ -65,6 +65,8 @@ const historyButton =
 const logoutButton =
     document.getElementById("logoutButton");
 
+const brandIcon =
+    document.querySelector(".app-brand-icon");
 
 // VARIABLES
 
@@ -89,6 +91,16 @@ logoutButton.addEventListener("click", async function() {
 
     window.location.href = "login.html";
 });
+
+
+brandIcon.addEventListener(
+    "click",
+    function() {
+
+        window.location.href =
+            "process.html";
+    }
+);
 
 
 // GET SESSION ID
