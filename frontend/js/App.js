@@ -1890,6 +1890,7 @@ if (recognition) {
             if (isRecording === false) {
 
                 try {
+                    finalTranscript = "";
 
                     recognition.start();
 
@@ -1960,14 +1961,15 @@ if (recognition) {
 
 
     /* =========================
-       SPEECH RESULT
-       ========================= */
+    SPEECH RESULT
+    ========================= */
+
+    let finalTranscript = "";
 
     recognition.onresult =
         function (event) {
 
-            let transcript = "";
-
+            let interimTranscript = "";
 
             for (
                 let i = event.resultIndex;
@@ -1975,44 +1977,51 @@ if (recognition) {
                 i++
             ) {
 
-                transcript =
-                    transcript +
+                const transcript =
                     event.results[i][0].transcript;
+
+                if (event.results[i].isFinal) {
+
+                    finalTranscript =
+                        finalTranscript +
+                        transcript +
+                        " ";
+
+                } else {
+
+                    interimTranscript =
+                        interimTranscript +
+                        transcript;
+
+                }
 
             }
 
-
-            transcript =
-                transcript.trim();
-
+            const displayedTranscript =
+                (
+                    finalTranscript +
+                    interimTranscript
+                ).trim();
 
             console.log(
                 "Speech result:",
-                transcript
+                displayedTranscript
             );
 
-
-            if (transcript !== "") {
+            if (displayedTranscript !== "") {
 
                 observationText.value =
-                    transcript;
-
+                    displayedTranscript;
 
                 observationCharacterCount.textContent =
                     observationText.value.length +
                     " / 1000";
-
 
                 voiceStatus.textContent =
                     "Observation captured.";
 
                 voiceHint.textContent =
                     "Review the text before saving.";
-
-
-                voiceButton.classList.remove(
-                    "recording"
-                );
 
                 voiceButton.classList.add(
                     "success"
@@ -2024,8 +2033,8 @@ if (recognition) {
 
 
     /* =========================
-       SPEECH END
-       ========================= */
+    SPEECH END
+    ========================= */
 
     recognition.onend =
         function () {
@@ -2043,12 +2052,24 @@ if (recognition) {
                 "recording"
             );
 
+            if (
+                finalTranscript.trim() !== ""
+            ) {
+
+                voiceStatus.textContent =
+                    "Observation captured.";
+
+                voiceHint.textContent =
+                    "Review the text before saving.";
+
+            }
+
         };
 
 
-    /* =========================
-       SPEECH ERROR
-       ========================= */
+/* =========================
+    SPEECH ERROR
+    ========================= */
 
     recognition.onerror =
         function (event) {
@@ -2057,6 +2078,17 @@ if (recognition) {
                 "Speech recognition error:",
                 event.error
             );
+
+            if (event.error === "no-speech") {
+
+                voiceStatus.textContent =
+                    "No speech detected.";
+
+                voiceHint.textContent =
+                    "Make sure the correct microphone is selected and speak clearly.";
+
+                return;
+            }
 
             isRecording = false;
 
@@ -2071,16 +2103,7 @@ if (recognition) {
                 "success"
             );
 
-
-            if (event.error === "no-speech") {
-
-                voiceStatus.textContent =
-                    "No speech detected.";
-
-                voiceHint.textContent =
-                    "Please try recording again.";
-
-            } else if (event.error === "not-allowed") {
+            if (event.error === "not-allowed") {
 
                 voiceStatus.textContent =
                     "Microphone permission was denied.";
@@ -2094,7 +2117,7 @@ if (recognition) {
                     "No microphone was detected.";
 
                 voiceHint.textContent =
-                    "Check your microphone and try again.";
+                    "Check your microphone and Windows input device.";
 
             } else if (event.error === "network") {
 
