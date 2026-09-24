@@ -14,6 +14,33 @@ const supabaseClient =
         SUPABASE_PUBLISHABLE_KEY
     );
 
+// FORMAT TIMESTAMP AS SINGAPORE TIME
+
+function formatSingaporeTime(
+    timestamp
+) {
+
+    if (!timestamp) {
+        return "Not available";
+    }
+
+    return new Date(
+        timestamp
+    ).toLocaleString(
+        "en-GB",
+        {
+            timeZone: "Asia/Singapore",
+            day: "numeric",
+            month: "numeric",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true
+        }
+    ) + " (GMT+8)";
+}
+
 const headerTimer = document.getElementById("headerTimer");
 const mainTimer = document.getElementById("timer");
 
@@ -1449,10 +1476,9 @@ function displayExperimentImages(images) {
             document.createElement("p");
 
         recordedTime.textContent =
-            new Date(
+            formatSingaporeTime(
                 image.recorded_at
-            ).toLocaleTimeString();
-
+            );
         imageItem.appendChild(
             imageElement
         );
@@ -2277,14 +2303,10 @@ async function loadObservations() {
         data.observations.forEach(
             function (observation) {
 
-                const recordedTime =
-                    new Date(
+                const processTime =
+                    formatSingaporeTime(
                         observation.recorded_at
                     );
-
-
-                const processTime =
-                    recordedTime.toLocaleTimeString();
 
 
                 const newObservation = {

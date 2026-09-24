@@ -1,25 +1,38 @@
 // REQUIRE MODULES
+
 const express = require("express");
 
+
 // CREATE ROUTER
+
 const router = express.Router();
+
 
 // DEFINE ROUTES
 
+
 // CREATE OBSERVATION
+
 router.post("/", async function(req, res) {
     try {
         const supabase = req.app.locals.supabase;
 
         const sessionId = req.body.session_id;
         const observation = req.body.observation;
-        const recordedAt = req.body.recorded_at || new Date().toISOString();
+
+        // Store observation timestamp in UTC
+
+        const recordedAt =
+            req.body.recorded_at ||
+            new Date().toISOString();
+
 
         if (!sessionId || !observation) {
             return res.status(400).json({
                 message: "session_id and observation are required"
             });
         }
+
 
         const { data, error } = await supabase
             .from("observations")
@@ -33,8 +46,12 @@ router.post("/", async function(req, res) {
             .select()
             .single();
 
+
         if (error) {
-            console.error("Create observation error:", error);
+            console.error(
+                "Create observation error:",
+                error
+            );
 
             return res.status(500).json({
                 message: "Failed to create observation",
@@ -42,12 +59,18 @@ router.post("/", async function(req, res) {
             });
         }
 
+
         res.status(201).json({
             message: "Observation created successfully",
             observation: data
         });
+
     } catch (error) {
-        console.error("Create observation error:", error);
+
+        console.error(
+            "Create observation error:",
+            error
+        );
 
         res.status(500).json({
             message: "Server error",
@@ -56,12 +79,15 @@ router.post("/", async function(req, res) {
     }
 });
 
+
 // GET OBSERVATIONS FOR SESSION
+
 router.get("/:sessionId", async function(req, res) {
     try {
         const supabase = req.app.locals.supabase;
 
         const sessionId = req.params.sessionId;
+
 
         const { data, error } = await supabase
             .from("observations")
@@ -71,8 +97,12 @@ router.get("/:sessionId", async function(req, res) {
                 ascending: true
             });
 
+
         if (error) {
-            console.error("Get observations error:", error);
+            console.error(
+                "Get observations error:",
+                error
+            );
 
             return res.status(500).json({
                 message: "Failed to retrieve observations",
@@ -80,12 +110,21 @@ router.get("/:sessionId", async function(req, res) {
             });
         }
 
+
         res.json({
-            message: "Observations retrieved successfully",
-            observations: data
+            message:
+                "Observations retrieved successfully",
+
+            observations:
+                data
         });
+
     } catch (error) {
-        console.error("Get observations error:", error);
+
+        console.error(
+            "Get observations error:",
+            error
+        );
 
         res.status(500).json({
             message: "Server error",
@@ -94,19 +133,26 @@ router.get("/:sessionId", async function(req, res) {
     }
 });
 
+
 // UPDATE OBSERVATION
+
 router.patch("/:observationId", async function(req, res) {
     try {
         const supabase = req.app.locals.supabase;
 
-        const observationId = req.params.observationId;
-        const observation = req.body.observation;
+        const observationId =
+            req.params.observationId;
+
+        const observation =
+            req.body.observation;
+
 
         if (!observation || !observation.trim()) {
             return res.status(400).json({
                 message: "Observation is required"
             });
         }
+
 
         const { data, error } = await supabase
             .from("observations")
@@ -117,8 +163,12 @@ router.patch("/:observationId", async function(req, res) {
             .select()
             .single();
 
+
         if (error) {
-            console.error("Update observation error:", error);
+            console.error(
+                "Update observation error:",
+                error
+            );
 
             return res.status(500).json({
                 message: "Failed to update observation",
@@ -126,12 +176,21 @@ router.patch("/:observationId", async function(req, res) {
             });
         }
 
+
         res.json({
-            message: "Observation updated successfully",
-            observation: data
+            message:
+                "Observation updated successfully",
+
+            observation:
+                data
         });
+
     } catch (error) {
-        console.error("Update observation error:", error);
+
+        console.error(
+            "Update observation error:",
+            error
+        );
 
         res.status(500).json({
             message: "Server error",
@@ -140,5 +199,7 @@ router.patch("/:observationId", async function(req, res) {
     }
 });
 
+
 // EXPORT ROUTER
+
 module.exports = router;

@@ -12,6 +12,32 @@ const supabaseClient =
         SUPABASE_PUBLISHABLE_KEY
     );
 
+// FORMAT TIMESTAMP AS SINGAPORE TIME
+
+function formatSingaporeTime(
+    timestamp
+) {
+
+    if (!timestamp) {
+        return "Not available";
+    }
+
+    return new Date(
+        timestamp
+    ).toLocaleString(
+        "en-GB",
+        {
+            timeZone: "Asia/Singapore",
+            day: "numeric",
+            month: "numeric",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true
+        }
+    ) + " (SGT)";
+}
 
 // DOM ELEMENTS
 
@@ -312,9 +338,9 @@ function displayExperiments(
 
                 startTime.textContent =
                     "Started: " +
-                    new Date(
+                    formatSingaporeTime(
                         experiment.start_time
-                    ).toLocaleString();
+                    );
 
             } else {
 
