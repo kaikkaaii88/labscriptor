@@ -816,6 +816,11 @@ newExperimentButton.addEventListener("click", function () {
     timerInterval = null;
 
 
+    /* Stop camera */
+
+    stopCamera();
+
+
     /* Reset timer */
 
     elapsedSeconds = 0;
@@ -942,6 +947,21 @@ let observations = [];
    IMAGE ELEMENTS
    ========================= */
 
+const takePhotoButton =
+    document.getElementById("takePhotoButton");
+
+const capturePhotoButton =
+    document.getElementById("capturePhotoButton");
+
+const cancelCameraButton =
+    document.getElementById("cancelCameraButton");
+
+const cameraPreview =
+    document.getElementById("cameraPreview");
+
+const cameraActions =
+    document.getElementById("cameraActions");
+
 const imageInput =
     document.getElementById("imageInput");
 
@@ -961,6 +981,269 @@ const imageList =
     document.getElementById("imageList");
 
 let selectedImage = null;
+
+let cameraStream = null;
+
+/* =========================
+   START CAMERA
+   ========================= */
+
+async function startCamera() {
+
+    try {
+
+        if (
+            !navigator.mediaDevices ||
+            !navigator.mediaDevices.getUserMedia
+        ) {
+
+            imageStatus.textContent =
+                "Camera access is not supported by this browser.";
+
+            return;
+
+        }
+
+
+        cameraStream =
+            await navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: false
+            });
+
+
+        cameraPreview.srcObject =
+            cameraStream;
+
+
+        cameraPreview.style.display =
+            "block";
+
+
+        imagePreview.style.display =
+            "none";
+
+
+        imagePreviewMessage.style.display =
+            "none";
+
+
+        cameraActions.style.display =
+            "flex";
+
+
+        imageStatus.textContent =
+            "Camera is ready. Position the experiment and capture a photo.";
+
+    } catch (error) {
+
+        console.error(
+            "Camera access error:",
+            error
+        );
+
+
+        if (error.name === "NotAllowedError") {
+
+            imageStatus.textContent =
+                "Camera access was denied. Please allow camera access in your browser.";
+
+        } else if (error.name === "NotFoundError") {
+
+            imageStatus.textContent =
+                "No camera was found on this device.";
+
+        } else {
+
+            imageStatus.textContent =
+                "Unable to access the camera.";
+
+        }
+
+    }
+
+}
+
+
+/* =========================
+   STOP CAMERA
+   ========================= */
+
+function stopCamera() {
+
+    if (cameraStream) {
+
+        cameraStream
+            .getTracks()
+            .forEach(function (track) {
+
+                track.stop();
+
+            });
+
+        cameraStream = null;
+
+    }
+
+
+    cameraPreview.srcObject =
+        null;
+
+    cameraPreview.style.display =
+        "none";
+
+
+    cameraActions.style.display =
+        "none";
+
+}
+
+
+/* =========================
+   TAKE PHOTO
+   ========================= */
+
+takePhotoButton.addEventListener(
+    "click",
+    function () {
+
+        startCamera();
+
+    }
+);
+
+
+/* =========================
+   CAPTURE PHOTO
+   ========================= */
+
+capturePhotoButton.addEventListener(
+    "click",
+    function () {
+
+        if (!cameraStream) {
+
+            imageStatus.textContent =
+                "Camera is not active.";
+
+            return;
+
+        }
+
+
+        if (
+            cameraPreview.videoWidth === 0 ||
+            cameraPreview.videoHeight === 0
+        ) {
+
+            imageStatus.textContent =
+                "Camera is not ready yet. Please try again.";
+
+            return;
+
+        }
+
+
+        const canvas =
+            document.createElement("canvas");
+
+
+        canvas.width =
+            cameraPreview.videoWidth;
+
+        canvas.height =
+            cameraPreview.videoHeight;
+
+
+        const context =
+            canvas.getContext("2d");
+
+
+        context.drawImage(
+            cameraPreview,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+
+        canvas.toBlob(
+            function (blob) {
+
+                if (!blob) {
+
+                    imageStatus.textContent =
+                        "Unable to capture photo.";
+
+                    return;
+
+                }
+
+
+                selectedImage =
+                    new File(
+                        [blob],
+                        "experiment-photo-" +
+                        Date.now() +
+                        ".jpg",
+                        {
+                            type: "image/jpeg"
+                        }
+                    );
+
+
+                const imageUrl =
+                    URL.createObjectURL(
+                        selectedImage
+                    );
+
+
+                imagePreview.src =
+                    imageUrl;
+
+                imagePreview.style.display =
+                    "block";
+
+                imagePreviewMessage.style.display =
+                    "none";
+
+
+                uploadImageButton.disabled =
+                    false;
+
+
+                imageStatus.textContent =
+                    "Photo captured. Ready to upload.";
+
+
+                /* CLOSE CAMERA AFTER CAPTURE */
+
+                stopCamera();
+
+            },
+            "image/jpeg",
+            0.9
+        );
+
+    }
+);
+
+/* =========================
+   CANCEL CAMERA
+   ========================= */
+
+cancelCameraButton.addEventListener(
+    "click",
+    function () {
+
+        stopCamera();
+
+        imageStatus.textContent =
+            "Camera cancelled.";
+
+    }
+);
 
 
 /* =========================

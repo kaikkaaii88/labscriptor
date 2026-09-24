@@ -272,18 +272,20 @@
 
             </div>
 
-                        <!-- Experiment Images -->
+            <!-- Experiment Images -->
 
             <section class="experiment-images">
 
                 <div class="section-header">
 
                     <div>
+
                         <h2>Experiment Images</h2>
 
                         <p>
                             Capture or upload images related to this experiment.
                         </p>
+
                     </div>
 
                 </div>
@@ -291,22 +293,36 @@
 
                 <div class="image-controls">
 
+                    <!-- Take Photo -->
+
+                    <button
+                        type="button"
+                        id="takePhotoButton"
+                        class="image-action-button camera-button"
+                    >
+                        📷 Take Photo
+                    </button>
+
+
+                    <!-- Upload Existing Image -->
+
                     <label
                         for="imageInput"
-                        class="image-upload-button"
+                        class="image-action-button upload-button"
                     >
-                        📷 Capture / Choose Image
+                        📁 Upload Image
                     </label>
 
                     <input
                         type="file"
                         id="imageInput"
                         accept="image/*"
-                        capture="environment"
                     >
 
                 </div>
 
+
+                <!-- Image Preview -->
 
                 <div
                     id="imagePreviewContainer"
@@ -317,6 +333,12 @@
                         No image selected.
                     </p>
 
+                    <video
+                        id="cameraPreview"
+                        autoplay
+                        playsinline
+                    ></video>
+
                     <img
                         id="imagePreview"
                         src=""
@@ -325,6 +347,35 @@
 
                 </div>
 
+
+                <!-- Camera Actions -->
+
+                <div
+                    id="cameraActions"
+                    class="camera-actions"
+                    style="display: none;"
+                >
+
+                    <button
+                        type="button"
+                        id="capturePhotoButton"
+                        class="primary-button"
+                    >
+                        Capture Photo
+                    </button>
+
+                    <button
+                        type="button"
+                        id="cancelCameraButton"
+                        class="secondary-button"
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+
+                <!-- Image Upload -->
 
                 <div class="image-upload-actions">
 
@@ -344,6 +395,55 @@
                     </p>
 
                 </div>
+
+
+                <!-- Uploaded Images -->
+
+                <div
+                    id="imageList"
+                    class="image-list"
+                >
+                </div>
+
+            </section>
+
+
+    <!-- Camera Actions -->
+
+    <div
+        id="cameraActions"
+        class="camera-actions"
+        style="display: none;"
+    >
+
+        <button
+            type="button"
+            id="capturePhotoButton"
+            class="primary-button"
+        >
+            Capture Photo
+        </button>
+
+        <button
+            type="button"
+            id="cancelCameraButton"
+            class="secondary-button"
+        >
+            Cancel
+        </button>
+
+    </div>
+
+
+    <div class="image-upload-actions">
+
+        <button
+            type="button"
+            id="uploadImageButton"
+            disabled
+        >
+            Upload Image
+        </button>
 
 
                 <div

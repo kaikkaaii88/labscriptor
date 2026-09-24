@@ -1466,13 +1466,19 @@ input:disabled::placeholder {
 
 
 
-/* EXPERIMENT IMAGES */
+/* =========================
+   EXPERIMENT IMAGES
+   ========================= */
 
 .experiment-images {
     margin-top: 30px;
+
     padding: 24px;
+
     border: 1px solid #ddd;
+
     border-radius: 12px;
+
     background-color: #ffffff;
 }
 
@@ -1492,103 +1498,436 @@ input:disabled::placeholder {
 }
 
 
+/* =========================
+   IMAGE CONTROLS
+   ========================= */
+
 .image-controls {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
     margin-bottom: 20px;
+
+    flex-wrap: wrap;
 }
 
 
-.image-upload-button {
-    display: inline-block;
-    padding: 12px 18px;
-    border: 1px solid #000000;
+/* =========================
+   IMAGE ACTION BUTTONS
+   ========================= */
+
+.image-action-button {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 10px 18px;
+
     border-radius: 8px;
-    cursor: pointer;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
     font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        transform 0.1s ease;
 }
 
+
+/* =========================
+   TAKE PHOTO
+   ========================= */
+
+.camera-button {
+    background-color: #2563eb;
+
+    color: white;
+
+    border: 1px solid #2563eb;
+}
+
+
+.camera-button:hover {
+    background-color: #1d4ed8;
+}
+
+
+.camera-button:active {
+    transform: translateY(1px);
+}
+
+
+/* =========================
+   UPLOAD IMAGE
+   ========================= */
+
+.upload-button {
+    background-color: #16a34a;
+
+    color: white;
+
+    border: 1px solid #16a34a;
+}
+
+
+.upload-button:hover {
+    background-color: #15803d;
+}
+
+
+.upload-button:active {
+    transform: translateY(1px);
+}
+
+
+/* =========================
+   HIDE FILE INPUT
+   ========================= */
 
 #imageInput {
     display: none;
 }
 
 
+/* =========================
+   IMAGE PREVIEW
+   ========================= */
+
 .image-preview-container {
     width: 100%;
+
     min-height: 200px;
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     border: 2px dashed #ccc;
+
     border-radius: 10px;
+
     overflow: hidden;
+
     margin-bottom: 16px;
+
+    background-color: #fafafa;
 }
 
 
 #imagePreviewMessage {
     margin: 0;
+
+    color: #9ca3af;
+
+    font-size: 13px;
+
+    text-align: center;
 }
 
+
+/* =========================
+   CAMERA PREVIEW
+   ========================= */
+
+#cameraPreview {
+    display: none;
+
+    width: 100%;
+
+    max-height: 400px;
+
+    object-fit: contain;
+
+    border-radius: 8px;
+}
+
+
+/* =========================
+   SELECTED IMAGE PREVIEW
+   ========================= */
 
 #imagePreview {
     display: none;
+
     max-width: 100%;
+
     max-height: 400px;
+
     object-fit: contain;
+
+    border-radius: 8px;
 }
 
 
-.image-upload-actions {
+/* =========================
+   CAMERA ACTIONS
+   ========================= */
+
+.camera-actions {
     display: flex;
+
     align-items: center;
-    gap: 15px;
+
+    gap: 10px;
+
+    margin-bottom: 16px;
+
     flex-wrap: wrap;
 }
 
 
+/* =========================
+   CAPTURE PHOTO BUTTON
+   ========================= */
+
+#capturePhotoButton {
+    background-color: #2563eb;
+
+    color: white;
+
+    border: 1px solid #2563eb;
+}
+
+
+#capturePhotoButton:hover:not(:disabled) {
+    background-color: #1d4ed8;
+}
+
+
+/* =========================
+   CANCEL CAMERA BUTTON
+   ========================= */
+
+#cancelCameraButton {
+    background-color: #f3f4f6;
+
+    color: #374151;
+
+    border: 1px solid #d1d5db;
+}
+
+
+#cancelCameraButton:hover:not(:disabled) {
+    background-color: #e5e7eb;
+}
+
+
+/* =========================
+   IMAGE UPLOAD ACTIONS
+   ========================= */
+
+.image-upload-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    flex-wrap: wrap;
+}
+
+
+/* =========================
+   UPLOAD IMAGE BUTTON
+   ========================= */
+
 #uploadImageButton {
     padding: 10px 18px;
-    border: none;
+
+    background-color: #16a34a;
+
+    color: white;
+
+    border: 1px solid #16a34a;
+
     border-radius: 8px;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
     cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        transform 0.1s ease;
+}
+
+
+#uploadImageButton:hover:not(:disabled) {
+    background-color: #15803d;
+}
+
+
+#uploadImageButton:active:not(:disabled) {
+    transform: translateY(1px);
 }
 
 
 #uploadImageButton:disabled {
     cursor: not-allowed;
+
     opacity: 0.5;
 }
 
 
+/* =========================
+   IMAGE STATUS
+   ========================= */
+
 .image-status {
     margin: 0;
+
+    color: #6b7280;
+
+    font-size: 13px;
 }
 
+
+/* =========================
+   IMAGE LIST
+   ========================= */
 
 .image-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+
+    grid-template-columns: repeat(4, 1fr);
+
     gap: 16px;
+
     margin-top: 24px;
+
+    width: 100%;
 }
 
+
+/* =========================
+   IMAGE LIST ITEM
+   ========================= */
 
 .image-list-item {
-    border: 1px solid #ddd;
-    border-radius: 10px;
+    min-width: 0;
+
     padding: 10px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 10px;
+
     overflow: hidden;
+
+    background-color: #ffffff;
 }
 
 
+/* =========================
+   IMAGE
+   ========================= */
+
 .image-list-item img {
+    display: block;
+
     width: 100%;
+
     height: 160px;
+
     object-fit: cover;
+
     border-radius: 6px;
 }
 
+
+/* =========================
+   IMAGE FILE NAME
+   ========================= */
+
 .image-list-item p {
-    margin: 6px 0 0 0;
-    font-size: 14px;
+    margin: 8px 0 0;
+
+    color: #6b7280;
+
+    font-size: 12px;
+
+    line-height: 1.4;
+
+    word-break: break-word;
+}
+
+
+/* =========================
+   RESPONSIVE IMAGE LIST
+   ========================= */
+
+@media (max-width: 900px) {
+
+    .image-list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .image-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 450px) {
+
+    .image-list {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* =========================
+   CAMERA PREVIEW
+   ========================= */
+
+#cameraPreview {
+    display: none;
+
+    width: 100%;
+
+    max-height: 400px;
+
+    object-fit: contain;
+
+    border-radius: 8px;
+}
+
+
+/* =========================
+   CAMERA ACTIONS
+   ========================= */
+
+.camera-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 16px;
+
+    flex-wrap: wrap;
 }
