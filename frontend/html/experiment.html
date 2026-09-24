@@ -33,7 +33,6 @@
 
     <header class="app-header">
 
-        <!-- LabScriptor Branding -->
         <div class="header-left">
 
             <span class="app-brand-icon">
@@ -55,23 +54,29 @@
         </div>
 
 
-        <!-- Header Actions -->
         <div class="header-right">
 
             <button
                 id="editModeButton"
                 class="edit-mode-button"
+                type="button"
             >
                 Edit Experiment
             </button>
 
 
-            <button id="historyButton">
+            <button
+                id="historyButton"
+                type="button"
+            >
                 History
             </button>
 
 
-            <button id="logoutButton">
+            <button
+                id="logoutButton"
+                type="button"
+            >
                 Logout
             </button>
 
@@ -86,7 +91,10 @@
 
     <main class="experiment-page">
 
-        <!-- EXPERIMENT DETAILS -->
+
+        <!-- =========================
+             EXPERIMENT DETAILS
+             ========================= -->
 
         <section class="details-section">
 
@@ -99,7 +107,7 @@
                     </h2>
 
                     <p id="experimentStatus">
-                        Loading...
+                        Unknown
                     </p>
 
                 </div>
@@ -165,7 +173,9 @@
         </section>
 
 
-        <!-- OBSERVATIONS -->
+        <!-- =========================
+             OBSERVATIONS
+             ========================= -->
 
         <section class="observations-section">
 
@@ -182,6 +192,15 @@
                     </p>
 
                 </div>
+
+
+                <button
+                    id="addObservationButton"
+                    class="add-observation-button"
+                    type="button"
+                >
+                    + Add Observation
+                </button>
 
             </div>
 
@@ -200,7 +219,9 @@
         </section>
 
 
-        <!-- IMAGES -->
+        <!-- =========================
+             IMAGES
+             ========================= -->
 
         <section class="images-section">
 
@@ -221,6 +242,8 @@
             </div>
 
 
+            <!-- IMAGE UPLOAD -->
+
             <div
                 id="imageUploadSection"
                 class="image-upload-section"
@@ -233,7 +256,10 @@
                 >
 
 
-                <button id="uploadImageButton">
+                <button
+                    id="uploadImageButton"
+                    type="button"
+                >
                     Upload Image
                 </button>
 
@@ -249,6 +275,8 @@
             ></p>
 
 
+            <!-- EXISTING IMAGES -->
+
             <div
                 id="imageList"
                 class="image-list"
@@ -259,9 +287,17 @@
     </main>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- =========================
+         SCRIPTS
+         ========================= -->
 
-    <script src="../js/experiment.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+    <script
+        src="../js/experiment.js"
+    ></script>
 
 </body>
 

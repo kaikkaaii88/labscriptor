@@ -1,15 +1,16 @@
 // SUPABASE CONFIGURATION
 
-const SUPABASE_URL = 
+const SUPABASE_URL =
     "https://wxoisxojhqelzmeqhoml.supabase.co";
 
 const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_HmZbJeN7C7bHRoPcDHSj1A_WxKjoHdy";
 
-const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-);
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
 
 
 // DOM ELEMENTS
@@ -37,6 +38,9 @@ const observationMessage =
 
 const observationList =
     document.getElementById("observationList");
+
+const addObservationButton =
+    document.getElementById("addObservationButton");
 
 const imageMessage =
     document.getElementById("imageMessage");
@@ -68,39 +72,73 @@ const logoutButton =
 const brandIcon =
     document.querySelector(".app-brand-icon");
 
+
 // VARIABLES
 
 let currentExperiment = null;
+
 let editMode = false;
+
+let currentObservations = [];
+
+let currentImages = [];
 
 
 // NAVIGATION
 
-historyButton.addEventListener("click", function() {
-    window.location.href = "history.html";
-});
+if (historyButton) {
 
-logoutButton.addEventListener("click", async function() {
+    historyButton.addEventListener(
+        "click",
+        function() {
 
-    const { error } = await supabaseClient.auth.signOut();
-
-    if (error) {
-        console.error("Logout error:", error);
-        return;
-    }
-
-    window.location.href = "login.html";
-});
+            window.location.href =
+                "history.html";
+        }
+    );
+}
 
 
-brandIcon.addEventListener(
-    "click",
-    function() {
+if (logoutButton) {
 
-        window.location.href =
-            "process.html";
-    }
-);
+    logoutButton.addEventListener(
+        "click",
+        async function() {
+
+            const result =
+                await supabaseClient.auth.signOut();
+
+            const error =
+                result.error;
+
+            if (error) {
+
+                console.error(
+                    "Logout error:",
+                    error
+                );
+
+                return;
+            }
+
+            window.location.href =
+                "login.html";
+        }
+    );
+}
+
+
+if (brandIcon) {
+
+    brandIcon.addEventListener(
+        "click",
+        function() {
+
+            window.location.href =
+                "process.html";
+        }
+    );
+}
 
 
 // GET SESSION ID
@@ -108,42 +146,12 @@ brandIcon.addEventListener(
 function getSessionId() {
 
     const urlParams =
-        new URLSearchParams(window.location.search);
+        new URLSearchParams(
+            window.location.search
+        );
 
-    return urlParams.get("session_id");
-}
-
-
-// CHECK EDIT MODE FROM URL
-
-function checkEditModeFromUrl() {
-
-    const urlParams =
-        new URLSearchParams(window.location.search);
-
-    const editParameter =
-        urlParams.get("edit");
-
-    if (editParameter === "true") {
-        editMode = true;
-    }
-}
-
-
-// CHECK IF EXPERIMENT IS COMPLETED
-
-function isExperimentCompleted(status) {
-
-    if (!status) {
-        return false;
-    }
-
-    const normalizedStatus =
-        status.toLowerCase();
-
-    return (
-        normalizedStatus === "completed" ||
-        normalizedStatus === "finished"
+    return urlParams.get(
+        "session_id"
     );
 }
 
@@ -152,106 +160,280 @@ function isExperimentCompleted(status) {
 
 function updateEditModeUI() {
 
-    if (!currentExperiment) {
-        return;
-    }
-
-    const completed =
-        isExperimentCompleted(
-            currentExperiment.status
-        );
-
-    if (!completed) {
-
-        editModeButton.style.display = "none";
-        imageUploadSection.style.display = "none";
+    if (!editModeButton) {
 
         return;
     }
 
-    editModeButton.style.display = "inline-block";
+
+    // Edit Experiment is always available.
+
+    editModeButton.style.display =
+        "inline-block";
+
 
     if (editMode) {
 
         editModeButton.textContent =
             "Done Editing";
 
-        imageUploadSection.style.display =
-            "flex";
+
+        if (addObservationButton) {
+
+            addObservationButton.style.display =
+                "inline-flex";
+        }
+
+
+        if (imageUploadSection) {
+
+            imageUploadSection.style.display =
+                "flex";
+        }
 
     } else {
 
         editModeButton.textContent =
             "Edit Experiment";
 
-        imageUploadSection.style.display =
-            "none";
+
+        if (addObservationButton) {
+
+            addObservationButton.style.display =
+                "none";
+        }
+
+
+        if (imageUploadSection) {
+
+            imageUploadSection.style.display =
+                "none";
+        }
     }
+
+
+    displayObservations(
+        currentObservations
+    );
+
+
+    displayExperimentImages(
+        currentImages
+    );
 }
 
 
 // EDIT MODE BUTTON
 
-editModeButton.addEventListener("click", function() {
+if (editModeButton) {
 
-    if (!currentExperiment) {
-        return;
-    }
+    editModeButton.addEventListener(
+        "click",
+        function() {
 
-    if (!isExperimentCompleted(currentExperiment.status)) {
-        return;
-    }
+            if (!currentExperiment) {
 
-    editMode = !editMode;
+                return;
+            }
 
-    updateEditModeUI();
 
-    if (currentExperiment.session_id) {
-        loadObservations(
-            currentExperiment.session_id
-        );
+            editMode =
+                !editMode;
 
-        loadExperimentImages(
-            currentExperiment.session_id
-        );
-    }
-});
+
+            updateEditModeUI();
+        }
+    );
+}
+
+
+// ADD OBSERVATION BUTTON
+
+if (addObservationButton) {
+
+    addObservationButton.addEventListener(
+        "click",
+        function() {
+
+            if (!editMode) {
+
+                return;
+            }
+
+
+            startNewObservation();
+        }
+    );
+}
 
 
 // LOAD EXPERIMENT
 
-async function loadExperiment(sessionId) {
+// LOAD EXPERIMENT
+
+async function loadExperiment() {
+
+    const sessionId =
+        getSessionId();
+
+
+    if (!sessionId) {
+
+        console.error(
+            "No session ID found."
+        );
+
+
+        if (experimentName) {
+
+            experimentName.textContent =
+                "Experiment not found";
+        }
+
+
+        if (experimentStatus) {
+
+            experimentStatus.textContent =
+                "No session ID provided.";
+        }
+
+
+        return;
+    }
+
 
     try {
 
-        const response = await fetch(
-            "http://localhost:3000/api/process-sessions/" +
-            sessionId
-        );
+        const response =
+            await fetch(
+                "http://localhost:3000/api/process-sessions/" +
+                sessionId
+            );
 
-        const data = await response.json();
+
+        const data =
+            await response.json();
+
 
         if (!response.ok) {
+
             throw new Error(
-                data.message || "Failed to load experiment"
+                data.message ||
+                "Failed to load experiment"
             );
         }
 
-        currentExperiment =
-            data.processSession ||
-            data.process_session ||
-            data.session ||
+
+        console.log(
+            "Process session API response:",
+            data
+        );
+
+
+        let experiment =
             data;
+
+
+        // HANDLE DIFFERENT API RESPONSE STRUCTURES
+
+        if (
+            data.data &&
+            !Array.isArray(data.data)
+        ) {
+
+            experiment =
+                data.data;
+        }
+
+
+        if (
+            data.session &&
+            !Array.isArray(data.session)
+        ) {
+
+            experiment =
+                data.session;
+        }
+
+
+        if (
+            data.processSession &&
+            !Array.isArray(data.processSession)
+        ) {
+
+            experiment =
+                data.processSession;
+        }
+
+
+        if (
+            data.process_session &&
+            !Array.isArray(data.process_session)
+        ) {
+
+            experiment =
+                data.process_session;
+        }
+
+
+        if (
+            data.processSessionData &&
+            !Array.isArray(data.processSessionData)
+        ) {
+
+            experiment =
+                data.processSessionData;
+        }
+
+
+        console.log(
+            "Experiment object used by page:",
+            experiment
+        );
+
+
+        if (
+            !experiment ||
+            typeof experiment !== "object"
+        ) {
+
+            throw new Error(
+                "Experiment data was not found."
+            );
+        }
+
+
+        // ALWAYS USE THE SESSION ID FROM THE URL
+
+        const actualSessionId =
+            sessionId;
+
+
+        currentExperiment =
+            experiment;
+
+
+        currentExperiment.session_id =
+            actualSessionId;
+
 
         displayExperiment(
             currentExperiment
         );
 
+
+        await loadObservations(
+            actualSessionId
+        );
+
+
+        await loadExperimentImages(
+            actualSessionId
+        );
+
+
         updateEditModeUI();
 
-        await loadObservations(sessionId);
-
-        await loadExperimentImages(sessionId);
 
     } catch (error) {
 
@@ -260,11 +442,19 @@ async function loadExperiment(sessionId) {
             error
         );
 
-        experimentName.textContent =
-            "Unable to load experiment";
 
-        experimentStatus.textContent =
-            error.message;
+        if (experimentName) {
+
+            experimentName.textContent =
+                "Unable to load experiment";
+        }
+
+
+        if (experimentStatus) {
+
+            experimentStatus.textContent =
+                "Error loading experiment";
+        }
     }
 }
 
@@ -272,74 +462,76 @@ async function loadExperiment(sessionId) {
 // DISPLAY EXPERIMENT
 
 function displayExperiment(experiment) {
-
     if (!experiment) {
-
-        experimentName.textContent =
-            "Experiment not found";
-
-        experimentStatus.textContent =
-            "Unable to retrieve experiment details.";
-
         return;
     }
 
+    const experimentNameValue =
+        experiment.process_name ||
+        experiment.processName ||
+        experiment.name ||
+        "Unnamed Experiment";
+
+    const startTimeValue =
+        experiment.start_time ||
+        experiment.startTime ||
+        experiment.started_at ||
+        experiment.startedAt;
+
+    const endTimeValue =
+        experiment.end_time ||
+        experiment.endTime ||
+        experiment.ended_at ||
+        experiment.endedAt;
+
     experimentName.textContent =
-        experiment.process_name || "Experiment";
+        experimentNameValue;
 
-    experimentStatus.textContent =
-        experiment.status || "Unknown";
-
-    if (experiment.start_time) {
-
-        startTime.textContent =
-            formatDateTime(
-                experiment.start_time
-            );
-
+    if (endTimeValue) {
+        experimentStatus.textContent = "Experiment Completed";
+    } else if (startTimeValue) {
+        experimentStatus.textContent = "Experiment Active";
     } else {
-
-        startTime.textContent =
-            "Not available";
+        experimentStatus.textContent = "Ready";
     }
 
-    if (experiment.end_time) {
+    startTime.textContent =
+        formatDateTime(startTimeValue);
 
-        endTime.textContent =
-            formatDateTime(
-                experiment.end_time
-            );
+    endTime.textContent =
+        formatDateTime(endTimeValue);
 
-    } else {
-
-        endTime.textContent =
-            "Not available";
-    }
-
-    if (
-        experiment.start_time &&
-        experiment.end_time
-    ) {
-
-        duration.textContent =
-            formatDuration(
-                experiment.start_time,
-                experiment.end_time
-            );
-
-    } else {
-
-        duration.textContent =
-            "Not available";
-    }
+    duration.textContent =
+        formatDuration(
+            startTimeValue,
+            endTimeValue
+        );
 }
 
 
 // FORMAT DATE AND TIME
 
-function formatDateTime(dateTime) {
+function formatDateTime(
+    dateTime
+) {
 
-    return new Date(dateTime).toLocaleString(
+    if (!dateTime) {
+
+        return "Not available";
+    }
+
+
+    const date =
+        new Date(dateTime);
+
+
+    if (isNaN(date.getTime())) {
+
+        return "Not available";
+    }
+
+
+    return date.toLocaleString(
         "en-SG",
         {
             dateStyle: "medium",
@@ -351,7 +543,10 @@ function formatDateTime(dateTime) {
 
 // FORMAT DURATION
 
-function formatDuration(start, end) {
+function formatDuration(
+    start,
+    end
+) {
 
     const startDate =
         new Date(start);
@@ -359,27 +554,148 @@ function formatDuration(start, end) {
     const endDate =
         new Date(end);
 
+
+    if (
+        isNaN(startDate.getTime()) ||
+        isNaN(endDate.getTime())
+    ) {
+
+        return "Not available";
+    }
+
+
     const difference =
         endDate.getTime() -
         startDate.getTime();
 
+
     if (difference < 0) {
+
         return "Not available";
     }
 
+
     const totalSeconds =
-        Math.floor(difference / 1000);
+        Math.floor(
+            difference / 1000
+        );
+
+
+    return formatDurationSeconds(
+        totalSeconds
+    );
+}
+
+
+// FORMAT STORED DURATION
+
+function formatStoredDuration(
+    storedDuration
+) {
+
+    if (
+        storedDuration ===
+            undefined ||
+        storedDuration ===
+            null ||
+        storedDuration ===
+            ""
+    ) {
+
+        return "Not available";
+    }
+
+
+    // DATABASE DURATION IS A NUMBER
+
+    if (
+        typeof storedDuration ===
+        "number"
+    ) {
+
+        return formatDurationSeconds(
+            Math.floor(
+                storedDuration
+            )
+        );
+    }
+
+
+    // DATABASE DURATION IS TEXT
+
+    if (
+        typeof storedDuration ===
+        "string"
+    ) {
+
+        // Already formatted duration
+
+        if (
+            storedDuration.includes("h") ||
+            storedDuration.includes("m") ||
+            storedDuration.includes("s")
+        ) {
+
+            return storedDuration;
+        }
+
+
+        const numericDuration =
+            Number(
+                storedDuration
+            );
+
+
+        if (
+            !isNaN(numericDuration)
+        ) {
+
+            return formatDurationSeconds(
+                Math.floor(
+                    numericDuration
+                )
+            );
+        }
+
+
+        return storedDuration;
+    }
+
+
+    return "Not available";
+}
+
+
+// FORMAT DURATION SECONDS
+
+function formatDurationSeconds(
+    totalSeconds
+) {
+
+    if (
+        isNaN(totalSeconds) ||
+        totalSeconds < 0
+    ) {
+
+        return "Not available";
+    }
+
 
     const hours =
-        Math.floor(totalSeconds / 3600);
+        Math.floor(
+            totalSeconds / 3600
+        );
+
 
     const minutes =
         Math.floor(
             (totalSeconds % 3600) / 60
         );
 
+
     const seconds =
         totalSeconds % 60;
+
 
     if (hours > 0) {
 
@@ -393,6 +709,7 @@ function formatDuration(start, end) {
         );
     }
 
+
     if (minutes > 0) {
 
         return (
@@ -403,39 +720,204 @@ function formatDuration(start, end) {
         );
     }
 
+
     return seconds + "s";
+}
+
+// =========================
+// OBSERVATIONS
+// =========================
+
+
+// CREATE OBSERVATION
+
+async function createObservation(
+    observation
+) {
+
+    if (!currentExperiment) {
+
+        alert(
+            "Unable to save the observation because the experiment information is unavailable."
+        );
+
+        return null;
+    }
+
+
+    if (!observation.trim()) {
+
+        alert(
+            "Observation cannot be empty."
+        );
+
+        return null;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:3000/api/observations",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        session_id:
+                            currentExperiment.session_id,
+
+                        observation:
+                            observation.trim()
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Failed to create observation"
+            );
+        }
+
+
+        /*
+         * Return the created observation
+         * so it can be added directly to
+         * the current page.
+         */
+
+        if (data.observation) {
+
+            return data.observation;
+        }
+
+
+        if (data.data) {
+
+            return data.data;
+        }
+
+
+        return {
+            observation:
+                observation.trim()
+        };
+
+
+    } catch (error) {
+
+        console.error(
+            "Create observation error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Unable to add the observation."
+        );
+
+
+        return null;
+    }
 }
 
 
 // LOAD OBSERVATIONS
 
-async function loadObservations(sessionId) {
+async function loadObservations(
+    sessionId
+) {
 
     try {
 
-        const response = await fetch(
-            "http://localhost:3000/api/observations/" +
-            sessionId
-        );
+        const response =
+            await fetch(
+                "http://localhost:3000/api/observations/" +
+                sessionId
+            );
 
-        const data = await response.json();
+
+        const data =
+            await response.json();
+
 
         if (!response.ok) {
+
             throw new Error(
                 data.message ||
                 "Failed to load observations"
             );
         }
 
-        const observations =
-            data.observations || [];
 
-        observationCount.textContent =
-            observations.length;
+        let observations = [];
+
+
+        if (Array.isArray(data)) {
+
+            observations =
+                data;
+
+        } else if (
+            Array.isArray(
+                data.observations
+            )
+        ) {
+
+            observations =
+                data.observations;
+
+        } else if (
+            data.data &&
+            Array.isArray(data.data)
+        ) {
+
+            observations =
+                data.data;
+
+        } else if (
+            data.data &&
+            Array.isArray(
+                data.data.observations
+            )
+        ) {
+
+            observations =
+                data.data.observations;
+        }
+
+
+        currentObservations =
+            observations;
+
+
+        if (observationCount) {
+
+            observationCount.textContent =
+                observations.length;
+        }
+
 
         displayObservations(
             observations
         );
+
+
+        return true;
+
 
     } catch (error) {
 
@@ -444,222 +926,699 @@ async function loadObservations(sessionId) {
             error
         );
 
-        observationMessage.textContent =
-            "Unable to load observations.";
+
+        /*
+         * IMPORTANT:
+         * Do NOT clear currentObservations here.
+         *
+         * If the GET request fails after an
+         * observation has been saved or edited,
+         * clearing the array makes the observation
+         * disappear from the screen even though
+         * it may still exist in the database.
+         */
+
+        if (observationMessage) {
+
+            observationMessage.textContent =
+                "Unable to refresh observations.";
+        }
+
+
+        return false;
     }
 }
 
 
 // DISPLAY OBSERVATIONS
 
-function displayObservations(observations) {
+function displayObservations(
+    observations
+) {
 
-    observationList.innerHTML = "";
-
-    if (observations.length === 0) {
-
-        observationMessage.textContent =
-            "No observations recorded.";
+    if (!observationList) {
 
         return;
     }
 
-    observationMessage.textContent = "";
 
-    observations.forEach(function(observation, index) {
+    observationList.innerHTML =
+        "";
 
-        const card =
-            document.createElement("div");
 
-        card.className =
-            "observation-card";
+    if (
+        !observations ||
+        observations.length === 0
+    ) {
 
-        const meta =
-            document.createElement("div");
+        if (observationMessage) {
 
-        meta.className =
-            "observation-meta";
+            if (editMode) {
 
-        const title =
-            document.createElement("strong");
+                observationMessage.textContent =
+                    "No observations recorded. You can add one now.";
 
-        title.textContent =
-            "Observation " + (index + 1);
+            } else {
 
-        const recordedAt =
-            document.createElement("span");
-
-        recordedAt.textContent =
-            observation.recorded_at
-                ? formatDateTime(
-                    observation.recorded_at
-                )
-                : "Unknown time";
-
-        meta.appendChild(title);
-        meta.appendChild(recordedAt);
-
-        const text =
-            document.createElement("p");
-
-        text.className =
-            "observation-text";
-
-        text.textContent =
-            observation.observation;
-
-        card.appendChild(meta);
-        card.appendChild(text);
-
-        if (editMode) {
-
-            const actions =
-                document.createElement("div");
-
-            actions.className =
-                "observation-actions";
-
-            const editButton =
-                document.createElement("button");
-
-            editButton.className =
-                "edit-observation-button";
-
-            editButton.textContent =
-                "Edit";
-
-            editButton.addEventListener(
-                "click",
-                function() {
-                    startObservationEdit(
-                        observation,
-                        card
-                    );
-                }
-            );
-
-            actions.appendChild(editButton);
-
-            card.appendChild(actions);
+                observationMessage.textContent =
+                    "No observations recorded.";
+            }
         }
 
-        observationList.appendChild(card);
-    });
+
+        if (observationCount) {
+
+            observationCount.textContent =
+                "0";
+        }
+
+
+        return;
+    }
+
+
+    if (observationMessage) {
+
+        observationMessage.textContent =
+            "";
+    }
+
+
+    if (observationCount) {
+
+        observationCount.textContent =
+            observations.length;
+    }
+
+
+    observations.forEach(
+        function(
+            observation,
+            index
+        ) {
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "observation-card";
+
+
+            const meta =
+                document.createElement(
+                    "div"
+                );
+
+
+            meta.className =
+                "observation-meta";
+
+
+            const title =
+                document.createElement(
+                    "strong"
+                );
+
+
+            title.textContent =
+                "Observation " +
+                (index + 1);
+
+
+            const recordedAt =
+                document.createElement(
+                    "span"
+                );
+
+
+            if (observation.recorded_at) {
+
+                recordedAt.textContent =
+                    formatDateTime(
+                        observation.recorded_at
+                    );
+
+            } else {
+
+                recordedAt.textContent =
+                    "Unknown time";
+            }
+
+
+            meta.appendChild(
+                title
+            );
+
+
+            meta.appendChild(
+                recordedAt
+            );
+
+
+            const text =
+                document.createElement(
+                    "p"
+                );
+
+
+            text.className =
+                "observation-text";
+
+
+            text.textContent =
+                observation.observation ||
+                observation.observation_text ||
+                "";
+
+
+            card.appendChild(
+                meta
+            );
+
+
+            card.appendChild(
+                text
+            );
+
+
+            if (editMode) {
+
+                const actions =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                actions.className =
+                    "observation-actions";
+
+
+                createObservationActionButtons(
+                    observation,
+                    card,
+                    actions
+                );
+
+
+                card.appendChild(
+                    actions
+                );
+            }
+
+
+            observationList.appendChild(
+                card
+            );
+        }
+    );
 }
 
 
-// START OBSERVATION EDIT
+// CREATE OBSERVATION ACTION BUTTONS
+
+function createObservationActionButtons(
+    observation,
+    card,
+    actions
+) {
+
+    const editButton =
+        document.createElement(
+            "button"
+        );
+
+
+    editButton.type =
+        "button";
+
+
+    editButton.className =
+        "edit-observation-button";
+
+
+    editButton.textContent =
+        "Edit";
+
+
+    editButton.addEventListener(
+        "click",
+        function() {
+
+            startObservationEdit(
+                observation,
+                card
+            );
+        }
+    );
+
+
+    const deleteButton =
+        document.createElement(
+            "button"
+        );
+
+
+    deleteButton.type =
+        "button";
+
+
+    deleteButton.className =
+        "delete-observation-button";
+
+
+    deleteButton.textContent =
+        "Delete";
+
+
+    deleteButton.addEventListener(
+        "click",
+        function() {
+
+            deleteObservation(
+                observation.observation_id
+            );
+        }
+    );
+
+
+    actions.appendChild(
+        editButton
+    );
+
+
+    actions.appendChild(
+        deleteButton
+    );
+}
+
+
+// START NEW OBSERVATION
+
+function startNewObservation() {
+
+    if (!editMode) {
+
+        return;
+    }
+
+
+    if (!observationList) {
+
+        return;
+    }
+
+
+    const existingEditor =
+        document.querySelector(
+            ".new-observation-editor"
+        );
+
+
+    if (existingEditor) {
+
+        return;
+    }
+
+
+    const editor =
+        document.createElement(
+            "div"
+        );
+
+
+    editor.className =
+        "new-observation-editor";
+
+
+    const textarea =
+        document.createElement(
+            "textarea"
+        );
+
+
+    textarea.className =
+        "observation-edit-input";
+
+
+    textarea.placeholder =
+        "Enter observation...";
+
+
+    textarea.rows =
+        4;
+
+
+    const actions =
+        document.createElement(
+            "div"
+        );
+
+
+    actions.className =
+        "observation-actions";
+
+
+    const saveButton =
+        document.createElement(
+            "button"
+        );
+
+
+    saveButton.type =
+        "button";
+
+
+    saveButton.className =
+        "save-observation-button";
+
+
+    saveButton.textContent =
+        "Save Observation";
+
+
+    const cancelButton =
+        document.createElement(
+            "button"
+        );
+
+
+    cancelButton.type =
+        "button";
+
+
+    cancelButton.className =
+        "cancel-observation-button";
+
+
+    cancelButton.textContent =
+        "Cancel";
+
+
+    saveButton.addEventListener(
+        "click",
+        async function() {
+
+            const observation =
+                textarea.value.trim();
+
+
+            if (!observation) {
+
+                alert(
+                    "Observation cannot be empty."
+                );
+
+                return;
+            }
+
+
+            saveButton.disabled =
+                true;
+
+
+            const created =
+                await createObservation(
+                    observation
+                );
+
+
+            if (created) {
+
+                /*
+                 * Add the new observation
+                 * directly to the local array.
+                 */
+
+                currentObservations.push(
+                    created
+                );
+
+
+                editor.remove();
+
+
+                displayObservations(
+                    currentObservations
+                );
+
+            } else {
+
+                /*
+                 * Keep the editor open
+                 * when saving fails.
+                 */
+
+                saveButton.disabled =
+                    false;
+            }
+        }
+    );
+
+
+    cancelButton.addEventListener(
+        "click",
+        function() {
+
+            editor.remove();
+        }
+    );
+
+
+    actions.appendChild(
+        saveButton
+    );
+
+
+    actions.appendChild(
+        cancelButton
+    );
+
+
+    editor.appendChild(
+        textarea
+    );
+
+
+    editor.appendChild(
+        actions
+    );
+
+
+    observationList.prepend(
+        editor
+    );
+
+
+    textarea.focus();
+}
+
+
+// EDIT OBSERVATION
 
 function startObservationEdit(
     observation,
     card
 ) {
 
+    if (!editMode) {
+
+        return;
+    }
+
+
     const textElement =
         card.querySelector(
             ".observation-text"
         );
+
 
     const actions =
         card.querySelector(
             ".observation-actions"
         );
 
+
     if (!textElement || !actions) {
+
         return;
     }
+
 
     textElement.style.display =
         "none";
 
-    actions.innerHTML = "";
+
+    actions.innerHTML =
+        "";
+
 
     const textarea =
-        document.createElement("textarea");
+        document.createElement(
+            "textarea"
+        );
+
 
     textarea.className =
         "observation-edit-input";
 
-    textarea.value =
-        observation.observation;
 
-    textarea.rows = 4;
+    textarea.value =
+        observation.observation ||
+        observation.observation_text ||
+        "";
+
+
+    textarea.rows =
+        4;
+
 
     const saveButton =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
+
+
+    saveButton.type =
+        "button";
+
 
     saveButton.className =
         "save-observation-button";
 
+
     saveButton.textContent =
         "Save";
 
+
     const cancelButton =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
+
+
+    cancelButton.type =
+        "button";
+
 
     cancelButton.className =
         "cancel-observation-button";
 
+
     cancelButton.textContent =
         "Cancel";
 
+
     saveButton.addEventListener(
         "click",
-        function() {
+        async function() {
 
-            updateObservation(
-                observation.observation_id,
-                textarea.value
-            );
+            const newObservation =
+                textarea.value.trim();
+
+
+            if (!newObservation) {
+
+                alert(
+                    "Observation cannot be empty."
+                );
+
+                return;
+            }
+
+
+            saveButton.disabled =
+                true;
+
+
+            const updated =
+                await updateObservation(
+                    observation.observation_id,
+                    newObservation
+                );
+
+
+            if (updated) {
+
+                /*
+                 * Update the existing observation
+                 * directly in the local array.
+                 */
+
+                observation.observation =
+                    updated.observation ||
+                    newObservation;
+
+
+                if (
+                    updated.recorded_at
+                ) {
+
+                    observation.recorded_at =
+                        updated.recorded_at;
+                }
+
+
+                displayObservations(
+                    currentObservations
+                );
+            } else {
+
+                /*
+                 * Keep the editor open when
+                 * the update fails.
+                 */
+
+                saveButton.disabled =
+                    false;
+            }
         }
     );
+
 
     cancelButton.addEventListener(
         "click",
         function() {
 
+            textarea.remove();
+
+
             textElement.style.display =
                 "";
 
-            actions.innerHTML = "";
 
-            const editButton =
-                document.createElement("button");
+            actions.innerHTML =
+                "";
 
-            editButton.className =
-                "edit-observation-button";
 
-            editButton.textContent =
-                "Edit";
-
-            editButton.addEventListener(
-                "click",
-                function() {
-                    startObservationEdit(
-                        observation,
-                        card
-                    );
-                }
-            );
-
-            actions.appendChild(
-                editButton
+            createObservationActionButtons(
+                observation,
+                card,
+                actions
             );
         }
     );
+
 
     card.insertBefore(
         textarea,
         textElement
     );
 
+
     actions.appendChild(
         saveButton
     );
 
+
     actions.appendChild(
         cancelButton
     );
+
+
+    textarea.focus();
 }
 
 
@@ -670,37 +1629,57 @@ async function updateObservation(
     observation
 ) {
 
+    if (!editMode) {
+
+        return null;
+    }
+
+
     if (!observation.trim()) {
 
         alert(
             "Observation cannot be empty."
         );
 
-        return;
+        return null;
     }
+
+
+    if (!observationId) {
+
+        alert(
+            "Unable to update observation because the observation ID is missing."
+        );
+
+        return null;
+    }
+
 
     try {
 
-        const response = await fetch(
-            "http://localhost:3000/api/observations/" +
-            observationId,
-            {
-                method: "PATCH",
+        const response =
+            await fetch(
+                "http://localhost:3000/api/observations/" +
+                observationId,
+                {
+                    method: "PATCH",
 
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                body: JSON.stringify({
-                    observation:
-                        observation.trim()
-                })
-            }
-        );
+                    body: JSON.stringify({
+                        observation:
+                            observation.trim()
+                    })
+                }
+            );
+
 
         const data =
             await response.json();
+
 
         if (!response.ok) {
 
@@ -710,9 +1689,27 @@ async function updateObservation(
             );
         }
 
-        await loadObservations(
-            currentExperiment.session_id
-        );
+
+        if (data.observation) {
+
+            return data.observation;
+        }
+
+
+        if (data.data) {
+
+            return data.data;
+        }
+
+
+        return {
+            observation_id:
+                observationId,
+
+            observation:
+                observation.trim()
+        };
+
 
     } catch (error) {
 
@@ -721,26 +1718,138 @@ async function updateObservation(
             error
         );
 
+
         alert(
+            error.message ||
             "Unable to update observation."
+        );
+
+
+        return null;
+    }
+}
+
+
+// DELETE OBSERVATION
+
+async function deleteObservation(
+    observationId
+) {
+
+    if (!editMode) {
+
+        return;
+    }
+
+
+    if (!observationId) {
+
+        alert(
+            "Unable to delete observation because the observation ID is missing."
+        );
+
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to delete this observation?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:3000/api/observations/" +
+                observationId,
+                {
+                    method: "DELETE"
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Failed to delete observation"
+            );
+        }
+
+
+        /*
+         * Remove only the successfully deleted
+         * observation from the local array.
+         */
+
+        currentObservations =
+            currentObservations.filter(
+                function(item) {
+
+                    return (
+                        item.observation_id !==
+                        observationId
+                    );
+                }
+            );
+
+
+        displayObservations(
+            currentObservations
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Delete observation error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Unable to delete observation."
         );
     }
 }
 
 
+// =========================
+// IMAGES
+// =========================
+
+
 // LOAD EXPERIMENT IMAGES
 
-async function loadExperimentImages(sessionId) {
+async function loadExperimentImages(
+    sessionId
+) {
 
     try {
 
-        const response = await fetch(
-            "http://localhost:3000/api/images/" +
-            sessionId
-        );
+        const response =
+            await fetch(
+                "http://localhost:3000/api/images/" +
+                sessionId
+            );
+
 
         const data =
             await response.json();
+
 
         if (!response.ok) {
 
@@ -750,9 +1859,55 @@ async function loadExperimentImages(sessionId) {
             );
         }
 
+
+        let images = [];
+
+
+        if (Array.isArray(data)) {
+
+            images =
+                data;
+
+        } else if (
+            Array.isArray(
+                data.images
+            )
+        ) {
+
+            images =
+                data.images;
+
+        } else if (
+            data.data &&
+            Array.isArray(
+                data.data.images
+            )
+        ) {
+
+            images =
+                data.data.images;
+
+        } else if (
+            data.data &&
+            Array.isArray(data.data)
+        ) {
+
+            images =
+                data.data;
+        }
+
+
+        currentImages =
+            images;
+
+
         displayExperimentImages(
-            data.images || []
+            images
         );
+
+
+        return true;
+
 
     } catch (error) {
 
@@ -761,242 +1916,443 @@ async function loadExperimentImages(sessionId) {
             error
         );
 
-        imageMessage.textContent =
-            "Unable to load images.";
+
+        /*
+         * Do not erase currentImages when
+         * a refresh request fails.
+         */
+
+        if (imageMessage) {
+
+            imageMessage.textContent =
+                "Unable to refresh images.";
+        }
+
+
+        return false;
     }
+}
+
+
+function formatFileName(fileName) {
+    if (!fileName) {
+        return "Unnamed file";
+    }
+
+    if (fileName.length <= 33) {
+        return fileName;
+    }
+
+    return fileName.substring(0, 30) + "...";
 }
 
 
 // DISPLAY EXPERIMENT IMAGES
 
-function displayExperimentImages(images) {
+function displayExperimentImages(
+    images
+) {
 
-    imageList.innerHTML = "";
-
-    if (images.length === 0) {
-
-        imageMessage.textContent =
-            "No images uploaded.";
+    if (!imageList) {
 
         return;
     }
 
-    imageMessage.textContent = "";
 
-    images.forEach(function(image) {
+    imageList.innerHTML =
+        "";
 
-        const card =
-            document.createElement("div");
 
-        card.className =
-            "experiment-image-card";
+    if (
+        !images ||
+        images.length === 0
+    ) {
 
-        const imageElement =
-            document.createElement("img");
+        if (imageMessage) {
 
-        imageElement.src =
-            image.image_url;
+            if (editMode) {
 
-        imageElement.alt =
-            image.file_name;
+                imageMessage.textContent =
+                    "No images uploaded. You can upload one now.";
 
-        imageElement.addEventListener(
-            "click",
-            function() {
+            } else {
 
-                openImageViewer(
-                    image.image_url,
-                    image.file_name
-                );
+                imageMessage.textContent =
+                    "No images uploaded.";
             }
-        );
+        }
 
-        const fileName =
-            document.createElement("p");
 
-        fileName.className =
-            "image-file-name";
+        return;
+    }
 
-        fileName.textContent =
-            formatFileName(
-                image.file_name
-            );
 
-        const recordedAt =
-            document.createElement("p");
+    if (imageMessage) {
 
-        recordedAt.className =
-            "image-recorded-time";
+        imageMessage.textContent =
+            "";
+    }
 
-        recordedAt.textContent =
-            image.recorded_at
-                ? formatDateTime(
-                    image.recorded_at
-                )
-                : "Unknown time";
 
-        card.appendChild(
-            imageElement
-        );
+    images.forEach(
+        function(image) {
 
-        card.appendChild(
-            fileName
-        );
+            const card =
+                document.createElement(
+                    "div"
+                );
 
-        card.appendChild(
-            recordedAt
-        );
 
-        if (editMode) {
+            card.className =
+                "experiment-image-card";
 
-            const deleteButton =
-                document.createElement("button");
 
-            deleteButton.className =
-                "delete-image-button";
+            const imageElement =
+                document.createElement(
+                    "img"
+                );
 
-            deleteButton.textContent =
-                "Delete Image";
 
-            deleteButton.addEventListener(
+            imageElement.src =
+                image.image_url;
+
+
+            imageElement.alt =
+                image.file_name ||
+                "Experiment image";
+
+
+            /*
+             * Existing images can always
+             * be clicked to enlarge.
+             */
+
+            imageElement.addEventListener(
                 "click",
                 function() {
 
-                    deleteImage(
-                        image.image_id
+                    openImageViewer(
+                        image.image_url,
+                        image.file_name
                     );
                 }
             );
 
+
+            const fileName =
+                document.createElement(
+                    "p"
+                );
+
+
+            fileName.className =
+                "image-file-name";
+
+
+            fileName.textContent =
+                formatFileName(
+                    image.file_name
+                );
+
+
+            const recordedAt =
+                document.createElement(
+                    "p"
+                );
+
+
+            recordedAt.className =
+                "image-recorded-time";
+
+
+            if (image.recorded_at) {
+
+                recordedAt.textContent =
+                    formatDateTime(
+                        image.recorded_at
+                    );
+
+            } else {
+
+                recordedAt.textContent =
+                    "Unknown time";
+            }
+
+
             card.appendChild(
-                deleteButton
+                imageElement
+            );
+
+
+            card.appendChild(
+                fileName
+            );
+
+
+            card.appendChild(
+                recordedAt
+            );
+
+
+            /*
+             * DELETE IMAGE BUTTON
+             */
+
+            if (editMode) {
+
+                const deleteButton =
+                    document.createElement(
+                        "button"
+                    );
+
+
+                deleteButton.type =
+                    "button";
+
+
+                deleteButton.className =
+                    "delete-image-button";
+
+
+                deleteButton.textContent =
+                    "Delete Image";
+
+
+                deleteButton.addEventListener(
+                    "click",
+                    function(event) {
+
+                        event.stopPropagation();
+
+
+                        deleteImage(
+                            image.image_id
+                        );
+                    }
+                );
+
+
+                card.appendChild(
+                    deleteButton
+                );
+            }
+
+
+            imageList.appendChild(
+                card
             );
         }
-
-        imageList.appendChild(card);
-    });
+    );
 }
 
 
 // UPLOAD IMAGE
 
-uploadImageButton.addEventListener(
-    "click",
-    async function() {
+if (uploadImageButton) {
 
-        const file =
-            imageInput.files[0];
+    uploadImageButton.addEventListener(
+        "click",
+        async function() {
 
-        if (!file) {
+            if (!editMode) {
 
-            uploadImageMessage.textContent =
-                "Please select an image first.";
-
-            return;
-        }
-
-        if (!currentExperiment) {
-
-            uploadImageMessage.textContent =
-                "Experiment information is unavailable.";
-
-            return;
-        }
-
-        uploadImageMessage.textContent =
-            "Uploading image...";
-
-        uploadImageButton.disabled =
-            true;
-
-        try {
-
-            const formData =
-                new FormData();
-
-            formData.append(
-                "image",
-                file
-            );
-
-            formData.append(
-                "session_id",
-                currentExperiment.session_id
-            );
-
-            const response = await fetch(
-                "http://localhost:3000/api/images",
-                {
-                    method: "POST",
-                    body: formData
-                }
-            );
-
-            const data =
-                await response.json();
-
-            if (!response.ok) {
-
-                throw new Error(
-                    data.message ||
-                    "Failed to upload image"
-                );
+                return;
             }
 
-            uploadImageMessage.textContent =
-                "Image uploaded successfully.";
 
-            imageInput.value = "";
+            if (!imageInput) {
 
-            await loadExperimentImages(
-                currentExperiment.session_id
-            );
+                return;
+            }
 
-        } catch (error) {
 
-            console.error(
-                "Upload image error:",
-                error
-            );
+            const file =
+                imageInput.files[0];
 
-            uploadImageMessage.textContent =
-                error.message ||
-                "Unable to upload image.";
 
-        } finally {
+            if (!file) {
+
+                if (uploadImageMessage) {
+
+                    uploadImageMessage.textContent =
+                        "Please select an image first.";
+                }
+
+                return;
+            }
+
+
+            if (!file.type.startsWith("image/")) {
+
+                if (uploadImageMessage) {
+
+                    uploadImageMessage.textContent =
+                        "Please select an image file.";
+                }
+
+                return;
+            }
+
+
+            if (!currentExperiment) {
+
+                if (uploadImageMessage) {
+
+                    uploadImageMessage.textContent =
+                        "Experiment information is unavailable.";
+                }
+
+                return;
+            }
+
+
+            if (uploadImageMessage) {
+
+                uploadImageMessage.textContent =
+                    "Uploading image...";
+            }
+
 
             uploadImageButton.disabled =
-                false;
+                true;
+
+
+            try {
+
+                const formData =
+                    new FormData();
+
+
+                formData.append(
+                    "image",
+                    file
+                );
+
+
+                formData.append(
+                    "session_id",
+                    currentExperiment.session_id
+                );
+
+
+                const response =
+                    await fetch(
+                        "http://localhost:3000/api/images",
+                        {
+                            method: "POST",
+                            body: formData
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.message ||
+                        "Failed to upload image"
+                    );
+                }
+
+
+                if (uploadImageMessage) {
+
+                    uploadImageMessage.textContent =
+                        "Image uploaded successfully.";
+                }
+
+
+                /*
+                 * Only clear the selected file
+                 * after successful upload.
+                 */
+
+                imageInput.value =
+                    "";
+
+
+                await loadExperimentImages(
+                    currentExperiment.session_id
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Upload image error:",
+                    error
+                );
+
+
+                if (uploadImageMessage) {
+
+                    uploadImageMessage.textContent =
+                        error.message ||
+                        "Unable to upload image.";
+                }
+
+            } finally {
+
+                uploadImageButton.disabled =
+                    false;
+            }
         }
-    }
-);
+    );
+}
 
 
 // DELETE IMAGE
 
-async function deleteImage(imageId) {
+async function deleteImage(
+    imageId
+) {
+
+    if (!editMode) {
+
+        return;
+    }
+
+
+    if (!imageId) {
+
+        alert(
+            "Unable to delete image because the image ID is missing."
+        );
+
+        return;
+    }
+
 
     const confirmed =
         confirm(
             "Are you sure you want to delete this image?"
         );
 
+
     if (!confirmed) {
+
         return;
     }
 
+
     try {
 
-        const response = await fetch(
-            "http://localhost:3000/api/images/" +
-            imageId,
-            {
-                method: "DELETE"
-            }
-        );
+        const response =
+            await fetch(
+                "http://localhost:3000/api/images/" +
+                imageId,
+                {
+                    method: "DELETE"
+                }
+            );
+
 
         const data =
             await response.json();
+
 
         if (!response.ok) {
 
@@ -1006,9 +2362,28 @@ async function deleteImage(imageId) {
             );
         }
 
-        await loadExperimentImages(
-            currentExperiment.session_id
+
+        /*
+         * Remove the successfully deleted
+         * image from the local array.
+         */
+
+        currentImages =
+            currentImages.filter(
+                function(item) {
+
+                    return (
+                        item.image_id !==
+                        imageId
+                    );
+                }
+            );
+
+
+        displayExperimentImages(
+            currentImages
         );
+
 
     } catch (error) {
 
@@ -1017,7 +2392,9 @@ async function deleteImage(imageId) {
             error
         );
 
+
         alert(
+            error.message ||
             "Unable to delete image."
         );
     }
@@ -1026,21 +2403,61 @@ async function deleteImage(imageId) {
 
 // FORMAT FILE NAME
 
-function formatFileName(fileName) {
-
-    if (!fileName) {
-        return "Unknown file";
+function formatDuration(startTime, endTime) {
+    if (!startTime || !endTime) {
+        return "Not available";
     }
 
-    if (fileName.length <= 25) {
-        return fileName;
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+
+    if (
+        Number.isNaN(start.getTime()) ||
+        Number.isNaN(end.getTime())
+    ) {
+        return "Not available";
     }
 
-    return (
-        fileName.substring(0, 22) +
-        "..."
-    );
+    const difference = end.getTime() - start.getTime();
+
+    if (difference < 0) {
+        return "Not available";
+    }
+
+    const totalSeconds = Math.round(difference / 1000);
+
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    if (hours > 0) {
+        return (
+            hours +
+            "h " +
+            minutes +
+            "m " +
+            seconds +
+            "s"
+        );
+    }
+
+    if (minutes > 0) {
+        return (
+            minutes +
+            "m " +
+            seconds +
+            "s"
+        );
+    }
+
+    return totalSeconds + "s";
 }
+
+
+// =========================
+// IMAGE VIEWER
+// =========================
+
 
 // OPEN IMAGE VIEWER
 
@@ -1054,6 +2471,7 @@ function openImageViewer(
             "div"
         );
 
+
     overlay.className =
         "image-viewer-overlay";
 
@@ -1062,6 +2480,7 @@ function openImageViewer(
         document.createElement(
             "div"
         );
+
 
     viewer.className =
         "image-viewer";
@@ -1072,11 +2491,18 @@ function openImageViewer(
             "button"
         );
 
+
+    closeButton.type =
+        "button";
+
+
     closeButton.className =
         "image-viewer-close";
 
+
     closeButton.textContent =
         "×";
+
 
     closeButton.setAttribute(
         "aria-label",
@@ -1089,14 +2515,18 @@ function openImageViewer(
             "img"
         );
 
+
     largeImage.className =
         "image-viewer-image";
+
 
     largeImage.src =
         imageUrl;
 
+
     largeImage.alt =
-        fileName;
+        fileName ||
+        "Experiment image";
 
 
     closeButton.addEventListener(
@@ -1131,13 +2561,16 @@ function openImageViewer(
         closeButton
     );
 
+
     viewer.appendChild(
         largeImage
     );
 
+
     overlay.appendChild(
         viewer
     );
+
 
     document.body.appendChild(
         overlay
@@ -1151,20 +2584,26 @@ function closeImageViewer(
     overlay
 ) {
 
-    overlay.remove();
+    if (overlay) {
+
+        overlay.remove();
+    }
 }
 
+
+// =========================
 // INITIALIZE
+// =========================
 
 async function initializeExperimentPage() {
 
-    checkEditModeFromUrl();
+    const sessionResult =
+        await supabaseClient.auth.getSession();
 
-    const {
-        data: {
-            session
-        }
-    } = await supabaseClient.auth.getSession();
+
+    const session =
+        sessionResult.data.session;
+
 
     if (!session) {
 
@@ -1174,26 +2613,41 @@ async function initializeExperimentPage() {
         return;
     }
 
+
     const sessionId =
         getSessionId();
 
+
     if (!sessionId) {
 
-        experimentName.textContent =
-            "Experiment not found";
+        if (experimentName) {
 
-        experimentStatus.textContent =
-            "No session ID provided.";
+            experimentName.textContent =
+                "Experiment not found";
+        }
 
-        editModeButton.style.display =
-            "none";
+
+        if (experimentStatus) {
+
+            experimentStatus.textContent =
+                "No session ID provided.";
+        }
+
 
         return;
     }
 
-    await loadExperiment(
-        sessionId
-    );
+
+    /*
+     * Always start in normal read-only mode.
+     */
+
+    editMode =
+        false;
+
+
+    await loadExperiment();
 }
+
 
 initializeExperimentPage();

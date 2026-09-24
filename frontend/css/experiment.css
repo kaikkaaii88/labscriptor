@@ -1123,6 +1123,11 @@ body {
     .experiment-image-card img {
         height: 200px;
     }
+    .add-observation-button {
+
+        width: 100%;
+
+    }
 }
 
 /* =========================
@@ -1317,4 +1322,118 @@ body {
 
 .app-brand-icon:active {
     transform: translateY(1px);
+}
+
+
+/* =========================
+   ADD OBSERVATION
+   ========================= */
+
+.add-observation-button {
+
+    display: none;
+
+    flex-shrink: 0;
+
+    padding: 9px 14px;
+
+    background-color: #111827;
+
+    border: 1px solid #111827;
+
+    border-radius: 7px;
+
+    color: white;
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        transform 0.1s ease;
+}
+
+
+.add-observation-button:hover {
+
+    background-color: #374151;
+
+    border-color: #374151;
+}
+
+
+.add-observation-button:active {
+
+    transform: translateY(1px);
+}
+
+.image-upload-section {
+    display: none;
+    width: 100%;
+    margin-bottom: 16px;
+    padding: 13px;
+    background: #f8fafc;
+    border: 1px dashed #d1d5db;
+    border-radius: 10px;
+}
+
+.image-upload-section input[type="file"] {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 7px;
+    box-sizing: border-box;
+}
+
+.image-upload-section button {
+    padding: 9px 15px;
+    border: none;
+    border-radius: 7px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.image-upload-section button:hover {
+    background: #1d4ed8;
+}
+
+.image-upload-section button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#uploadImageMessage {
+    margin: 10px 0 0;
+    font-size: 14px;
+}
+
+.remove-image-button:hover {
+    background: #fef2f2;
+}
+
+.remove-image-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#uploadImageButton {
+    border: none;
+    background: #2563eb;
+    color: #ffffff;
+}
+
+#uploadImageButton:hover {
+    background: #1d4ed8;
+}
+
+#uploadImageButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }

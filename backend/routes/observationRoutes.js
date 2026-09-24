@@ -200,6 +200,58 @@ router.patch("/:observationId", async function(req, res) {
 });
 
 
+// DELETE OBSERVATION
+
+router.delete("/:observationId", async function(req, res) {
+    try {
+        const supabase = req.app.locals.supabase;
+
+        const observationId =
+            req.params.observationId;
+
+        if (!observationId) {
+            return res.status(400).json({
+                message: "Observation ID is required"
+            });
+        }
+
+        const { error } = await supabase
+            .from("observations")
+            .delete()
+            .eq("observation_id", observationId);
+
+        if (error) {
+            console.error(
+                "Delete observation error:",
+                error
+            );
+
+            return res.status(500).json({
+                message: "Failed to delete observation",
+                error: error.message
+            });
+        }
+
+        res.json({
+            message:
+                "Observation deleted successfully"
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Delete observation error:",
+            error
+        );
+
+        res.status(500).json({
+            message: "Server error",
+            error: error.message
+        });
+    }
+});
+
+
 // EXPORT ROUTER
 
 module.exports = router;
