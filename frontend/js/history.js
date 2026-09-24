@@ -1,6 +1,10 @@
-const SUPABASE_URL = "https://wxoisxojhqelzmeqhoml.supabase.co";
+// SUPABASE CONFIGURATION
 
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_HmZbJeN7C7bHRoPcDHSj1A_WxKjoHdy";
+const SUPABASE_URL =
+    "https://wxoisxojhqelzmeqhoml.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_HmZbJeN7C7bHRoPcDHSj1A_WxKjoHdy";
 
 const supabaseClient =
     window.supabase.createClient(
@@ -8,6 +12,8 @@ const supabaseClient =
         SUPABASE_PUBLISHABLE_KEY
     );
 
+
+// DOM ELEMENTS
 
 const historyMessage =
     document.getElementById(
@@ -17,6 +23,16 @@ const historyMessage =
 const experimentList =
     document.getElementById(
         "experimentList"
+    );
+
+const imageMessage =
+    document.getElementById(
+        "imageMessage"
+    );
+
+const imageList =
+    document.getElementById(
+        "imageList"
     );
 
 const homeButton =
@@ -29,6 +45,8 @@ const logoutButton =
         "logoutButton"
     );
 
+
+// NAVIGATION
 
 homeButton.addEventListener(
     "click",
@@ -70,6 +88,8 @@ logoutButton.addEventListener(
 );
 
 
+// LOAD CURRENT USER
+
 async function loadCurrentUser() {
 
     const result =
@@ -100,6 +120,8 @@ async function loadCurrentUser() {
     return user;
 }
 
+
+// LOAD USER ID
 
 async function loadUserId(user) {
 
@@ -140,6 +162,8 @@ async function loadUserId(user) {
 }
 
 
+// LOAD EXPERIMENTS
+
 async function loadExperiments(
     userId
 ) {
@@ -164,7 +188,7 @@ async function loadExperiments(
             historyMessage.textContent =
                 "Unable to load experiments.";
 
-            return;
+            return [];
         }
 
         const experiments =
@@ -182,6 +206,8 @@ async function loadExperiments(
             experiments
         );
 
+        return experiments;
+
     } catch (error) {
 
         console.error(
@@ -191,11 +217,15 @@ async function loadExperiments(
 
         historyMessage.textContent =
             "Unable to connect to the LabScriptor backend.";
+
+        return [];
     }
 }
 
 
-async function displayExperiments(
+// DISPLAY EXPERIMENTS
+
+function displayExperiments(
     experiments
 ) {
 
@@ -215,8 +245,9 @@ async function displayExperiments(
         experiments.length +
         " experiment(s) found.";
 
+
     experiments.forEach(
-        async function (experiment) {
+        function (experiment) {
 
             const card =
                 document.createElement(
@@ -226,6 +257,8 @@ async function displayExperiments(
             card.className =
                 "experiment-card";
 
+
+            // EXPERIMENT INFORMATION
 
             const info =
                 document.createElement(
@@ -280,6 +313,30 @@ async function displayExperiments(
                 experiment.status;
 
 
+            info.appendChild(
+                title
+            );
+
+            info.appendChild(
+                startTime
+            );
+
+            info.appendChild(
+                status
+            );
+
+
+            // EXPERIMENT ACTIONS
+
+            const buttonContainer =
+                document.createElement(
+                    "div"
+                );
+
+            buttonContainer.className =
+                "experiment-actions";
+
+
             const viewButton =
                 document.createElement(
                     "button"
@@ -290,7 +347,6 @@ async function displayExperiments(
 
             viewButton.textContent =
                 "View";
-
 
             viewButton.addEventListener(
                 "click",
@@ -303,89 +359,79 @@ async function displayExperiments(
             );
 
 
-            info.appendChild(title);
-
-            info.appendChild(startTime);
-
-            info.appendChild(status);
-
-
-            const imageSection =
-                document.createElement(
-                    "div"
-                );
-
-            imageSection.className =
-                "history-images";
-
-
-            const imageTitle =
-                document.createElement(
-                    "h4"
-                );
-
-            imageTitle.textContent =
-                "Images";
-
-
-            imageSection.appendChild(
-                imageTitle
+            buttonContainer.appendChild(
+                viewButton
             );
 
 
-            const imageContainer =
-                document.createElement(
-                    "div"
+            // EDIT BUTTON
+
+            if (
+                experiment.status &&
+                (
+                    experiment.status.toLowerCase() ===
+                        "completed" ||
+                    experiment.status.toLowerCase() ===
+                        "finished"
+                )
+            ) {
+
+                const editButton =
+                    document.createElement(
+                        "button"
+                    );
+
+                editButton.className =
+                    "edit-button";
+
+                editButton.textContent =
+                    "Edit";
+
+                editButton.addEventListener(
+                    "click",
+                    function () {
+
+                        window.location.href =
+                            "experiment.html?session_id=" +
+                            experiment.session_id +
+                            "&edit=true";
+                    }
                 );
 
-            imageContainer.className =
-                "history-image-container";
-
-
-            const loadingMessage =
-                document.createElement(
-                    "p"
+                buttonContainer.appendChild(
+                    editButton
                 );
-
-            loadingMessage.textContent =
-                "Loading images...";
+            }
 
 
-            imageContainer.appendChild(
-                loadingMessage
-            );
-
-
-            imageSection.appendChild(
-                imageContainer
-            );
-
-
-            card.appendChild(info);
+            // ADD CONTENT TO CARD
 
             card.appendChild(
-                imageSection
+                info
             );
 
-            card.appendChild(viewButton);
+            card.appendChild(
+                buttonContainer
+            );
 
 
             experimentList.appendChild(
                 card
             );
-
-
-            loadHistoryImages(
-                experiment.session_id,
-                imageContainer
-            );
-                    }
+        }
     );
 }
+
+
+// FORMAT FILE NAME
 
 function formatFileName(
     fileName
 ) {
+
+    if (!fileName) {
+        return "Unknown file";
+    }
 
     if (
         fileName.length > 23
@@ -404,153 +450,341 @@ function formatFileName(
 }
 
 
-/* =========================
-   LOAD HISTORY IMAGES
-   ========================= */
+// LOAD ALL HISTORY IMAGES
 
-async function loadHistoryImages(
-    sessionId,
-    imageContainer
+async function loadAllHistoryImages(
+    experiments
 ) {
 
-    try {
+    imageList.innerHTML = "";
 
-        const response =
-            await fetch(
-                "http://localhost:3000/api/images/" +
-                sessionId
+    if (
+        !experiments ||
+        experiments.length === 0
+    ) {
+
+        imageMessage.textContent =
+            "No images available.";
+
+        return;
+    }
+
+
+    imageMessage.textContent =
+        "Loading images...";
+
+
+    let allImages = [];
+
+
+    for (
+        let i = 0;
+        i < experiments.length;
+        i++
+    ) {
+
+        const experiment =
+            experiments[i];
+
+        try {
+
+            const response =
+                await fetch(
+                    "http://localhost:3000/api/images/" +
+                    experiment.session_id
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                console.error(
+                    "Failed to load images for session:",
+                    experiment.session_id,
+                    data
+                );
+
+                continue;
+            }
+
+
+            const images =
+                data.images || [];
+
+
+            images.forEach(
+                function (image) {
+
+                    allImages.push({
+                        image: image,
+                        experiment: experiment
+                    });
+
+                }
             );
 
-        const data =
-            await response.json();
+        } catch (error) {
 
-        if (!response.ok) {
-
-            throw new Error(
-                data.message ||
-                "Failed to load images."
+            console.error(
+                "Error loading images for session:",
+                experiment.session_id,
+                error
             );
-
         }
+    }
 
 
-        imageContainer.innerHTML = "";
+    imageList.innerHTML = "";
 
 
-        if (
-            !data.images ||
-            data.images.length === 0
-        ) {
+    if (
+        allImages.length === 0
+    ) {
 
-            const noImagesMessage =
+        imageMessage.textContent =
+            "No images uploaded.";
+
+        return;
+    }
+
+
+    imageMessage.textContent =
+        allImages.length +
+        " image(s) found.";
+
+
+    allImages.forEach(
+        function (item) {
+
+            const image =
+                item.image;
+
+            const experiment =
+                item.experiment;
+
+
+            const imageItem =
+                document.createElement(
+                    "div"
+                );
+
+            imageItem.className =
+                "history-image-item";
+
+
+            const imageElement =
+                document.createElement(
+                    "img"
+                );
+
+            imageElement.src =
+                image.image_url;
+
+            imageElement.alt =
+                image.file_name;
+
+            imageElement.addEventListener(
+                "click",
+                function () {
+
+                    openImageViewer(
+                        image.image_url,
+                        image.file_name
+                    );
+                }
+            );
+
+
+            const fileName =
                 document.createElement(
                     "p"
                 );
 
-            noImagesMessage.textContent =
-                "No images uploaded.";
+            fileName.className =
+                "history-image-file-name";
 
-            noImagesMessage.className =
-                "no-images-message";
-
-            imageContainer.appendChild(
-                noImagesMessage
-            );
-
-            return;
-        }
+            fileName.textContent =
+                formatFileName(
+                    image.file_name
+                );
 
 
-        data.images.forEach(
-            function (image) {
+            const experimentName =
+                document.createElement(
+                    "p"
+                );
 
-                const imageItem =
-                    document.createElement(
-                        "div"
-                    );
+            experimentName.className =
+                "history-image-experiment";
 
-                imageItem.className =
-                    "history-image-item";
-
-
-                const imageElement =
-                    document.createElement(
-                        "img"
-                    );
-
-                imageElement.src =
-                    image.image_url;
-
-                imageElement.alt =
-                    image.file_name;
+            experimentName.textContent =
+                experiment.process_name;
 
 
-                const fileName =
-                    document.createElement(
-                        "p"
-                    );
+            const recordedTime =
+                document.createElement(
+                    "p"
+                );
 
-                fileName.textContent =
-                    formatFileName(
-                        image.file_name
-                    );
+            recordedTime.className =
+                "history-image-time";
 
-                const recordedTime =
-                    document.createElement(
-                        "p"
-                    );
+            if (
+                image.recorded_at
+            ) {
 
                 recordedTime.textContent =
                     new Date(
                         image.recorded_at
-                    ).toLocaleTimeString();
+                    ).toLocaleString();
 
+            } else {
 
-                imageItem.appendChild(
-                    imageElement
-                );
-
-                imageItem.appendChild(
-                    fileName
-                );
-
-                imageItem.appendChild(
-                    recordedTime
-                );
-
-
-                imageContainer.appendChild(
-                    imageItem
-                );
-
+                recordedTime.textContent =
+                    "Unknown time";
             }
-        );
 
 
-    } catch (error) {
-
-        console.error(
-            "Load history images error:",
-            error
-        );
-
-        imageContainer.innerHTML = "";
-
-        const errorMessage =
-            document.createElement(
-                "p"
+            imageItem.appendChild(
+                imageElement
             );
 
-        errorMessage.textContent =
-            "Unable to load images.";
+            imageItem.appendChild(
+                fileName
+            );
 
-        imageContainer.appendChild(
-            errorMessage
-        );
+            imageItem.appendChild(
+                experimentName
+            );
 
-    }
+            imageItem.appendChild(
+                recordedTime
+            );
+
+
+            imageList.appendChild(
+                imageItem
+            );
+        }
+    );
 }
 
+
+// OPEN IMAGE VIEWER
+
+function openImageViewer(
+    imageUrl,
+    fileName
+) {
+
+    const overlay =
+        document.createElement(
+            "div"
+        );
+
+    overlay.className =
+        "image-viewer-overlay";
+
+
+    const viewer =
+        document.createElement(
+            "div"
+        );
+
+    viewer.className =
+        "image-viewer";
+
+
+    const closeButton =
+        document.createElement(
+            "button"
+        );
+
+    closeButton.className =
+        "image-viewer-close";
+
+    closeButton.textContent =
+        "×";
+
+    closeButton.setAttribute(
+        "aria-label",
+        "Close image"
+    );
+
+
+    const largeImage =
+        document.createElement(
+            "img"
+        );
+
+    largeImage.className =
+        "image-viewer-image";
+
+    largeImage.src =
+        imageUrl;
+
+    largeImage.alt =
+        fileName;
+
+
+    closeButton.addEventListener(
+        "click",
+        function () {
+
+            closeImageViewer(
+                overlay
+            );
+        }
+    );
+
+
+    overlay.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                event.target ===
+                overlay
+            ) {
+
+                closeImageViewer(
+                    overlay
+                );
+            }
+        }
+    );
+
+
+    viewer.appendChild(
+        closeButton
+    );
+
+    viewer.appendChild(
+        largeImage
+    );
+
+    overlay.appendChild(
+        viewer
+    );
+
+    document.body.appendChild(
+        overlay
+    );
+}
+
+
+// CLOSE IMAGE VIEWER
+
+function closeImageViewer(
+    overlay
+) {
+
+    overlay.remove();
+}
+
+
+// INITIALIZE HISTORY
 
 async function initializeHistory() {
 
@@ -561,8 +795,11 @@ async function initializeHistory() {
         return;
     }
 
+
     const userId =
-        await loadUserId(user);
+        await loadUserId(
+            user
+        );
 
     if (
         userId === null
@@ -574,10 +811,19 @@ async function initializeHistory() {
         return;
     }
 
-    await loadExperiments(
-        userId
+
+    const experiments =
+        await loadExperiments(
+            userId
+        );
+
+
+    await loadAllHistoryImages(
+        experiments
     );
 }
 
+
+// START
 
 initializeHistory();

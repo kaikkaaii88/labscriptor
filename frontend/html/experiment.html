@@ -1,206 +1,267 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<title>LabScriptor Experiment Details</title>
+    <title>LabScriptor</title>
 
-<link
-    rel="stylesheet"
-    href="../css/experiment.css"
->
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
 
-<link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
->
-
+    <link
+        rel="stylesheet"
+        href="../css/experiment.css"
+    >
 
 </head>
 
 <body>
 
+    <!-- =========================
+         HEADER
+         ========================= -->
 
-<header class="experiment-header">
+    <header class="app-header">
 
-    <!-- Left: LabScriptor Branding -->
-    <div class="app-brand">
+        <!-- LabScriptor Branding -->
+        <div class="header-left">
 
-        <span class="app-brand-icon">
-            <i class="fa-solid fa-flask"></i>
-        </span>
-
-        <div class="app-brand-text">
-
-            <span class="app-brand-name">
-                LabScriptor
+            <span class="app-brand-icon">
+                <i class="fa-solid fa-flask"></i>
             </span>
 
-            <span class="app-brand-subtitle">
-                Experiment Details
-            </span>
+            <div class="app-brand-text">
+
+                <span class="app-brand-name">
+                    LabScriptor
+                </span>
+
+                <span class="app-brand-subtitle">
+                    Experiment Details
+                </span>
+
+            </div>
 
         </div>
 
-    </div>
+
+        <!-- Header Actions -->
+        <div class="header-right">
+
+            <button
+                id="editModeButton"
+                class="edit-mode-button"
+            >
+                Edit Experiment
+            </button>
 
 
-    <!-- Centre: Experiment Status -->
-    <div class="header-center">
-
-        <div class="status">
-
-            <span class="status-dot"></span>
-
-            <span>
-                Experiment Details
-            </span>
-
-        </div>
-
-    </div>
+            <button id="historyButton">
+                History
+            </button>
 
 
-    <!-- Right: Header Actions -->
-    <div class="header-actions">
-
-        <button
-            id="historyButton"
-            class="secondary-button"
-        >
-
-            <i class="fa-solid fa-clock-rotate-left"></i>
-
-            <span>
-                Experiment History
-            </span>
-
-        </button>
-
-
-        <button
-            id="logoutButton"
-            class="logout-button"
-        >
-
-            <i class="fa-solid fa-right-from-bracket"></i>
-
-            <span>
+            <button id="logoutButton">
                 Logout
-            </span>
-
-        </button>
-
-    </div>
-
-</header>
-
-
-<main class="experiment-container">
-
-    <section class="details-section">
-
-        <h2 id="experimentName">
-            Loading experiment...
-        </h2>
-
-        <p id="experimentStatus">
-            Loading status...
-        </p>
-
-
-        <div class="details-grid">
-
-            <div class="detail-card">
-
-                <h3>Start Time</h3>
-
-                <p id="startTime">
-                    -
-                </p>
-
-            </div>
-
-
-            <div class="detail-card">
-
-                <h3>End Time</h3>
-
-                <p id="endTime">
-                    -
-                </p>
-
-            </div>
-
-
-            <div class="detail-card">
-
-                <h3>Duration</h3>
-
-                <p id="duration">
-                    -
-                </p>
-
-            </div>
-
-
-            <div class="detail-card">
-
-                <h3>Observations</h3>
-
-                <p id="observationCount">
-                    -
-                </p>
-
-            </div>
+            </button>
 
         </div>
 
-    </section>
+    </header>
 
 
-    <section class="observations-section">
+    <!-- =========================
+         MAIN CONTENT
+         ========================= -->
 
-        <h2>Recorded Observations</h2>
+    <main class="experiment-page">
 
-        <p id="observationMessage">
-            Loading observations...
-        </p>
+        <!-- EXPERIMENT DETAILS -->
 
-        <div id="observationList">
-        </div>
+        <section class="details-section">
 
-    </section>
+            <div class="section-header">
 
+                <div>
 
-    <section class="images-section">
+                    <h2 id="experimentName">
+                        Experiment
+                    </h2>
 
-        <h2>Experiment Images</h2>
+                    <p id="experimentStatus">
+                        Loading...
+                    </p>
 
-        <p id="imageMessage">
-            Loading images...
-        </p>
+                </div>
 
-        <div id="imageList">
-        </div>
-
-    </section>
-
-</main>
+            </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+            <div class="details-grid">
 
-<script src="../js/experiment.js"></script>
+                <div class="detail-card">
 
+                    <span class="detail-label">
+                        Start Time
+                    </span>
+
+                    <span id="startTime">
+                        Not available
+                    </span>
+
+                </div>
+
+
+                <div class="detail-card">
+
+                    <span class="detail-label">
+                        End Time
+                    </span>
+
+                    <span id="endTime">
+                        Not available
+                    </span>
+
+                </div>
+
+
+                <div class="detail-card">
+
+                    <span class="detail-label">
+                        Duration
+                    </span>
+
+                    <span id="duration">
+                        Not available
+                    </span>
+
+                </div>
+
+
+                <div class="detail-card">
+
+                    <span class="detail-label">
+                        Observations
+                    </span>
+
+                    <span id="observationCount">
+                        0
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- OBSERVATIONS -->
+
+        <section class="observations-section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Observations
+                    </h2>
+
+                    <p>
+                        Recorded observations from this experiment.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <p
+                id="observationMessage"
+                class="section-message"
+            ></p>
+
+
+            <div
+                id="observationList"
+                class="observation-list"
+            ></div>
+
+        </section>
+
+
+        <!-- IMAGES -->
+
+        <section class="images-section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Images
+                    </h2>
+
+                    <p>
+                        Images recorded during this experiment.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="imageUploadSection"
+                class="image-upload-section"
+            >
+
+                <input
+                    type="file"
+                    id="imageInput"
+                    accept="image/*"
+                >
+
+
+                <button id="uploadImageButton">
+                    Upload Image
+                </button>
+
+
+                <p id="uploadImageMessage"></p>
+
+            </div>
+
+
+            <p
+                id="imageMessage"
+                class="section-message"
+            ></p>
+
+
+            <div
+                id="imageList"
+                class="image-list"
+            ></div>
+
+        </section>
+
+    </main>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../js/experiment.js"></script>
 
 </body>
 
