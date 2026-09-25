@@ -63,6 +63,9 @@ const imageUploadSection =
 const editModeButton =
     document.getElementById("editModeButton");
 
+const exportDocxButton = 
+    document.getElementById("exportDocxButton");
+
 const historyButton =
     document.getElementById("historyButton");
 
@@ -247,6 +250,17 @@ if (editModeButton) {
 }
 
 
+// EXPORT DOCX BUTTON
+
+if (exportDocxButton) {
+
+    exportDocxButton.addEventListener(
+        "click",
+        exportExperimentToDocx
+    );
+}
+
+
 // ADD OBSERVATION BUTTON
 
 if (addObservationButton) {
@@ -265,9 +279,6 @@ if (addObservationButton) {
         }
     );
 }
-
-
-// LOAD EXPERIMENT
 
 // LOAD EXPERIMENT
 
@@ -2401,7 +2412,7 @@ async function deleteImage(
 }
 
 
-// FORMAT FILE NAME
+// FORMAT DURATION
 
 function formatDuration(startTime, endTime) {
     if (!startTime || !endTime) {
@@ -2588,6 +2599,1000 @@ function closeImageViewer(
 
         overlay.remove();
     }
+}
+
+
+// =========================
+// DOCX EXPORT
+// =========================
+
+async function exportExperimentToDocx() {
+
+    if (!currentExperiment) {
+        alert("Unable to export experiment data.");
+        return;
+    }
+
+    try {
+
+        exportDocxButton.disabled = true;
+        exportDocxButton.textContent = "Preparing...";
+
+
+        const experimentTitle =
+            getExperimentExportName(
+                currentExperiment
+            );
+
+
+        const experimentStartTime =
+            getExperimentStartTime(
+                currentExperiment
+            );
+
+
+        const experimentEndTime =
+            getExperimentEndTime(
+                currentExperiment
+            );
+
+
+        const experimentStatus =
+            getExperimentStatus(
+                currentExperiment
+            );
+
+
+        const experimentDuration =
+            getExperimentDuration(
+                currentExperiment
+            );
+
+
+        const observationItems =
+            currentObservations || [];
+
+
+        const imageItems =
+            currentImages || [];
+
+
+        const children = [];
+
+
+        // DOCUMENT TITLE
+
+        children.push(
+            new docx.Paragraph({
+                text: "LabScriptor",
+                heading: docx.HeadingLevel.TITLE,
+                alignment: docx.AlignmentType.CENTER,
+                spacing: {
+                    after: 100
+                }
+            })
+        );
+
+
+        children.push(
+            new docx.Paragraph({
+                text: "Experiment Report",
+                alignment: docx.AlignmentType.CENTER,
+                spacing: {
+                    after: 400
+                },
+                run: {
+                    color: "666666",
+                    size: 24
+                }
+            })
+        );
+
+
+        // EXPERIMENT NAME
+
+        children.push(
+            new docx.Paragraph({
+                text: experimentTitle,
+                heading: docx.HeadingLevel.HEADING_1,
+                spacing: {
+                    before: 200,
+                    after: 200
+                }
+            })
+        );
+
+
+        // EXPERIMENT INFORMATION
+
+        children.push(
+            new docx.Paragraph({
+                text: "Experiment Information",
+                heading: docx.HeadingLevel.HEADING_2,
+                spacing: {
+                    before: 200,
+                    after: 150
+                }
+            })
+        );
+
+
+        const informationRows = [
+            createDocxTableRow(
+                "Status",
+                experimentStatus
+            ),
+            createDocxTableRow(
+                "Start Time",
+                experimentStartTime
+            ),
+            createDocxTableRow(
+                "End Time",
+                experimentEndTime
+            ),
+            createDocxTableRow(
+                "Duration",
+                experimentDuration
+            ),
+            createDocxTableRow(
+                "Observations",
+                String(observationItems.length)
+            ),
+            createDocxTableRow(
+                "Images",
+                String(imageItems.length)
+            )
+        ];
+
+
+        children.push(
+            new docx.Table({
+                width: {
+                    size: 100,
+                    type: docx.WidthType.PERCENTAGE
+                },
+                rows: informationRows
+            })
+        );
+
+
+        // OBSERVATIONS
+
+        children.push(
+            new docx.Paragraph({
+                text: "Observations",
+                heading: docx.HeadingLevel.HEADING_2,
+                spacing: {
+                    before: 500,
+                    after: 150
+                }
+            })
+        );
+
+
+        if (observationItems.length === 0) {
+
+            children.push(
+                new docx.Paragraph({
+                    text: "No observations were recorded for this experiment.",
+                    spacing: {
+                        after: 200
+                    }
+                })
+            );
+
+        } else {
+
+            for (
+                let index = 0;
+                index < observationItems.length;
+                index++
+            ) {
+
+                const observation =
+                    observationItems[index];
+
+
+                const observationNumber =
+                    index + 1;
+
+
+                const observationText =
+                    getObservationText(
+                        observation
+                    );
+
+
+                const observationTime =
+                    getObservationTime(
+                        observation
+                    );
+
+
+                children.push(
+                    new docx.Paragraph({
+                        text:
+                            "Observation " +
+                            observationNumber,
+                        heading: docx.HeadingLevel.HEADING_3,
+                        spacing: {
+                            before: 200,
+                            after: 50
+                        }
+                    })
+                );
+
+
+                children.push(
+                    new docx.Paragraph({
+                        children: [
+                            new docx.TextRun({
+                                text: "Recorded: ",
+                                bold: true
+                            }),
+                            new docx.TextRun({
+                                text: observationTime
+                            })
+                        ],
+                        spacing: {
+                            after: 75
+                        }
+                    })
+                );
+
+
+                children.push(
+                    new docx.Paragraph({
+                        text: observationText,
+                        spacing: {
+                            after: 200
+                        }
+                    })
+                );
+            }
+        }
+
+
+        // IMAGES
+
+        children.push(
+            new docx.Paragraph({
+                text: "Images",
+                heading: docx.HeadingLevel.HEADING_2,
+                spacing: {
+                    before: 500,
+                    after: 150
+                }
+            })
+        );
+
+
+        if (imageItems.length === 0) {
+
+            children.push(
+                new docx.Paragraph({
+                    text: "No images were recorded for this experiment.",
+                    spacing: {
+                        after: 200
+                    }
+                })
+            );
+
+        } else {
+
+            for (
+                let index = 0;
+                index < imageItems.length;
+                index++
+            ) {
+
+                const image =
+                    imageItems[index];
+
+
+                const imageName =
+                    getImageExportName(
+                        image
+                    );
+
+
+                const imageTime =
+                    getImageExportTime(
+                        image
+                    );
+
+
+                children.push(
+                    new docx.Paragraph({
+                        text:
+                            "Image " +
+                            (index + 1),
+                        heading: docx.HeadingLevel.HEADING_3,
+                        spacing: {
+                            before: 200,
+                            after: 50
+                        }
+                    })
+                );
+
+
+                children.push(
+                    new docx.Paragraph({
+                        children: [
+                            new docx.TextRun({
+                                text: "File: ",
+                                bold: true
+                            }),
+                            new docx.TextRun({
+                                text: imageName
+                            })
+                        ],
+                        spacing: {
+                            after: 50
+                        }
+                    })
+                );
+
+
+                children.push(
+                    new docx.Paragraph({
+                        children: [
+                            new docx.TextRun({
+                                text: "Recorded: ",
+                                bold: true
+                            }),
+                            new docx.TextRun({
+                                text: imageTime
+                            })
+                        ],
+                        spacing: {
+                            after: 100
+                        }
+                    })
+                );
+
+
+                try {
+
+                    const imageData =
+                        await getImageDataForDocx(
+                            image
+                        );
+
+
+                    if (imageData) {
+
+                        children.push(
+                            new docx.Paragraph({
+                                children: [
+                                    new docx.ImageRun({
+                                        data: imageData.data,
+                                        transformation: {
+                                            width: 450,
+                                            height: imageData.height
+                                        },
+                                        type: imageData.type
+                                    })
+                                ],
+                                alignment:
+                                    docx.AlignmentType.CENTER,
+                                spacing: {
+                                    after: 250
+                                }
+                            })
+                        );
+
+                    } else {
+
+                        children.push(
+                            new docx.Paragraph({
+                                text:
+                                    "Image could not be embedded.",
+                                spacing: {
+                                    after: 200
+                                }
+                            })
+                        );
+                    }
+
+                } catch (imageError) {
+
+                    console.error(
+                        "Unable to embed image:",
+                        imageError
+                    );
+
+
+                    children.push(
+                        new docx.Paragraph({
+                            text:
+                                "Image could not be embedded.",
+                            spacing: {
+                                after: 200
+                            }
+                        })
+                    );
+                }
+            }
+        }
+
+
+        // CREATE DOCUMENT
+
+        const docxDocument =
+            new docx.Document({
+                creator: "LabScriptor",
+                title: experimentTitle,
+                description:
+                    "LabScriptor experiment report",
+                sections: [
+                    {
+                        properties: {
+                            page: {
+                                margin: {
+                                    top: 720,
+                                    right: 720,
+                                    bottom: 720,
+                                    left: 720
+                                }
+                            }
+                        },
+                        children: children
+                    }
+                ]
+            });
+
+
+        // GENERATE DOCX
+
+        const blob =
+            await docx.Packer.toBlob(
+                docxDocument
+            );
+
+
+        // DOWNLOAD
+
+        const fileName =
+            createExportFileName(
+                experimentTitle
+            );
+
+
+        const downloadUrl =
+            URL.createObjectURL(blob);
+
+
+        const downloadLink =
+            document.createElement("a");
+
+
+        downloadLink.href =
+            downloadUrl;
+
+
+        downloadLink.download =
+            fileName;
+
+
+        document.body.appendChild(
+            downloadLink
+        );
+
+
+        downloadLink.click();
+
+
+        document.body.removeChild(
+            downloadLink
+        );
+
+
+        URL.revokeObjectURL(
+            downloadUrl
+        );
+
+
+        exportDocxButton.disabled = false;
+        exportDocxButton.innerHTML =
+            '<i class="fa-solid fa-file-word"></i> Export DOCX';
+
+
+    } catch (error) {
+
+        console.error(
+            "DOCX export error:",
+            error
+        );
+
+
+        alert(
+            "Unable to export the experiment as a Word document."
+        );
+
+
+        exportDocxButton.disabled = false;
+        exportDocxButton.innerHTML =
+            '<i class="fa-solid fa-file-word"></i> Export DOCX';
+    }
+}
+
+
+
+function createDocxTableRow(label, value) {
+
+    return new docx.TableRow({
+        children: [
+
+            new docx.TableCell({
+                width: {
+                    size: 30,
+                    type: docx.WidthType.PERCENTAGE
+                },
+                shading: {
+                    fill: "EAF0F6"
+                },
+                children: [
+                    new docx.Paragraph({
+                        children: [
+                            new docx.TextRun({
+                                text: label,
+                                bold: true
+                            })
+                        ]
+                    })
+                ]
+            }),
+
+
+            new docx.TableCell({
+                width: {
+                    size: 70,
+                    type: docx.WidthType.PERCENTAGE
+                },
+                children: [
+                    new docx.Paragraph({
+                        text: value
+                    })
+                ]
+            })
+
+        ]
+    });
+}
+
+
+
+function getExperimentExportName(experiment) {
+
+    if (!experiment) {
+        return "Experiment";
+    }
+
+
+    return (
+        experiment.process_name ||
+        experiment.processName ||
+        experiment.name ||
+        "Experiment"
+    );
+}
+
+
+function getExperimentStartTime(experiment) {
+
+    if (!experiment) {
+        return "Not available";
+    }
+
+
+    const value =
+        experiment.start_time ||
+        experiment.startTime ||
+        experiment.started_at ||
+        experiment.startedAt;
+
+
+    if (!value) {
+        return "Not available";
+    }
+
+
+    return formatDateTime(value);
+}
+
+
+function getExperimentEndTime(experiment) {
+
+    if (!experiment) {
+        return "Not available";
+    }
+
+
+    const value =
+        experiment.end_time ||
+        experiment.endTime ||
+        experiment.ended_at ||
+        experiment.endedAt;
+
+
+    if (!value) {
+        return "Not available";
+    }
+
+
+    return formatDateTime(value);
+}
+
+
+function getExperimentStatus(experiment) {
+
+    if (!experiment) {
+        return "Unknown";
+    }
+
+
+    const endTime =
+        experiment.end_time ||
+        experiment.endTime ||
+        experiment.ended_at ||
+        experiment.endedAt;
+
+
+    const startTime =
+        experiment.start_time ||
+        experiment.startTime ||
+        experiment.started_at ||
+        experiment.startedAt;
+
+
+    if (endTime) {
+        return "Completed";
+    }
+
+
+    if (startTime) {
+        return "Active";
+    }
+
+
+    return "Ready";
+}
+
+
+function getExperimentDuration(experiment) {
+
+    if (!experiment) {
+        return "Not available";
+    }
+
+
+    const start =
+        experiment.start_time ||
+        experiment.startTime ||
+        experiment.started_at ||
+        experiment.startedAt;
+
+
+    const end =
+        experiment.end_time ||
+        experiment.endTime ||
+        experiment.ended_at ||
+        experiment.endedAt;
+
+
+    if (start && end) {
+        return formatDuration(
+            start,
+            end
+        );
+    }
+
+
+    const storedDuration =
+        experiment.duration;
+
+
+    if (
+        storedDuration !== undefined &&
+        storedDuration !== null
+    ) {
+        return formatStoredDuration(
+            storedDuration
+        );
+    }
+
+
+    return "Not available";
+}
+
+
+
+function getObservationText(observation) {
+
+    if (!observation) {
+        return "No observation text.";
+    }
+
+
+    return (
+        observation.observation_text ||
+        observation.observation ||
+        observation.text ||
+        observation.content ||
+        "No observation text."
+    );
+}
+
+
+function getObservationTime(observation) {
+
+    if (!observation) {
+        return "Not available";
+    }
+
+
+    const value =
+        observation.recorded_at ||
+        observation.recordedAt ||
+        observation.observation_time ||
+        observation.observationTime ||
+        observation.created_at ||
+        observation.createdAt;
+
+
+    if (!value) {
+        return "Not available";
+    }
+
+
+    return formatDateTime(value);
+}
+
+
+
+function getImageExportName(image) {
+
+    if (!image) {
+        return "Unnamed image";
+    }
+
+
+    return (
+        image.file_name ||
+        image.fileName ||
+        image.name ||
+        "Unnamed image"
+    );
+}
+
+
+function getImageExportTime(image) {
+
+    if (!image) {
+        return "Not available";
+    }
+
+
+    const value =
+        image.recorded_at ||
+        image.recordedAt ||
+        image.created_at ||
+        image.createdAt;
+
+
+    if (!value) {
+        return "Not available";
+    }
+
+
+    return formatDateTime(value);
+}
+
+
+function getImageExportUrl(image) {
+
+    if (!image) {
+        return null;
+    }
+
+
+    return (
+        image.image_url ||
+        image.imageUrl ||
+        image.url ||
+        image.public_url ||
+        image.publicUrl ||
+        image.file_url ||
+        image.fileUrl ||
+        null
+    );
+}
+
+
+async function getImageDataForDocx(image) {
+
+    const imageUrl =
+        getImageExportUrl(image);
+
+
+    if (!imageUrl) {
+        return null;
+    }
+
+
+    const response =
+        await fetch(imageUrl);
+
+
+    if (!response.ok) {
+        throw new Error(
+            "Unable to download image."
+        );
+    }
+
+
+    const blob =
+        await response.blob();
+
+
+    const arrayBuffer =
+        await blob.arrayBuffer();
+
+
+    const imageType =
+        getDocxImageType(
+            blob.type,
+            imageUrl
+        );
+
+
+    const imageDimensions =
+        await getImageDimensions(
+            imageUrl
+        );
+
+
+    const maxWidth = 450;
+    const originalWidth =
+        imageDimensions.width;
+
+
+    const originalHeight =
+        imageDimensions.height;
+
+
+    let finalWidth =
+        maxWidth;
+
+
+    let finalHeight =
+        originalHeight;
+
+
+    if (originalWidth > maxWidth) {
+
+        finalHeight =
+            Math.round(
+                originalHeight *
+                (maxWidth / originalWidth)
+            );
+    }
+
+
+    return {
+        data: new Uint8Array(arrayBuffer),
+        type: imageType,
+        height: finalHeight
+    };
+}
+
+
+function getDocxImageType(mimeType, imageUrl) {
+
+    if (
+        mimeType === "image/jpeg" ||
+        mimeType === "image/jpg"
+    ) {
+        return "jpg";
+    }
+
+
+    if (mimeType === "image/gif") {
+        return "gif";
+    }
+
+
+    if (mimeType === "image/bmp") {
+        return "bmp";
+    }
+
+
+    if (mimeType === "image/svg+xml") {
+        return "svg";
+    }
+
+
+    if (
+        mimeType === "image/png" ||
+        imageUrl.toLowerCase().includes(".png")
+    ) {
+        return "png";
+    }
+
+
+    if (
+        imageUrl.toLowerCase().includes(".jpg") ||
+        imageUrl.toLowerCase().includes(".jpeg")
+    ) {
+        return "jpg";
+    }
+
+
+    return "png";
+}
+
+
+function getImageDimensions(imageUrl) {
+
+    return new Promise(
+        function(resolve, reject) {
+
+            const image =
+                new Image();
+
+
+            image.onload =
+                function() {
+
+                    resolve({
+                        width: image.naturalWidth,
+                        height: image.naturalHeight
+                    });
+                };
+
+
+            image.onerror =
+                function() {
+
+                    resolve({
+                        width: 800,
+                        height: 500
+                    });
+                };
+
+
+            image.src =
+                imageUrl;
+        }
+    );
+}
+
+
+function createExportFileName(experimentName) {
+
+    let safeName =
+        experimentName ||
+        "Experiment";
+
+
+    safeName =
+        safeName
+            .replace(/[<>:"/\\|?*]/g, "")
+            .replace(/\s+/g, "_")
+            .trim();
+
+
+    if (!safeName) {
+        safeName = "Experiment";
+    }
+
+
+    return (
+        "LabScriptor_" +
+        safeName +
+        ".docx"
+    );
 }
 
 
