@@ -3025,15 +3025,26 @@ async function exportExperimentToDocx() {
                 title: experimentTitle,
                 description:
                     "LabScriptor experiment report",
+
+                styles: {
+                    default: {
+                        document: {
+                            run: {
+                                font: "Arial"
+                            }
+                        }
+                    }
+                },
+
                 sections: [
                     {
                         properties: {
                             page: {
                                 margin: {
-                                    top: 720,
-                                    right: 720,
-                                    bottom: 720,
-                                    left: 720
+                                    top: 1500,
+                                    right: 1500,
+                                    bottom: 1500,
+                                    left: 1500
                                 }
                             }
                         },
