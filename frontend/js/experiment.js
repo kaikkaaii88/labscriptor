@@ -1116,6 +1116,7 @@ function parseAIAnalysis(text) {
     const cleanedText =
         text
             .replace(/\*\*/g, "")
+            .replace(/---/g, "")
             .replace(/\r\n/g, "\n")
             .trim();
 
