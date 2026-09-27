@@ -742,6 +742,19 @@ finishExperimentButton.addEventListener(
             return;
         }
 
+        /* AUTOMATIC AI ANALYSIS */
+
+        const aiAnalysisStarted =
+            await triggerAIAnalysis();
+
+        if (aiAnalysisStarted === false) {
+
+            console.warn(
+                "Experiment completed successfully, but AI analysis failed."
+            );
+
+        }
+
         if (timerInterval !== null) {
 
             clearInterval(timerInterval);
@@ -2475,6 +2488,82 @@ async function completeProcessSession() {
 
         return false;
     }
+}
+
+
+/* =========================
+   TRIGGER AI ANALYSIS
+   ========================= */
+
+async function triggerAIAnalysis() {
+
+    if (currentSessionId === null) {
+
+        console.error(
+            "Cannot generate AI analysis because no process session exists."
+        );
+
+        return false;
+    }
+
+
+    try {
+
+        console.log(
+            "Starting automatic AI analysis for session:",
+            currentSessionId
+        );
+
+
+        const response =
+            await fetch(
+                "http://localhost:3000/api/ai/analyse/" +
+                currentSessionId,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "AI analysis failed:",
+                data
+            );
+
+            return false;
+        }
+
+
+        console.log(
+            "AI analysis completed:",
+            data
+        );
+
+
+        return true;
+
+
+    } catch (error) {
+
+        console.error(
+            "Network error while generating AI analysis:",
+            error
+        );
+
+        return false;
+
+    }
+
 }
 
 

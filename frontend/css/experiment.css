@@ -1437,3 +1437,213 @@ body {
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+
+/* =========================
+   AI ANALYSIS
+   ========================= */
+
+.ai-analysis-section {
+    margin-bottom: 18px;
+
+    padding: 26px;
+
+    background-color: white;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 4px 16px
+        rgba(15, 23, 42, 0.04);
+}
+
+
+/* =========================
+   AI ANALYSIS HEADER
+   ========================= */
+
+.ai-analysis-section .section-header {
+    margin-bottom: 22px;
+}
+
+
+/* =========================
+   AI ANALYSIS BLOCK
+   ========================= */
+
+.ai-analysis-block {
+    margin-bottom: 18px;
+
+    padding: 17px 18px;
+
+    background-color: #f8fafc;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius: 10px;
+}
+
+.ai-analysis-block:last-child {
+    margin-bottom: 0;
+}
+
+
+/* =========================
+   AI ANALYSIS HEADING
+   ========================= */
+
+.ai-analysis-block h3 {
+    margin: 0 0 10px;
+
+    color: #111827;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    letter-spacing: -0.1px;
+}
+
+
+/* =========================
+   AI ANALYSIS CONTENT
+   ========================= */
+
+.ai-analysis-content {
+    color: #374151;
+
+    font-size: 14px;
+
+    line-height: 1.65;
+}
+
+.ai-analysis-content p {
+    margin: 0;
+}
+
+
+/* =========================
+   AI ANALYSIS LIST
+   ========================= */
+
+.ai-analysis-list {
+    margin: 0;
+
+    padding-left: 21px;
+}
+
+.ai-analysis-list li {
+    margin-bottom: 6px;
+
+    padding-left: 3px;
+
+    color: #374151;
+
+    line-height: 1.6;
+}
+
+.ai-analysis-list li:last-child {
+    margin-bottom: 0;
+}
+
+
+/* =========================
+   AI ANALYSIS EMPTY STATE
+   ========================= */
+
+.ai-analysis-empty {
+    margin: 0;
+
+    color: #6b7280;
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   AI ANALYSIS MOBILE
+   ========================= */
+
+@media (max-width: 700px) {
+
+    .ai-analysis-section {
+        padding: 20px;
+
+        margin-bottom: 14px;
+
+        border-radius: 12px;
+    }
+
+    .ai-analysis-block {
+        padding: 15px 16px;
+
+        margin-bottom: 14px;
+    }
+
+}
+
+
+/* =========================
+   AI ANALYSIS SMALL MOBILE
+   ========================= */
+
+@media (max-width: 500px) {
+
+    .ai-analysis-section {
+        padding: 16px;
+    }
+
+    .ai-analysis-block {
+        padding: 14px 15px;
+    }
+
+    .ai-analysis-content {
+        font-size: 13px;
+    }
+
+}
+
+
+.experiment-name-editor {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.experiment-name-editor label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.experiment-name-edit-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#experimentNameInput {
+    flex: 1;
+    min-width: 250px;
+    padding: 10px 12px;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+#saveExperimentNameButton,
+#cancelExperimentNameButton {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#experimentNameMessage {
+    margin-top: 8px;
+    font-size: 14px;
+}

@@ -123,6 +123,48 @@
             </div>
 
 
+            <!-- EXPERIMENT NAME EDITOR -->
+
+            <div
+                id="experimentNameEditor"
+                class="experiment-name-editor"
+                style="display: none;"
+            >
+
+                <label for="experimentNameInput">
+                    Experiment Name
+                </label>
+
+                <div class="experiment-name-edit-row">
+
+                    <input
+                        type="text"
+                        id="experimentNameInput"
+                        maxlength="255"
+                        placeholder="Enter experiment name"
+                    >
+
+                    <button
+                        id="saveExperimentNameButton"
+                        type="button"
+                    >
+                        Save Name
+                    </button>
+
+                    <button
+                        id="cancelExperimentNameButton"
+                        type="button"
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+                <p id="experimentNameMessage"></p>
+
+            </div>
+
+
             <div class="details-grid">
 
                 <div class="detail-card">
@@ -179,7 +221,6 @@
             </div>
 
         </section>
-
 
         <!-- =========================
              OBSERVATIONS

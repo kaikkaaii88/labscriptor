@@ -12,6 +12,7 @@ const observationRoutes = require("./routes/observationRoutes");
 const timerEventRoutes = require("./routes/timerEventRoutes");
 const userRoutes = require("./routes/userRoutes");
 const imageRoutes = require("./routes/imageRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 
 
 // CREATE APP
@@ -128,6 +129,11 @@ app.use(
 app.use(
     "/api/images",
     imageRoutes
+);
+
+app.use(
+    "/api/ai",
+    aiRoutes
 );
 
 

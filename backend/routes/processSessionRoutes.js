@@ -156,12 +156,43 @@ router.patch("/:id", async function (req, res) {
         const status =
             req.body.status;
 
+        const processName =
+            req.body.process_name;
 
-        if (!endTime || !status) {
+
+        if (!endTime && !status && !processName) {
 
             return res.status(400).json({
-                message: "end_time and status are required"
+                message:
+                    "At least one field is required"
             });
+
+        }
+
+
+        const updateData = {};
+
+
+        if (endTime) {
+
+            updateData.end_time =
+                endTime;
+
+        }
+
+
+        if (status) {
+
+            updateData.status =
+                status;
+
+        }
+
+
+        if (processName) {
+
+            updateData.process_name =
+                processName;
 
         }
 
@@ -169,10 +200,7 @@ router.patch("/:id", async function (req, res) {
         const { data, error } =
             await supabase
                 .from("process_sessions")
-                .update({
-                    end_time: endTime,
-                    status: status
-                })
+                .update(updateData)
                 .eq("session_id", sessionId)
                 .select()
                 .single();

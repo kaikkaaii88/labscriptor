@@ -18,6 +18,21 @@ const supabaseClient =
 const experimentName =
     document.getElementById("experimentName");
 
+const experimentNameEditor =
+    document.getElementById("experimentNameEditor");
+
+const experimentNameInput =
+    document.getElementById("experimentNameInput");
+
+const saveExperimentNameButton =
+    document.getElementById("saveExperimentNameButton");
+
+const cancelExperimentNameButton =
+    document.getElementById("cancelExperimentNameButton");
+
+const experimentNameMessage =
+    document.getElementById("experimentNameMessage");
+
 const experimentStatus =
     document.getElementById("experimentStatus");
 
@@ -86,6 +101,7 @@ let currentObservations = [];
 
 let currentImages = [];
 
+let currentAIAnalysis = null;
 
 // NAVIGATION
 
@@ -194,6 +210,29 @@ function updateEditModeUI() {
                 "flex";
         }
 
+
+        if (experimentNameEditor) {
+
+            experimentNameEditor.style.display =
+                "block";
+        }
+
+
+        if (experimentNameInput) {
+
+            const currentName =
+                currentExperiment &&
+                (
+                    currentExperiment.process_name ||
+                    currentExperiment.processName ||
+                    currentExperiment.name ||
+                    ""
+                );
+
+            experimentNameInput.value =
+                currentName;
+        }
+
     } else {
 
         editModeButton.textContent =
@@ -211,6 +250,20 @@ function updateEditModeUI() {
 
             imageUploadSection.style.display =
                 "none";
+        }
+
+
+        if (experimentNameEditor) {
+
+            experimentNameEditor.style.display =
+                "none";
+        }
+
+
+        if (experimentNameMessage) {
+
+            experimentNameMessage.textContent =
+                "";
         }
     }
 
@@ -249,6 +302,241 @@ if (editModeButton) {
     );
 }
 
+// =========================
+// EDIT EXPERIMENT NAME
+// =========================
+
+
+// SAVE EXPERIMENT NAME
+
+if (saveExperimentNameButton) {
+
+    saveExperimentNameButton.addEventListener(
+        "click",
+        saveExperimentName
+    );
+}
+
+
+// CANCEL EXPERIMENT NAME EDIT
+
+if (cancelExperimentNameButton) {
+
+    cancelExperimentNameButton.addEventListener(
+        "click",
+        function() {
+
+            if (!currentExperiment) {
+
+                return;
+            }
+
+
+            const currentName =
+                currentExperiment.process_name ||
+                currentExperiment.processName ||
+                currentExperiment.name ||
+                "";
+
+
+            if (experimentNameInput) {
+
+                experimentNameInput.value =
+                    currentName;
+            }
+
+
+            if (experimentNameMessage) {
+
+                experimentNameMessage.textContent =
+                    "";
+            }
+        }
+    );
+}
+
+
+// SAVE EXPERIMENT NAME FUNCTION
+
+async function saveExperimentName() {
+
+    if (!editMode) {
+
+        return;
+    }
+
+
+    if (!currentExperiment) {
+
+        return;
+    }
+
+
+    const newName =
+        experimentNameInput
+            ? experimentNameInput.value.trim()
+            : "";
+
+
+    if (!newName) {
+
+        if (experimentNameMessage) {
+
+            experimentNameMessage.textContent =
+                "Experiment name cannot be empty.";
+        }
+
+        return;
+    }
+
+
+    if (saveExperimentNameButton) {
+
+        saveExperimentNameButton.disabled =
+            true;
+
+        saveExperimentNameButton.textContent =
+            "Saving...";
+    }
+
+
+    if (experimentNameMessage) {
+
+        experimentNameMessage.textContent =
+            "Saving experiment name...";
+    }
+
+
+    try {
+
+        const sessionId =
+            currentExperiment.session_id;
+
+
+        const response =
+            await fetch(
+                "http://localhost:3000/api/process-sessions/" +
+                sessionId,
+                {
+                    method: "PATCH",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        process_name:
+                            newName
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Failed to update experiment name."
+            );
+        }
+
+
+        let updatedExperiment =
+            data;
+
+
+        if (
+            data.data &&
+            !Array.isArray(data.data)
+        ) {
+
+            updatedExperiment =
+                data.data;
+        }
+
+
+        if (
+            data.session &&
+            !Array.isArray(data.session)
+        ) {
+
+            updatedExperiment =
+                data.session;
+        }
+
+
+        if (
+            data.processSession &&
+            !Array.isArray(data.processSession)
+        ) {
+
+            updatedExperiment =
+                data.processSession;
+        }
+
+
+        /*
+         * Update the local experiment name.
+         */
+
+        currentExperiment.process_name =
+            newName;
+
+
+        if (
+            updatedExperiment &&
+            updatedExperiment.process_name
+        ) {
+
+            currentExperiment.process_name =
+                updatedExperiment.process_name;
+        }
+
+
+        experimentName.textContent =
+            currentExperiment.process_name;
+
+
+        if (experimentNameMessage) {
+
+            experimentNameMessage.textContent =
+                "Experiment name updated successfully.";
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Update experiment name error:",
+            error
+        );
+
+
+        if (experimentNameMessage) {
+
+            experimentNameMessage.textContent =
+                error.message ||
+                "Unable to update experiment name.";
+        }
+
+
+    } finally {
+
+        if (saveExperimentNameButton) {
+
+            saveExperimentNameButton.disabled =
+                false;
+
+            saveExperimentNameButton.textContent =
+                "Save Name";
+        }
+    }
+}
 
 // EXPORT DOCX BUTTON
 
@@ -442,6 +730,9 @@ async function loadExperiment() {
             actualSessionId
         );
 
+        await loadAIAnalysis(
+            actualSessionId
+        );
 
         updateEditModeUI();
 
@@ -517,6 +808,590 @@ function displayExperiment(experiment) {
             startTimeValue,
             endTimeValue
         );
+}
+
+
+// =========================
+// AI ANALYSIS
+// =========================
+
+
+// LOAD AI ANALYSIS
+
+async function loadAIAnalysis(
+    sessionId
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:3000/api/ai/" +
+                sessionId
+            );
+
+
+        const data =
+            await response.json();
+
+
+        /*
+         * A 404 simply means that an AI analysis
+         * does not exist for this experiment.
+         */
+
+        if (
+            response.status ===
+            404
+        ) {
+
+            currentAIAnalysis =
+                null;
+
+            displayAIAnalysis(
+                null
+            );
+
+            return false;
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Failed to load AI analysis"
+            );
+        }
+
+
+        let analysis =
+            data.analysis;
+
+
+        /*
+         * Handle alternative response
+         * structures safely.
+         */
+
+        if (
+            !analysis &&
+            data.data
+        ) {
+
+            analysis =
+                data.data;
+        }
+
+
+        currentAIAnalysis =
+            analysis;
+
+
+        displayAIAnalysis(
+            analysis
+        );
+
+
+        return true;
+
+
+    } catch (error) {
+
+        console.error(
+            "Load AI analysis error:",
+            error
+        );
+
+
+        currentAIAnalysis =
+            null;
+
+
+        displayAIAnalysisError();
+
+
+        return false;
+    }
+}
+
+
+function displayAIAnalysis(analysis) {
+
+    const existingSection =
+        document.getElementById("aiAnalysisSection");
+
+    if (existingSection) {
+        existingSection.remove();
+    }
+
+    const section =
+        document.createElement("section");
+
+    section.id = "aiAnalysisSection";
+    section.className = "ai-analysis-section";
+
+    const header =
+        document.createElement("div");
+
+    header.className = "section-header";
+
+    const headerContent =
+        document.createElement("div");
+
+    const heading =
+        document.createElement("h2");
+
+    heading.textContent = "AI Analysis";
+
+    const description =
+        document.createElement("p");
+
+    description.textContent =
+        "AI-generated analysis based on the recorded experiment observations.";
+
+    headerContent.appendChild(heading);
+    headerContent.appendChild(description);
+
+    header.appendChild(headerContent);
+    section.appendChild(header);
+
+    if (
+        !analysis ||
+        !analysis.summary
+    ) {
+        const emptyMessage =
+            document.createElement("p");
+
+        emptyMessage.className =
+            "ai-analysis-empty";
+
+        emptyMessage.textContent =
+            "No AI analysis is available for this experiment.";
+
+        section.appendChild(emptyMessage);
+
+        insertAIAnalysisSection(section);
+
+        return;
+    }
+
+    const sections =
+        parseAIAnalysis(analysis.summary);
+
+    const sectionNames = [
+        "Summary",
+        "Key Observations",
+        "Patterns",
+        "Potential Anomalies"
+    ];
+
+    sectionNames.forEach(
+        function (sectionName) {
+
+            const content =
+                sections[sectionName];
+
+            if (!content) {
+                return;
+            }
+
+            const analysisBlock =
+                document.createElement("div");
+
+            analysisBlock.className =
+                "ai-analysis-block";
+
+            const blockHeading =
+                document.createElement("h3");
+
+            blockHeading.textContent =
+                sectionName;
+
+            analysisBlock.appendChild(
+                blockHeading
+            );
+
+            const contentContainer =
+                document.createElement("div");
+
+            contentContainer.className =
+                "ai-analysis-content";
+
+            const lines =
+                content
+                    .split("\n")
+                    .map(
+                        function (line) {
+                            return line.trim();
+                        }
+                    )
+                    .filter(
+                        function (line) {
+                            return line.length > 0;
+                        }
+                    );
+
+            let currentList = null;
+
+            lines.forEach(
+                function (line) {
+
+                    if (
+                        line.startsWith("- ")
+                    ) {
+
+                        if (!currentList) {
+
+                            currentList =
+                                document.createElement(
+                                    "ul"
+                                );
+
+                            currentList.className =
+                                "ai-analysis-list";
+
+                            contentContainer.appendChild(
+                                currentList
+                            );
+                        }
+
+                        const listItem =
+                            document.createElement(
+                                "li"
+                            );
+
+                        listItem.textContent =
+                            line.substring(2).trim();
+
+                        currentList.appendChild(
+                            listItem
+                        );
+
+                    } else {
+
+                        currentList = null;
+
+                        const paragraph =
+                            document.createElement(
+                                "p"
+                            );
+
+                        paragraph.textContent =
+                            line;
+
+                        contentContainer.appendChild(
+                            paragraph
+                        );
+                    }
+                }
+            );
+
+            analysisBlock.appendChild(
+                contentContainer
+            );
+
+            section.appendChild(
+                analysisBlock
+            );
+        }
+    );
+
+    insertAIAnalysisSection(section);
+}
+
+function parseAIAnalysis(text) {
+
+    const sections = {
+        "Summary": "",
+        "Key Observations": "",
+        "Patterns": "",
+        "Potential Anomalies": ""
+    };
+
+    if (!text) {
+        return sections;
+    }
+
+    const cleanedText =
+        text
+            .replace(/\*\*/g, "")
+            .replace(/\r\n/g, "\n")
+            .trim();
+
+    const sectionPattern =
+        /(Summary|Key Observations|Patterns|Potential Anomalies)/gi;
+
+    const matches =
+        Array.from(
+            cleanedText.matchAll(sectionPattern)
+        );
+
+    if (matches.length === 0) {
+        sections["Summary"] =
+            cleanedText;
+
+        return sections;
+    }
+
+    for (
+        let index = 0;
+        index < matches.length;
+        index++
+    ) {
+
+        const match =
+            matches[index];
+
+        const sectionName =
+            match[1];
+
+        const start =
+            match.index +
+            match[0].length;
+
+        let end =
+            cleanedText.length;
+
+        if (
+            index + 1 <
+            matches.length
+        ) {
+            end =
+                matches[index + 1].index;
+        }
+
+        const content =
+            cleanedText
+                .substring(start, end)
+                .replace(/^[\s:]+/, "")
+                .trim();
+
+        const normalizedName =
+            Object.keys(sections).find(
+                function (name) {
+                    return (
+                        name.toLowerCase() ===
+                        sectionName.toLowerCase()
+                    );
+                }
+            );
+
+        if (normalizedName) {
+            sections[normalizedName] =
+                content;
+        }
+    }
+
+    return sections;
+}
+
+// CREATE AI ANALYSIS SECTION
+
+function createAIAnalysisSection(
+    message,
+    status
+) {
+
+    const section =
+        document.createElement(
+            "section"
+        );
+
+
+    section.id =
+        "aiAnalysisSection";
+
+
+    section.className =
+        "ai-analysis-section";
+
+
+    if (status === "pending") {
+
+        section.classList.add(
+            "ai-analysis-pending"
+        );
+    }
+
+
+    if (status === "failed") {
+
+        section.classList.add(
+            "ai-analysis-failed"
+        );
+    }
+
+
+    const heading =
+        document.createElement(
+            "h2"
+        );
+
+
+    heading.textContent =
+        "AI Analysis";
+
+
+    section.appendChild(
+        heading
+    );
+
+
+    const messageElement =
+        document.createElement(
+            "p"
+        );
+
+
+    messageElement.className =
+        "ai-analysis-message";
+
+
+    messageElement.textContent =
+        message;
+
+
+    section.appendChild(
+        messageElement
+    );
+
+
+    insertAIAnalysisSection(
+        section
+    );
+}
+
+
+// INSERT AI ANALYSIS SECTION
+
+function insertAIAnalysisSection(
+    section
+) {
+
+    const imageSection =
+        document.querySelector(
+            ".images-section"
+        );
+
+
+    if (imageSection) {
+
+        imageSection.insertAdjacentElement(
+            "afterend",
+            section
+        );
+
+        return;
+    }
+
+
+    const imageListElement =
+        document.getElementById(
+            "imageList"
+        );
+
+
+    if (imageListElement) {
+
+        imageListElement.insertAdjacentElement(
+            "afterend",
+            section
+        );
+
+        return;
+    }
+
+
+    const main =
+        document.querySelector(
+            "main"
+        );
+
+
+    if (main) {
+
+        main.appendChild(
+            section
+        );
+
+        return;
+    }
+
+
+    document.body.appendChild(
+        section
+    );
+}
+
+
+// DISPLAY AI ANALYSIS ERROR
+
+function displayAIAnalysisError() {
+
+    const existingSection =
+        document.getElementById(
+            "aiAnalysisSection"
+        );
+
+
+    if (existingSection) {
+
+        existingSection.remove();
+    }
+
+
+    const section =
+        document.createElement(
+            "section"
+        );
+
+
+    section.id =
+        "aiAnalysisSection";
+
+
+    section.className =
+        "ai-analysis-section ai-analysis-failed";
+
+
+    const heading =
+        document.createElement(
+            "h2"
+        );
+
+
+    heading.textContent =
+        "AI Analysis";
+
+
+    section.appendChild(
+        heading
+    );
+
+
+    const message =
+        document.createElement(
+            "p"
+        );
+
+
+    message.className =
+        "ai-analysis-message";
+
+
+    message.textContent =
+        "Unable to load the AI analysis. The experiment data is still available.";
+
+
+    section.appendChild(
+        message
+    );
+
+
+    insertAIAnalysisSection(
+        section
+    );
 }
 
 
@@ -2414,55 +3289,55 @@ async function deleteImage(
 
 // FORMAT DURATION
 
-function formatDuration(startTime, endTime) {
-    if (!startTime || !endTime) {
-        return "Not available";
-    }
+// function formatDuration(startTime, endTime) {
+//     if (!startTime || !endTime) {
+//         return "Not available";
+//     }
 
-    const start = new Date(startTime);
-    const end = new Date(endTime);
+//     const start = new Date(startTime);
+//     const end = new Date(endTime);
 
-    if (
-        Number.isNaN(start.getTime()) ||
-        Number.isNaN(end.getTime())
-    ) {
-        return "Not available";
-    }
+//     if (
+//         Number.isNaN(start.getTime()) ||
+//         Number.isNaN(end.getTime())
+//     ) {
+//         return "Not available";
+//     }
 
-    const difference = end.getTime() - start.getTime();
+//     const difference = end.getTime() - start.getTime();
 
-    if (difference < 0) {
-        return "Not available";
-    }
+//     if (difference < 0) {
+//         return "Not available";
+//     }
 
-    const totalSeconds = Math.round(difference / 1000);
+//     const totalSeconds = Math.round(difference / 1000);
 
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
+//     const hours = Math.floor(totalSeconds / 3600);
+//     const minutes = Math.floor((totalSeconds % 3600) / 60);
+//     const seconds = totalSeconds % 60;
 
-    if (hours > 0) {
-        return (
-            hours +
-            "h " +
-            minutes +
-            "m " +
-            seconds +
-            "s"
-        );
-    }
+//     if (hours > 0) {
+//         return (
+//             hours +
+//             "h " +
+//             minutes +
+//             "m " +
+//             seconds +
+//             "s"
+//         );
+//     }
 
-    if (minutes > 0) {
-        return (
-            minutes +
-            "m " +
-            seconds +
-            "s"
-        );
-    }
+//     if (minutes > 0) {
+//         return (
+//             minutes +
+//             "m " +
+//             seconds +
+//             "s"
+//         );
+//     }
 
-    return totalSeconds + "s";
-}
+//     return totalSeconds + "s";
+// }
 
 
 // =========================
@@ -2849,6 +3724,96 @@ async function exportExperimentToDocx() {
                         }
                     })
                 );
+            }
+        }
+
+
+        // AI ANALYSIS
+
+        children.push(
+            new docx.Paragraph({
+                text: "AI Analysis",
+                heading: docx.HeadingLevel.HEADING_2,
+                spacing: {
+                    before: 500,
+                    after: 150
+                }
+            })
+        );
+
+        if (!currentAIAnalysis || !currentAIAnalysis.summary) {
+            children.push(
+                new docx.Paragraph({
+                    text: "No AI analysis is available for this experiment.",
+                    spacing: {
+                        after: 200
+                    }
+                })
+            );
+        } else {
+            const aiSections = parseAIAnalysis(currentAIAnalysis.summary);
+
+            const aiSectionNames = [
+                "Summary",
+                "Key Observations",
+                "Patterns",
+                "Potential Anomalies"
+            ];
+
+            for (let i = 0; i < aiSectionNames.length; i++) {
+                const sectionName = aiSectionNames[i];
+                const sectionContent = aiSections[sectionName];
+
+                if (!sectionContent) {
+                    continue;
+                }
+
+                children.push(
+                    new docx.Paragraph({
+                        text: sectionName,
+                        heading: docx.HeadingLevel.HEADING_3,
+                        spacing: {
+                            before: 250,
+                            after: 100
+                        }
+                    })
+                );
+
+                const lines = sectionContent
+                    .split("\n")
+                    .map(function (line) {
+                        return line.trim();
+                    })
+                    .filter(function (line) {
+                        return line.length > 0;
+                    });
+
+                for (let j = 0; j < lines.length; j++) {
+                    const line = lines[j];
+
+                    if (line.startsWith("- ")) {
+                        children.push(
+                            new docx.Paragraph({
+                                text: line.substring(2),
+                                bullet: {
+                                    level: 0
+                                },
+                                spacing: {
+                                    after: 80
+                                }
+                            })
+                        );
+                    } else {
+                        children.push(
+                            new docx.Paragraph({
+                                text: line,
+                                spacing: {
+                                    after: 100
+                                }
+                            })
+                        );
+                    }
+                }
             }
         }
 
