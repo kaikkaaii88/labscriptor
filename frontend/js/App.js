@@ -716,9 +716,34 @@ finishExperimentButton.addEventListener(
             return;
         }
 
-        if (isRecording === true && recognition) {
+        if (
+            isRecording === true &&
+            recognition
+        ) {
+
+            voiceCommandsEnabled = false;
+
+            observationRecordingMode = false;
+
+            voiceRecordingMode = false;
 
             recognition.stop();
+
+            isRecording = false;
+
+            voiceCommandButton.innerHTML =
+                '<i class="fa-solid fa-microphone"></i>' +
+                '<span>Enable Voice Commands</span>';
+
+            voiceCommandButton.classList.remove(
+                "recording"
+            );
+
+            voiceStatus.textContent =
+                "Voice commands are currently inactive.";
+
+            voiceHint.textContent =
+                "The experiment has been completed.";
 
             voiceStatus.textContent =
                 "Voice recording stopped.";
@@ -910,11 +935,45 @@ newExperimentButton.addEventListener("click", function () {
 
     /* Reset voice interface */
 
-    if (recognition && isRecording === true) {
+    if (
+        recognition &&
+        isRecording === true
+    ) {
+
+        voiceCommandsEnabled = false;
+
+        observationRecordingMode = false;
+
+        voiceRecordingMode = false;
 
         recognition.stop();
 
     }
+
+    isRecording = false;
+
+    voiceCommandsEnabled = false;
+
+    observationRecordingMode = false;
+
+    voiceRecordingMode = false;
+
+
+    voiceCommandButton.innerHTML =
+        '<i class="fa-solid fa-microphone"></i>' +
+        '<span>Enable Voice Commands</span>';
+
+    voiceCommandButton.classList.remove(
+        "recording"
+    );
+
+
+    voiceStatus.textContent =
+        "Voice commands are currently inactive.";
+
+    voiceHint.textContent =
+        "Click Enable Voice Commands to use voice control.";
+
 
     isRecording = false;
 
@@ -1836,8 +1895,25 @@ const voiceStatus =
 const voiceHint =
     document.getElementById("voiceHint");
 
-let recognition;
+
+/* =========================
+   VOICE COMMAND ELEMENTS
+   ========================= */
+const voiceCommandButton =
+    document.getElementById("voiceCommandButton");
+
+
+let recognition = null;
+
 let isRecording = false;
+
+let voiceCommandsEnabled = false;
+
+let observationRecordingMode = false;
+
+let voiceRecordingMode = false;
+
+let finalTranscript = "";
 
 
 /* =========================
@@ -1858,8 +1934,16 @@ if ("SpeechRecognition" in window) {
 
     voiceButton.disabled = true;
 
+    voiceCommandButton.disabled = true;
+
     voiceStatus.textContent =
         "Voice input is not supported by this browser.";
+
+    voiceHint.textContent =
+        "Please use a supported browser.";
+
+    voiceStatus.textContent =
+        "Voice commands are not supported by this browser.";
 
     voiceHint.textContent =
         "Please use a supported browser.";
@@ -1883,7 +1967,104 @@ if (recognition) {
 
 
     /* =========================
-       START / STOP RECORDING
+       START VOICE COMMANDS
+       ========================= */
+
+    voiceCommandButton.addEventListener(
+        "click",
+        function () {
+
+            if (experimentActive === false) {
+
+                alert(
+                    "Please start an experiment before using voice commands."
+                );
+
+                return;
+            }
+
+
+            if (voiceCommandsEnabled === false) {
+
+                try {
+
+                    finalTranscript = "";
+
+                    recognition.start();
+
+                    voiceCommandsEnabled = true;
+
+                    isRecording = true;
+
+                    voiceCommandButton.innerHTML =
+                        '<i class="fa-solid fa-microphone"></i>' +
+                        '<span>Disable Voice Commands</span>';
+
+                    voiceCommandButton.classList.add(
+                        "recording"
+                    );
+
+                    voiceStatus.textContent =
+                        "Voice commands are ON — Listening...";
+
+                    voiceHint.textContent =
+                        "Say commands such as Start timer, Pause timer, or Record observation.";
+
+                    console.log(
+                        "Voice commands enabled."
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        "Could not start voice commands:",
+                        error
+                    );
+
+                    voiceCommandsEnabled = false;
+
+                    isRecording = false;
+
+                    voiceStatus.textContent =
+                        "Unable to start voice commands.";
+
+                    voiceHint.textContent =
+                        "Please try again.";
+
+                }
+
+            } else {
+
+                voiceCommandsEnabled = false;
+
+                observationRecordingMode = false;
+
+                voiceRecordingMode = false;
+
+                recognition.stop();
+
+                voiceCommandButton.innerHTML =
+                    '<i class="fa-solid fa-microphone"></i>' +
+                    '<span>Enable Voice Commands</span>';
+
+                voiceCommandButton.classList.remove(
+                    "recording"
+                );
+
+                voiceStatus.textContent =
+                    "Voice commands are currently inactive.";
+
+                voiceHint.textContent =
+                    "Click Enable Voice Commands to use voice control.";
+
+            }
+
+        }
+    );
+
+
+    /* =========================
+       VOICE RECORDING BUTTON
        ========================= */
 
     voiceButton.addEventListener(
@@ -1900,14 +2081,27 @@ if (recognition) {
             }
 
 
+            if (voiceCommandsEnabled === true) {
+
+                alert(
+                    "Please disable Voice Commands before using Voice Recording."
+                );
+
+                return;
+            }
+
+
             if (isRecording === false) {
 
                 try {
+
                     finalTranscript = "";
 
                     recognition.start();
 
                     isRecording = true;
+
+                    voiceRecordingMode = true;
 
                     voiceButton.textContent =
                         "⏹ Stop Voice Recording";
@@ -1935,6 +2129,8 @@ if (recognition) {
 
                     isRecording = false;
 
+                    voiceRecordingMode = false;
+
                     voiceStatus.textContent =
                         "Unable to start voice recording.";
 
@@ -1944,6 +2140,8 @@ if (recognition) {
                 }
 
             } else {
+
+                voiceRecordingMode = false;
 
                 recognition.stop();
 
@@ -1964,6 +2162,16 @@ if (recognition) {
                 "Speech detected."
             );
 
+
+            if (voiceCommandsEnabled === true) {
+
+                voiceStatus.textContent =
+                    "Listening to your command...";
+
+                return;
+            }
+
+
             voiceStatus.textContent =
                 "Recording your observation...";
 
@@ -1974,15 +2182,11 @@ if (recognition) {
 
 
     /* =========================
-    SPEECH RESULT
-    ========================= */
-
-    let finalTranscript = "";
+       SPEECH RESULT
+       ========================= */
 
     recognition.onresult =
         function (event) {
-
-            let interimTranscript = "";
 
             for (
                 let i = event.resultIndex;
@@ -1991,54 +2195,86 @@ if (recognition) {
             ) {
 
                 const transcript =
-                    event.results[i][0].transcript;
+                    event.results[i][0].transcript.trim();
 
-                if (event.results[i].isFinal) {
+
+                if (
+                    event.results[i].isFinal === false
+                ) {
+
+                    continue;
+
+                }
+
+
+                if (transcript === "") {
+
+                    continue;
+
+                }
+
+
+                console.log(
+                    "Final speech:",
+                    transcript
+                );
+
+
+                /* =========================
+                   VOICE COMMAND MODE
+                   ========================= */
+
+                if (voiceCommandsEnabled === true) {
+
+                    handleVoiceCommand(
+                        transcript
+                    );
+
+                    continue;
+
+                }
+
+
+                /* =========================
+                   VOICE RECORDING MODE
+                   ========================= */
+
+                if (voiceRecordingMode === true) {
 
                     finalTranscript =
                         finalTranscript +
                         transcript +
                         " ";
 
-                } else {
 
-                    interimTranscript =
-                        interimTranscript +
-                        transcript;
+                    const displayedTranscript =
+                        finalTranscript.trim();
+
+
+                    if (
+                        displayedTranscript !== ""
+                    ) {
+
+                        observationText.value =
+                            displayedTranscript;
+
+                        observationCharacterCount.textContent =
+                            observationText.value.length +
+                            " / 1000";
+
+                        voiceStatus.textContent =
+                            "Observation captured.";
+
+                        voiceHint.textContent =
+                            "Review the text before saving.";
+
+                        voiceButton.classList.add(
+                            "success"
+                        );
+
+                    }
 
                 }
-
-            }
-
-            const displayedTranscript =
-                (
-                    finalTranscript +
-                    interimTranscript
-                ).trim();
-
-            console.log(
-                "Speech result:",
-                displayedTranscript
-            );
-
-            if (displayedTranscript !== "") {
-
-                observationText.value =
-                    displayedTranscript;
-
-                observationCharacterCount.textContent =
-                    observationText.value.length +
-                    " / 1000";
-
-                voiceStatus.textContent =
-                    "Observation captured.";
-
-                voiceHint.textContent =
-                    "Review the text before saving.";
-
-                voiceButton.classList.add(
-                    "success"
-                );
 
             }
 
@@ -2046,8 +2282,8 @@ if (recognition) {
 
 
     /* =========================
-    SPEECH END
-    ========================= */
+       SPEECH END
+       ========================= */
 
     recognition.onend =
         function () {
@@ -2056,7 +2292,69 @@ if (recognition) {
                 "Speech recognition ended."
             );
 
+
             isRecording = false;
+
+
+            /* =========================
+               VOICE COMMAND MODE
+               ========================= */
+
+            if (
+                voiceCommandsEnabled === true
+            ) {
+
+                isRecording = true;
+
+                voiceStatus.textContent =
+                    "Voice commands are ON — Listening...";
+
+                voiceHint.textContent =
+                    "Say a LabScriptor voice command.";
+
+
+                /*
+                 * Restart recognition so that
+                 * voice commands remain active.
+                 */
+
+                setTimeout(
+                    function () {
+
+                        if (
+                            voiceCommandsEnabled === true
+                        ) {
+
+                            try {
+
+                                recognition.start();
+
+                                isRecording = true;
+
+                            } catch (error) {
+
+                                console.error(
+                                    "Unable to restart voice commands:",
+                                    error
+                                );
+
+                            }
+
+                        }
+
+                    },
+                    300
+                );
+
+
+                return;
+
+            }
+
+
+            /* =========================
+               NORMAL VOICE RECORDING
+               ========================= */
 
             voiceButton.textContent =
                 "🎙 Start Voice Recording";
@@ -2064,6 +2362,7 @@ if (recognition) {
             voiceButton.classList.remove(
                 "recording"
             );
+
 
             if (
                 finalTranscript.trim() !== ""
@@ -2075,14 +2374,25 @@ if (recognition) {
                 voiceHint.textContent =
                     "Review the text before saving.";
 
+            } else {
+
+                voiceStatus.textContent =
+                    "Voice recording is currently inactive.";
+
+                voiceHint.textContent =
+                    "Click the button and speak your observation.";
+
             }
+
+
+            voiceRecordingMode = false;
 
         };
 
 
-/* =========================
-    SPEECH ERROR
-    ========================= */
+    /* =========================
+       SPEECH ERROR
+       ========================= */
 
     recognition.onerror =
         function (event) {
@@ -2092,31 +2402,67 @@ if (recognition) {
                 event.error
             );
 
-            if (event.error === "no-speech") {
 
-                voiceStatus.textContent =
-                    "No speech detected.";
-
-                voiceHint.textContent =
-                    "Make sure the correct microphone is selected and speak clearly.";
+            if (
+                event.error === "aborted"
+            ) {
 
                 return;
+
             }
+
+
+            if (
+                event.error === "no-speech"
+            ) {
+
+                if (
+                    voiceCommandsEnabled === true
+                ) {
+
+                    voiceStatus.textContent =
+                        "No speech detected.";
+
+                    voiceHint.textContent =
+                        "Voice commands will continue listening.";
+
+                } else {
+
+                    voiceStatus.textContent =
+                        "No speech detected.";
+
+                    voiceHint.textContent =
+                        "Make sure the correct microphone is selected and speak clearly.";
+
+                }
+
+                return;
+
+            }
+
 
             isRecording = false;
 
-            voiceButton.textContent =
-                "🎙 Start Voice Recording";
 
-            voiceButton.classList.remove(
-                "recording"
-            );
+            if (
+                event.error === "not-allowed"
+            ) {
 
-            voiceButton.classList.remove(
-                "success"
-            );
+                voiceCommandsEnabled = false;
 
-            if (event.error === "not-allowed") {
+                voiceRecordingMode = false;
+
+                observationRecordingMode = false;
+
+
+                voiceCommandButton.innerHTML =
+                    '<i class="fa-solid fa-microphone"></i>' +
+                    '<span>Enable Voice Commands</span>';
+
+                voiceCommandButton.classList.remove(
+                    "recording"
+                );
+
 
                 voiceStatus.textContent =
                     "Microphone permission was denied.";
@@ -2124,7 +2470,16 @@ if (recognition) {
                 voiceHint.textContent =
                     "Please allow microphone access and try again.";
 
-            } else if (event.error === "audio-capture") {
+
+                voiceStatus.textContent =
+                    "Microphone permission was denied.";
+
+                voiceHint.textContent =
+                    "Allow microphone access in your browser before using voice commands.";
+
+            } else if (
+                event.error === "audio-capture"
+            ) {
 
                 voiceStatus.textContent =
                     "No microphone was detected.";
@@ -2132,7 +2487,21 @@ if (recognition) {
                 voiceHint.textContent =
                     "Check your microphone and Windows input device.";
 
-            } else if (event.error === "network") {
+                voiceStatus.textContent =
+                    "No microphone was detected.";
+
+                voiceHint.textContent =
+                    "Check your microphone and Windows input device.";
+
+            } else if (
+                event.error === "network"
+            ) {
+
+                voiceStatus.textContent =
+                    "Network error during voice recognition.";
+
+                voiceHint.textContent =
+                    "Check your internet connection and try again.";
 
                 voiceStatus.textContent =
                     "Network error during voice recognition.";
@@ -2146,11 +2515,399 @@ if (recognition) {
                     "Voice input could not be completed.";
 
                 voiceHint.textContent =
-                    "Please try recording again.";
+                    "Please try again.";
+
+                voiceStatus.textContent =
+                    "Voice commands could not be completed.";
+
+                voiceHint.textContent =
+                    "Please try enabling voice commands again.";
 
             }
 
+
+            voiceButton.textContent =
+                "🎙 Start Voice Recording";
+
+            voiceButton.classList.remove(
+                "recording"
+            );
+
+            voiceButton.classList.remove(
+                "success"
+            );
+
+            voiceCommandButton.innerHTML =
+                '<i class="fa-solid fa-microphone"></i>' +
+                '<span>Enable Voice Commands</span>';
+
+            voiceCommandButton.classList.remove(
+                "recording"
+            );
+
         };
+
+}
+
+
+/* =========================
+   HANDLE VOICE COMMAND
+   ========================= */
+
+function handleVoiceCommand(
+    transcript
+) {
+
+    const command =
+        transcript
+            .toLowerCase()
+            .trim();
+
+
+    console.log(
+        "Voice command detected:",
+        command
+    );
+
+
+    voiceStatus.textContent =
+        "Command detected: " +
+        transcript;
+
+
+    /* =========================
+       SAVE OBSERVATION
+       ========================= */
+
+    if (
+        command === "save observation"
+    ) {
+
+        saveObservationButton.click();
+
+        observationRecordingMode = false;
+
+        return;
+
+    }
+
+
+    /* =========================
+       RECORD OBSERVATION
+       ========================= */
+
+    if (
+        command === "record observation"
+    ) {
+
+        observationRecordingMode = true;
+
+        voiceStatus.textContent =
+            "Observation recording mode active.";
+
+        voiceHint.textContent =
+            "Speak your observation. Say Save observation when finished.";
+
+        observationText.focus();
+
+        return;
+
+    }
+
+
+    /* =========================
+       OBSERVATION MODE
+       ========================= */
+
+    if (
+        observationRecordingMode === true
+    ) {
+
+        if (
+            observationText.value.trim() === ""
+        ) {
+
+            observationText.value =
+                transcript;
+
+        } else {
+
+            observationText.value =
+                observationText.value.trim() +
+                " " +
+                transcript;
+
+        }
+
+
+        observationCharacterCount.textContent =
+            observationText.value.length +
+            " / 1000";
+
+
+        voiceStatus.textContent =
+            "Observation captured.";
+
+        voiceHint.textContent =
+            "Continue speaking or say Save observation.";
+
+        return;
+
+    }
+
+
+    /* =========================
+       START TIMER
+       ========================= */
+
+    if (
+        command === "start timer"
+    ) {
+
+        startButton.click();
+
+        return;
+
+    }
+
+
+    /* =========================
+       PAUSE TIMER
+       ========================= */
+
+    if (
+        command === "pause timer"
+    ) {
+
+        pauseButton.click();
+
+        return;
+
+    }
+
+
+    /* =========================
+       RESUME TIMER
+       ========================= */
+
+    if (
+        command === "resume timer"
+    ) {
+
+        startButton.click();
+
+        return;
+
+    }
+
+
+    /* =========================
+       STOP TIMER
+       ========================= */
+
+    if (
+        command === "stop timer"
+    ) {
+
+        pauseButton.click();
+
+        return;
+
+    }
+
+
+    /* =========================
+       RESET TIMER
+       ========================= */
+
+    if (
+        command === "reset timer"
+    ) {
+
+        resetButton.click();
+
+        return;
+
+    }
+
+
+    /* =========================
+       START VOICE RECORDING
+       ========================= */
+
+    if (
+        command === "start voice recording"
+    ) {
+
+        if (
+            voiceRecordingMode === false
+        ) {
+
+            voiceRecordingMode = true;
+
+            finalTranscript = "";
+
+            voiceStatus.textContent =
+                "Voice recording started.";
+
+            voiceHint.textContent =
+                "Speak your observation. Say Stop voice recording when finished.";
+
+        }
+
+        return;
+
+    }
+
+
+    /* =========================
+       STOP VOICE RECORDING
+       ========================= */
+
+    if (
+        command === "stop voice recording"
+    ) {
+
+        voiceRecordingMode = false;
+
+        voiceStatus.textContent =
+            "Voice recording stopped.";
+
+        voiceHint.textContent =
+            "Say another voice command.";
+
+        return;
+
+    }
+
+
+    /* =========================
+       START CAMERA
+       ========================= */
+
+    if (
+        command === "start camera"
+    ) {
+
+        startCamera();
+
+        return;
+
+    }
+
+
+    /* =========================
+       TAKE PHOTO
+       ========================= */
+
+    if (
+        command === "take photo"
+    ) {
+
+        if (cameraStream) {
+
+            capturePhotoButton.click();
+
+        } else {
+
+            startCamera();
+
+            voiceStatus.textContent =
+                "Camera starting. Say Take photo when the camera is ready.";
+
+        }
+
+        return;
+
+    }
+
+
+    /* =========================
+       UPLOAD IMAGE
+       ========================= */
+
+    if (
+        command === "upload image"
+    ) {
+
+        if (selectedImage) {
+
+            uploadImageButton.click();
+
+        } else {
+
+            imageInput.click();
+
+            voiceStatus.textContent =
+                "Please select an image from the file picker.";
+
+        }
+
+        return;
+
+    }
+
+
+    /* =========================
+       SCROLL DOWN
+       ========================= */
+
+    if (
+        command === "scroll down"
+    ) {
+
+        window.scrollBy({
+            top: 600,
+            behavior: "smooth"
+        });
+
+        return;
+
+    }
+
+
+    /* =========================
+       SCROLL UP
+       ========================= */
+
+    if (
+        command === "scroll up"
+    ) {
+
+        window.scrollBy({
+            top: -600,
+            behavior: "smooth"
+        });
+
+        return;
+
+    }
+
+
+    /* =========================
+       END EXPERIMENT
+       ========================= */
+
+    if (
+        command === "end experiment"
+    ) {
+
+        finishExperimentButton.click();
+
+        return;
+
+    }
+
+
+    /* =========================
+       UNKNOWN COMMAND
+       ========================= */
+
+    voiceStatus.textContent =
+        "Command not recognised.";
+
+    voiceHint.textContent =
+        "Try Start timer, Pause timer, Record observation, Take photo, or another supported command.";
 
 }
 
