@@ -1974,15 +1974,6 @@ if (recognition) {
         "click",
         function () {
 
-            if (experimentActive === false) {
-
-                alert(
-                    "Please start an experiment before using voice commands."
-                );
-
-                return;
-            }
-
 
             if (voiceCommandsEnabled === false) {
 
@@ -2554,9 +2545,7 @@ if (recognition) {
    HANDLE VOICE COMMAND
    ========================= */
 
-function handleVoiceCommand(
-    transcript
-) {
+function handleVoiceCommand(transcript) {
 
     const command =
         transcript
@@ -2564,20 +2553,97 @@ function handleVoiceCommand(
             .trim();
 
 
-    console.log(
-        "Voice command detected:",
-        command
-    );
+    /*
+     * =========================
+     * EXPERIMENT NAME
+     * =========================
+     */
+
+    if (
+        command.startsWith("experiment name is")
+    ) {
+
+        const experimentNameText =
+            transcript
+                .trim()
+                .substring(
+                    "experiment name is".length
+                )
+                .trim();
 
 
-    voiceStatus.textContent =
-        "Command detected: " +
-        transcript;
+        if (experimentNameText.length === 0) {
+
+            voiceStatus.textContent =
+                "Experiment name was not detected.";
+
+            voiceHint.textContent =
+                "Say: Experiment name is followed by the experiment name.";
+
+            return;
+        }
 
 
-    /* =========================
-       SAVE OBSERVATION
-       ========================= */
+        experimentName.value =
+            experimentNameText;
+
+
+        voiceStatus.textContent =
+            "Experiment name captured.";
+
+        voiceHint.textContent =
+            experimentNameText;
+
+
+        experimentName.dispatchEvent(
+            new Event("input", {
+                bubbles: true
+            })
+        );
+
+
+        return;
+    }
+
+
+    /*
+     * =========================
+     * START EXPERIMENT
+     * =========================
+     */
+
+    if (
+        command === "start experiment" ||
+        command === "begin experiment"
+    ) {
+
+        startExperimentButton.click();
+
+        return;
+    }
+
+
+    /*
+     * =========================
+     * NEW EXPERIMENT
+     * =========================
+     */
+
+    if (
+        command === "new experiment"
+    ) {
+
+        newExperimentButton.click();
+
+        return;
+    }
+
+
+    /*
+     * =========================
+     * SAVE OBSERVATION
+     * =========================
+     */
 
     if (
         command === "save observation"
@@ -2585,80 +2651,77 @@ function handleVoiceCommand(
 
         saveObservationButton.click();
 
-        observationRecordingMode = false;
+        observationRecordingMode =
+            false;
 
         return;
-
     }
 
 
-    /* =========================
-       RECORD OBSERVATION
-       ========================= */
+    /*
+     * =========================
+     * RECORD OBSERVATION
+     * =========================
+     */
 
     if (
         command === "record observation"
     ) {
 
-        observationRecordingMode = true;
+        observationRecordingMode =
+            true;
 
         voiceStatus.textContent =
-            "Observation recording mode active.";
+            "Observation recording mode is active.";
 
         voiceHint.textContent =
-            "Speak your observation. Say Save observation when finished.";
+            "Speak your observation. Say Save Observation when finished.";
 
         observationText.focus();
 
         return;
-
     }
 
 
-    /* =========================
-       OBSERVATION MODE
-       ========================= */
+    /*
+     * =========================
+     * OBSERVATION INPUT MODE
+     * =========================
+     */
 
     if (
         observationRecordingMode === true
     ) {
 
         if (
-            observationText.value.trim() === ""
+            observationText.value.length > 0
         ) {
 
-            observationText.value =
-                transcript;
-
-        } else {
-
-            observationText.value =
-                observationText.value.trim() +
-                " " +
-                transcript;
-
+            observationText.value +=
+                " ";
         }
 
 
-        observationCharacterCount.textContent =
-            observationText.value.length +
-            " / 1000";
+        observationText.value +=
+            transcript.trim();
 
 
-        voiceStatus.textContent =
-            "Observation captured.";
+        observationText.dispatchEvent(
+            new Event("input", {
+                bubbles: true
+            })
+        );
 
-        voiceHint.textContent =
-            "Continue speaking or say Save observation.";
 
         return;
-
     }
 
 
-    /* =========================
-       START TIMER
-       ========================= */
+    /*
+     * =========================
+     * START TIMER
+     * =========================
+     */
 
     if (
         command === "start timer"
@@ -2667,13 +2730,14 @@ function handleVoiceCommand(
         startButton.click();
 
         return;
-
     }
 
 
-    /* =========================
-       PAUSE TIMER
-       ========================= */
+    /*
+     * =========================
+     * PAUSE TIMER
+     * =========================
+     */
 
     if (
         command === "pause timer"
@@ -2682,13 +2746,14 @@ function handleVoiceCommand(
         pauseButton.click();
 
         return;
-
     }
 
 
-    /* =========================
-       RESUME TIMER
-       ========================= */
+    /*
+     * =========================
+     * RESUME TIMER
+     * =========================
+     */
 
     if (
         command === "resume timer"
@@ -2697,28 +2762,14 @@ function handleVoiceCommand(
         startButton.click();
 
         return;
-
     }
 
 
-    /* =========================
-       STOP TIMER
-       ========================= */
-
-    if (
-        command === "stop timer"
-    ) {
-
-        pauseButton.click();
-
-        return;
-
-    }
-
-
-    /* =========================
-       RESET TIMER
-       ========================= */
+    /*
+     * =========================
+     * RESET TIMER
+     * =========================
+     */
 
     if (
         command === "reset timer"
@@ -2727,84 +2778,90 @@ function handleVoiceCommand(
         resetButton.click();
 
         return;
-
     }
 
 
-    /* =========================
-       START VOICE RECORDING
-       ========================= */
+    /*
+     * =========================
+     * START VOICE RECORDING
+     * =========================
+     */
 
     if (
-        command === "start voice recording"
+        command === "start voice recording" ||
+        command === "start recording"
     ) {
 
-        if (
-            voiceRecordingMode === false
-        ) {
+        voiceRecordingMode =
+            true;
 
-            voiceRecordingMode = true;
+        finalTranscript = "";
 
-            finalTranscript = "";
+        voiceStatus.textContent =
+            "Voice recording is active.";
 
-            voiceStatus.textContent =
-                "Voice recording started.";
-
-            voiceHint.textContent =
-                "Speak your observation. Say Stop voice recording when finished.";
-
-        }
+        voiceHint.textContent =
+            "Speak your observation.";
 
         return;
-
     }
 
 
-    /* =========================
-       STOP VOICE RECORDING
-       ========================= */
+    /*
+     * =========================
+     * STOP VOICE RECORDING
+     * =========================
+     */
 
     if (
-        command === "stop voice recording"
+        command === "stop voice recording" ||
+        command === "stop recording"
     ) {
 
-        voiceRecordingMode = false;
+        voiceRecordingMode =
+            false;
 
         voiceStatus.textContent =
             "Voice recording stopped.";
 
         voiceHint.textContent =
-            "Say another voice command.";
+            "Your voice recording has been captured.";
 
         return;
-
     }
 
 
-    /* =========================
-       START CAMERA
-       ========================= */
+    /*
+     * =========================
+     * START CAMERA
+     * =========================
+     */
 
     if (
-        command === "start camera"
+        command === "start camera" ||
+        command === "open camera"
     ) {
 
         startCamera();
 
         return;
-
     }
 
 
-    /* =========================
-       TAKE PHOTO
-       ========================= */
+    /*
+     * =========================
+     * TAKE PHOTO
+     * =========================
+     */
 
     if (
-        command === "take photo"
+        command === "take photo" ||
+        command === "capture image"
     ) {
 
-        if (cameraStream) {
+        if (
+            cameraStream
+        ) {
 
             capturePhotoButton.click();
 
@@ -2813,44 +2870,38 @@ function handleVoiceCommand(
             startCamera();
 
             voiceStatus.textContent =
-                "Camera starting. Say Take photo when the camera is ready.";
+                "Camera opened.";
 
+            voiceHint.textContent =
+                "Say Take Photo when ready.";
         }
 
         return;
-
     }
 
 
-    /* =========================
-       UPLOAD IMAGE
-       ========================= */
+    /*
+     * =========================
+     * UPLOAD IMAGE
+     * =========================
+     */
 
     if (
-        command === "upload image"
+        command === "upload image" ||
+        command === "add image"
     ) {
 
-        if (selectedImage) {
-
-            uploadImageButton.click();
-
-        } else {
-
-            imageInput.click();
-
-            voiceStatus.textContent =
-                "Please select an image from the file picker.";
-
-        }
+        imageInput.click();
 
         return;
-
     }
 
 
-    /* =========================
-       SCROLL DOWN
-       ========================= */
+    /*
+     * =========================
+     * SCROLL DOWN
+     * =========================
+     */
 
     if (
         command === "scroll down"
@@ -2862,13 +2913,14 @@ function handleVoiceCommand(
         });
 
         return;
-
     }
 
 
-    /* =========================
-       SCROLL UP
-       ========================= */
+    /*
+     * =========================
+     * SCROLL UP
+     * =========================
+     */
 
     if (
         command === "scroll up"
@@ -2880,35 +2932,37 @@ function handleVoiceCommand(
         });
 
         return;
-
     }
 
 
-    /* =========================
-       END EXPERIMENT
-       ========================= */
+    /*
+     * =========================
+     * END EXPERIMENT
+     * =========================
+     */
 
     if (
-        command === "end experiment"
+        command === "end experiment" ||
+        command === "finish experiment"
     ) {
 
         finishExperimentButton.click();
 
         return;
-
     }
 
 
-    /* =========================
-       UNKNOWN COMMAND
-       ========================= */
+    /*
+     * =========================
+     * UNKNOWN COMMAND
+     * =========================
+     */
 
     voiceStatus.textContent =
         "Command not recognised.";
 
     voiceHint.textContent =
-        "Try Start timer, Pause timer, Record observation, Take photo, or another supported command.";
-
+        "Please try another voice command.";
 }
 
 
