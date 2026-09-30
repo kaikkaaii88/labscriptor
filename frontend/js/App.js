@@ -312,6 +312,9 @@ const headerStatusText =
 const historyButton =
     document.getElementById("historyButton");
 
+const logoutButton =
+    document.getElementById("logoutButton");
+
 const reviewBanner =
     document.getElementById("reviewBanner");
 
@@ -334,9 +337,63 @@ const reviewObservationCheck =
 historyButton.addEventListener(
     "click",
     function () {
-
         window.location.href =
             "history.html";
+    }
+);
+
+logoutButton.addEventListener(
+    "click",
+    async function () {
+
+        const confirmation =
+            confirm(
+                "Are you sure you want to log out?"
+            );
+
+        if (confirmation === false) {
+            return;
+        }
+
+        try {
+
+            const result =
+                await supabaseClient.auth.signOut();
+
+            if (result.error) {
+
+                console.error(
+                    "Logout failed:",
+                    result.error
+                );
+
+                alert(
+                    "Unable to log out. Please try again."
+                );
+
+                return;
+            }
+
+            localStorage.removeItem(
+                "labscriptorSessionId"
+            );
+
+            window.location.href =
+                "login.html";
+
+        } catch (error) {
+
+            console.error(
+                "Logout error:",
+                error
+            );
+
+            alert(
+                "Unable to log out. Please try again."
+            );
+
+        }
+
     }
 );
 
@@ -1684,92 +1741,137 @@ imageInput.addEventListener(
    IMAGE UPLOAD
    ========================= */
 
+async function uploadSelectedImage() {
+
+    if (!selectedImage) {
+
+        imageStatus.textContent =
+            "Please select an image first.";
+
+        return;
+
+    }
+
+
+    if (!currentSessionId) {
+
+        imageStatus.textContent =
+            "Please start an experiment first.";
+
+        return;
+
+    }
+
+
+    uploadImageButton.disabled = true;
+
+    imageStatus.textContent =
+        "Uploading image...";
+
+
+    try {
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "image",
+            selectedImage
+        );
+
+
+        formData.append(
+            "session_id",
+            currentSessionId
+        );
+
+
+        const response =
+            await fetch(
+                "http://localhost:3000/api/images",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Failed to upload image"
+            );
+
+        }
+
+
+        imageStatus.textContent =
+            "Image uploaded successfully.";
+
+
+        await loadExperimentImages(
+            currentSessionId
+        );
+
+
+        console.log(
+            "Uploaded image:",
+            data
+        );
+
+
+        /*
+         * Clear selected image
+         * after successful upload.
+         */
+
+        selectedImage = null;
+
+        imageInput.value = "";
+
+        uploadImageButton.disabled =
+            true;
+
+
+    } catch (error) {
+
+        console.error(
+            "Image upload error:",
+            error
+        );
+
+
+        imageStatus.textContent =
+            "Failed to upload image.";
+
+
+        uploadImageButton.disabled =
+            false;
+
+    }
+
+}
+
+
+/* =========================
+   MANUAL IMAGE UPLOAD BUTTON
+   ========================= */
+
 uploadImageButton.addEventListener(
     "click",
     async function () {
 
-        if (!selectedImage) {
-            imageStatus.textContent =
-                "Please select an image first.";
-
-            return;
-        }
-
-        if (!currentSessionId) {
-            imageStatus.textContent =
-                "Please start an experiment first.";
-
-            return;
-        }
-
-        uploadImageButton.disabled = true;
-
-        imageStatus.textContent =
-            "Uploading image...";
-
-        try {
-
-            const formData =
-                new FormData();
-
-            formData.append(
-                "image",
-                selectedImage
-            );
-
-            formData.append(
-                "session_id",
-                currentSessionId
-            );
-
-            const response =
-                await fetch(
-                    "http://localhost:3000/api/images",
-                    {
-                        method: "POST",
-                        body: formData
-                    }
-                );
-
-            const data =
-                await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.message ||
-                    "Failed to upload image"
-                );
-            }
-
-            imageStatus.textContent =
-                "Image uploaded successfully.";
-
-            loadExperimentImages(
-                currentSessionId
-            );
-
-            console.log(
-                "Uploaded image:",
-                data
-            );
-
-        } catch (error) {
-
-            console.error(
-                "Image upload error:",
-                error
-            );
-
-            imageStatus.textContent =
-                "Failed to upload image.";
-
-            uploadImageButton.disabled =
-                false;
-
-        }
+        await uploadSelectedImage();
 
     }
 );
+
 
 /* =========================
    LOAD EXPERIMENT IMAGES
@@ -1903,6 +2005,56 @@ const voiceCommandButton =
     document.getElementById("voiceCommandButton");
 
 
+/* =========================
+   SIDEBAR MENU
+   ========================= */
+
+const voiceCommandMenu =
+    document.getElementById(
+        "voiceCommandMenu"
+    );
+
+const openVoiceCommandMenu =
+    document.getElementById(
+        "openVoiceCommandMenu"
+    );
+
+const closeVoiceCommandMenu =
+    document.getElementById(
+        "closeVoiceCommandMenu"
+    );
+
+const sidebarProcessButton =
+    document.getElementById(
+        "sidebarProcessButton"
+    );
+
+const sidebarHistoryButton =
+    document.getElementById(
+        "sidebarHistoryButton"
+    );
+
+const sidebarVoiceButton =
+    document.getElementById(
+        "sidebarVoiceButton"
+    );
+
+const sidebarVoiceStatus =
+    document.getElementById(
+        "sidebarVoiceStatus"
+    );
+
+const sidebarVoiceHint =
+    document.getElementById(
+        "sidebarVoiceHint"
+    );
+
+const sidebarVoiceStatusCard =
+    document.querySelector(
+        ".voice-command-status-card"
+    );
+
+
 let recognition = null;
 
 let isRecording = false;
@@ -1914,6 +2066,94 @@ let observationRecordingMode = false;
 let voiceRecordingMode = false;
 
 let finalTranscript = "";
+
+
+/* =========================
+   SIDEBAR MENU CONTROLS
+   ========================= */
+
+function openSidebarMenu() {
+
+    voiceCommandMenu.classList.remove(
+        "closed"
+    );
+
+    document.body.classList.add(
+        "sidebar-open"
+    );
+
+}
+
+
+function closeSidebarMenu() {
+
+    voiceCommandMenu.classList.add(
+        "closed"
+    );
+
+    document.body.classList.remove(
+        "sidebar-open"
+    );
+
+}
+
+
+openVoiceCommandMenu.addEventListener(
+    "click",
+    function () {
+
+        openSidebarMenu();
+
+    }
+);
+
+
+closeVoiceCommandMenu.addEventListener(
+    "click",
+    function () {
+
+        closeSidebarMenu();
+
+    }
+);
+
+
+/* =========================
+   SIDEBAR NAVIGATION
+   ========================= */
+
+sidebarProcessButton.addEventListener(
+    "click",
+    function () {
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    }
+);
+
+
+sidebarHistoryButton.addEventListener(
+    "click",
+    function () {
+
+        window.location.href =
+            "history.html";
+
+    }
+);
+
+
+sidebarVoiceButton.addEventListener(
+    "click",
+    function () {
+
+        voiceCommandButton.click();
+
+    }
+);
 
 
 /* =========================
@@ -2001,6 +2241,23 @@ if (recognition) {
                     voiceHint.textContent =
                         "Say commands such as Start timer, Pause timer, or Record observation.";
 
+
+                    /* UPDATE SIDEBAR VOICE STATUS */
+
+                    sidebarVoiceStatus.textContent =
+                        "Voice Commands On";
+
+                    sidebarVoiceHint.textContent =
+                        "Listening for commands.";
+
+                    sidebarVoiceStatusCard.classList.add(
+                        "active"
+                    );
+
+                    /* OPEN SIDEBAR */
+
+                    openSidebarMenu();
+
                     console.log(
                         "Voice commands enabled."
                     );
@@ -2024,31 +2281,46 @@ if (recognition) {
 
                 }
 
-            } else {
+                } else {
 
-                voiceCommandsEnabled = false;
+                    voiceCommandsEnabled = false;
 
-                observationRecordingMode = false;
+                    observationRecordingMode = false;
 
-                voiceRecordingMode = false;
+                    voiceRecordingMode = false;
 
-                recognition.stop();
+                    recognition.stop();
 
-                voiceCommandButton.innerHTML =
-                    '<i class="fa-solid fa-microphone"></i>' +
-                    '<span>Enable Voice Commands</span>';
+                    voiceCommandButton.innerHTML =
+                        '<i class="fa-solid fa-microphone"></i>' +
+                        '<span>Enable Voice Commands</span>';
 
-                voiceCommandButton.classList.remove(
-                    "recording"
-                );
+                    voiceCommandButton.classList.remove(
+                        "recording"
+                    );
 
-                voiceStatus.textContent =
-                    "Voice commands are currently inactive.";
+                    voiceStatus.textContent =
+                        "Voice commands are currently inactive.";
 
-                voiceHint.textContent =
-                    "Click Enable Voice Commands to use voice control.";
+                    voiceHint.textContent =
+                        "Click Enable Voice Commands to use voice control.";
 
-            }
+                    sidebarVoiceStatusCard.classList.remove(
+                        "active"
+                    );
+
+                    closeSidebarMenu();
+
+
+                    /* UPDATE SIDEBAR VOICE STATUS */
+
+                    sidebarVoiceStatus.textContent =
+                        "Voice Commands Off";
+
+                    sidebarVoiceHint.textContent =
+                        "Enable voice commands for hands-free control.";
+
+                }
 
         }
     );
@@ -2545,7 +2817,7 @@ if (recognition) {
    HANDLE VOICE COMMAND
    ========================= */
 
-function handleVoiceCommand(transcript) {
+async function handleVoiceCommand(transcript) {
 
     const command =
         transcript
@@ -2584,6 +2856,18 @@ function handleVoiceCommand(transcript) {
         }
 
 
+        if (experimentActive === true) {
+
+            voiceStatus.textContent =
+                "The current experiment is already active.";
+
+            voiceHint.textContent =
+                "Finish the current experiment before changing its name.";
+
+            return;
+        }
+
+
         experimentName.value =
             experimentNameText;
 
@@ -2602,6 +2886,9 @@ function handleVoiceCommand(transcript) {
         );
 
 
+        updateExperimentSummary();
+
+
         return;
     }
 
@@ -2616,6 +2903,18 @@ function handleVoiceCommand(transcript) {
         command === "start experiment" ||
         command === "begin experiment"
     ) {
+
+        if (experimentActive === true) {
+
+            voiceStatus.textContent =
+                "The experiment is already active.";
+
+            voiceHint.textContent =
+                "You can say Start Timer to begin the timer.";
+
+            return;
+        }
+
 
         startExperimentButton.click();
 
@@ -2649,6 +2948,21 @@ function handleVoiceCommand(transcript) {
         command === "save observation"
     ) {
 
+        if (experimentActive === false) {
+
+            voiceStatus.textContent =
+                "No active experiment.";
+
+            voiceHint.textContent =
+                "Start an experiment before saving an observation.";
+
+            observationRecordingMode =
+                false;
+
+            return;
+        }
+
+
         saveObservationButton.click();
 
         observationRecordingMode =
@@ -2668,6 +2982,18 @@ function handleVoiceCommand(transcript) {
         command === "record observation"
     ) {
 
+        if (experimentActive === false) {
+
+            voiceStatus.textContent =
+                "No active experiment.";
+
+            voiceHint.textContent =
+                "Start an experiment before recording an observation.";
+
+            return;
+        }
+
+
         observationRecordingMode =
             true;
 
@@ -2685,40 +3011,6 @@ function handleVoiceCommand(transcript) {
 
     /*
      * =========================
-     * OBSERVATION INPUT MODE
-     * =========================
-     */
-
-    if (
-        observationRecordingMode === true
-    ) {
-
-        if (
-            observationText.value.length > 0
-        ) {
-
-            observationText.value +=
-                " ";
-        }
-
-
-        observationText.value +=
-            transcript.trim();
-
-
-        observationText.dispatchEvent(
-            new Event("input", {
-                bubbles: true
-            })
-        );
-
-
-        return;
-    }
-
-
-    /*
-     * =========================
      * START TIMER
      * =========================
      */
@@ -2726,6 +3018,18 @@ function handleVoiceCommand(transcript) {
     if (
         command === "start timer"
     ) {
+
+        if (experimentActive === false) {
+
+            voiceStatus.textContent =
+                "No active experiment.";
+
+            voiceHint.textContent =
+                "Start an experiment before starting the timer.";
+
+            return;
+        }
+
 
         startButton.click();
 
@@ -2743,6 +3047,18 @@ function handleVoiceCommand(transcript) {
         command === "pause timer"
     ) {
 
+        if (experimentActive === false) {
+
+            voiceStatus.textContent =
+                "No active experiment.";
+
+            voiceHint.textContent =
+                "Start an experiment before pausing the timer.";
+
+            return;
+        }
+
+
         pauseButton.click();
 
         return;
@@ -2750,14 +3066,56 @@ function handleVoiceCommand(transcript) {
 
 
     /*
-     * =========================
-     * RESUME TIMER
-     * =========================
-     */
+    * =========================
+    * RESUME TIMER
+    * =========================
+    */
 
     if (
-        command === "resume timer"
+        command === "resume timer" ||
+        command === "resume the timer" ||
+        command === "resumed timer" ||
+        command === "resumed the timer" ||
+        command === "resume" ||
+        command === "resumed" ||
+        command === "continue timer" ||
+        command === "continue the timer" ||
+        command === "continue" ||
+        command.includes("resume") ||
+        command.includes("resumed") ||
+        command.includes("continue")
     ) {
+
+        if (experimentActive === false) {
+
+            voiceStatus.textContent =
+                "No active experiment.";
+
+            voiceHint.textContent =
+                "Start an experiment before resuming the timer.";
+
+            return;
+        }
+
+
+        if (timerInterval !== null) {
+
+            voiceStatus.textContent =
+                "Timer is already running.";
+
+            voiceHint.textContent =
+                "The timer is already active.";
+
+            return;
+        }
+
+
+        voiceStatus.textContent =
+            "Resuming timer...";
+
+        voiceHint.textContent =
+            "The timer is running again.";
+
 
         startButton.click();
 
@@ -2791,6 +3149,18 @@ function handleVoiceCommand(transcript) {
         command === "start voice recording" ||
         command === "start recording"
     ) {
+
+        if (experimentActive === false) {
+
+            voiceStatus.textContent =
+                "No active experiment.";
+
+            voiceHint.textContent =
+                "Start an experiment before using voice recording.";
+
+            return;
+        }
+
 
         voiceRecordingMode =
             true;
@@ -2842,6 +3212,18 @@ function handleVoiceCommand(transcript) {
         command === "open camera"
     ) {
 
+        if (experimentActive === false) {
+
+            voiceStatus.textContent =
+                "No active experiment.";
+
+            voiceHint.textContent =
+                "Start an experiment before using the camera.";
+
+            return;
+        }
+
+
         startCamera();
 
         return;
@@ -2859,9 +3241,19 @@ function handleVoiceCommand(transcript) {
         command === "capture image"
     ) {
 
-        if (
-            cameraStream
-        ) {
+        if (experimentActive === false) {
+
+            voiceStatus.textContent =
+                "No active experiment.";
+
+            voiceHint.textContent =
+                "Start an experiment before taking a photo.";
+
+            return;
+        }
+
+
+        if (cameraStream) {
 
             capturePhotoButton.click();
 
@@ -2874,6 +3266,7 @@ function handleVoiceCommand(transcript) {
 
             voiceHint.textContent =
                 "Say Take Photo when ready.";
+
         }
 
         return;
@@ -2881,17 +3274,49 @@ function handleVoiceCommand(transcript) {
 
 
     /*
-     * =========================
-     * UPLOAD IMAGE
-     * =========================
-     */
+    * =========================
+    * UPLOAD IMAGE
+    * =========================
+    */
 
     if (
         command === "upload image" ||
         command === "add image"
     ) {
 
-        imageInput.click();
+        if (experimentActive === false) {
+
+            voiceStatus.textContent =
+                "No active experiment.";
+
+            voiceHint.textContent =
+                "Start an experiment before uploading an image.";
+
+            return;
+        }
+
+
+        if (!selectedImage) {
+
+            voiceStatus.textContent =
+                "No image is ready to upload.";
+
+            voiceHint.textContent =
+                "Select or capture an image first.";
+
+            return;
+        }
+
+
+        voiceStatus.textContent =
+            "Uploading image...";
+
+        voiceHint.textContent =
+            "Saving the image to your experiment.";
+
+
+        await uploadSelectedImage();
+
 
         return;
     }
@@ -2908,9 +3333,23 @@ function handleVoiceCommand(transcript) {
     ) {
 
         window.scrollBy({
-            top: 600,
+            top: 500,
             behavior: "smooth"
         });
+
+        const sidebarContent =
+            document.querySelector(
+                ".voice-command-menu-content"
+            );
+
+        if (sidebarContent) {
+
+            sidebarContent.scrollBy({
+                top: 450,
+                behavior: "smooth"
+            });
+
+        }
 
         return;
     }
@@ -2927,9 +3366,24 @@ function handleVoiceCommand(transcript) {
     ) {
 
         window.scrollBy({
-            top: -600,
+            top: -500,
             behavior: "smooth"
         });
+
+
+        const sidebarContent =
+            document.querySelector(
+                ".voice-command-menu-content"
+            );
+
+        if (sidebarContent) {
+
+            sidebarContent.scrollBy({
+                top: -450,
+                behavior: "smooth"
+            });
+
+        }
 
         return;
     }
@@ -2946,7 +3400,62 @@ function handleVoiceCommand(transcript) {
         command === "finish experiment"
     ) {
 
+        if (experimentActive === false) {
+
+            voiceStatus.textContent =
+                "No active experiment.";
+
+            voiceHint.textContent =
+                "Start an experiment before ending it.";
+
+            return;
+        }
+
+
         finishExperimentButton.click();
+
+        return;
+    }
+
+
+    /*
+     * =========================
+     * OBSERVATION INPUT MODE
+     * =========================
+     */
+
+    if (
+        observationRecordingMode === true &&
+        experimentActive === true
+    ) {
+
+        if (
+            observationText.value.length > 0
+        ) {
+
+            observationText.value +=
+                " ";
+
+        }
+
+
+        observationText.value +=
+            transcript.trim();
+
+
+        observationText.dispatchEvent(
+            new Event("input", {
+                bubbles: true
+            })
+        );
+
+
+        voiceStatus.textContent =
+            "Observation captured.";
+
+        voiceHint.textContent =
+            "Continue speaking or say Save Observation when finished.";
+
 
         return;
     }
@@ -2962,7 +3471,7 @@ function handleVoiceCommand(transcript) {
         "Command not recognised.";
 
     voiceHint.textContent =
-        "Please try another voice command.";
+        "Please try another LabScriptor voice command.";
 }
 
 

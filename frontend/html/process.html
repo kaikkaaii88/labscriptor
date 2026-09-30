@@ -16,6 +16,529 @@
 
 <body>
 
+    <!-- Left Sidebar -->
+
+    <aside
+        id="voiceCommandMenu"
+        class="voice-command-menu closed"
+    >
+
+        <div class="sidebar-header">
+
+            <div class="sidebar-brand">
+
+                <span class="sidebar-brand-icon">
+                    <i class="fa-solid fa-flask"></i>
+                </span>
+
+                <div class="sidebar-brand-text">
+
+                    <span class="sidebar-brand-name">
+                        LabScriptor
+                    </span>
+
+                    <span class="sidebar-brand-subtitle">
+                        Laboratory Assistant
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <button
+                id="closeVoiceCommandMenu"
+                class="voice-command-close-button"
+                type="button"
+                aria-label="Close menu"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+
+        <div class="sidebar-navigation">
+
+            <button
+                id="sidebarProcessButton"
+                class="sidebar-navigation-button active"
+                type="button"
+            >
+                <i class="fa-solid fa-flask"></i>
+
+                <span>
+                    Process
+                </span>
+            </button>
+
+
+            <button
+                id="sidebarHistoryButton"
+                class="sidebar-navigation-button"
+                type="button"
+            >
+                <i class="fa-solid fa-clock-rotate-left"></i>
+
+                <span>
+                    Experiment History
+                </span>
+            </button>
+
+
+            <button
+                id="sidebarVoiceButton"
+                class="sidebar-navigation-button"
+                type="button"
+            >
+                <i class="fa-solid fa-microphone"></i>
+
+                <span>
+                    Voice Commands
+                </span>
+            </button>
+
+        </div>
+
+
+        <div class="sidebar-divider"></div>
+
+
+        <div class="voice-command-status-card">
+
+            <div class="voice-command-status-icon">
+
+                <i class="fa-solid fa-microphone"></i>
+
+            </div>
+
+            <div>
+
+                <strong id="sidebarVoiceStatus">
+                    Voice Commands Off
+                </strong>
+
+                <p id="sidebarVoiceHint">
+                    Enable voice commands for hands-free control.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="voice-command-menu-content">
+
+            <!-- Navigation -->
+
+            <div class="voice-command-category">
+
+                <h3>
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                    Navigation
+                </h3>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Scroll down"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Scrolls down the page
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Scroll up"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Scrolls up the page
+                    </span>
+
+                </div>
+
+            </div>
+
+            <!-- Experiment -->
+
+            <div class="voice-command-category">
+
+                <h3>
+                    <i class="fa-solid fa-flask"></i>
+                    Experiment
+                </h3>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Experiment Name is: [name]"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Fills the Experiment Name text box
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Start experiment"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Starts the experiment
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Begin experiment"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Starts the experiment
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "New experiment"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Creates a new experiment
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "End experiment"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Opens finish-experiment confirmation
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Finish experiment"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Opens finish-experiment confirmation
+                    </span>
+
+                </div>
+
+            </div>
+
+            <!-- Observation -->
+
+            <div class="voice-command-category">
+
+                <h3>
+                    <i class="fa-solid fa-note-sticky"></i>
+                    Observation
+                </h3>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Record observation"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Enters observation recording mode
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Save observation"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Saves the current spoken observation
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- Timer -->
+
+            <div class="voice-command-category">
+
+                <h3>
+                    <i class="fa-solid fa-stopwatch"></i>
+                    Timer
+                </h3>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Start timer"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Starts the experiment timer
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Pause timer"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Pauses the timer
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Resume timer"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Resumes the timer
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Stop timer"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Stops the timer
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Reset timer"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Resets the timer to 0
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- Voice Recording -->
+
+            <div class="voice-command-category">
+
+                <h3>
+                    <i class="fa-solid fa-microphone-lines"></i>
+                    Voice Recording
+                </h3>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Start voice recording"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Starts voice recording / dictation
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Start recording"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Starts voice recording / dictation
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Stop voice recording"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Stops voice recording / dictation
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Stop recording"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Stops voice recording / dictation
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- Camera -->
+
+            <div class="voice-command-category">
+
+                <h3>
+                    <i class="fa-solid fa-camera"></i>
+                    Camera
+                </h3>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Start camera"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Opens the camera
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Open camera"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Opens the camera
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Take photo"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Captures a photo
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Capture image"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Captures a photo
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Upload image"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Opens the image upload function
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Add image"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Opens the image upload function
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- Navigation -->
+
+            <div class="voice-command-category">
+
+                <h3>
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                    Navigation
+                </h3>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Scroll down"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Scrolls down the page
+                    </span>
+
+                </div>
+
+                <div class="voice-command-item">
+
+                    <span class="voice-command-say">
+                        "Scroll up"
+                    </span>
+
+                    <span class="voice-command-action">
+                        Scrolls up the page
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
     <header class="app-header">
 
         <!-- Left: LabScriptor Branding -->
@@ -111,6 +634,17 @@
 
 
     <main class="main-container">
+
+        <!-- Sidebar Toggle -->
+        <button
+            id="openVoiceCommandMenu"
+            class="sidebar-toggle-button"
+            type="button"
+            aria-label="Open menu"
+        >
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
 
         <!-- Process Section -->
         <section class="process-section">
@@ -416,54 +950,6 @@
                     id="imageList"
                     class="image-list"
                 >
-                </div>
-
-            </section>
-
-
-    <!-- Camera Actions -->
-
-    <div
-        id="cameraActions"
-        class="camera-actions"
-        style="display: none;"
-    >
-
-        <button
-            type="button"
-            id="capturePhotoButton"
-            class="primary-button"
-        >
-            Capture Photo
-        </button>
-
-        <button
-            type="button"
-            id="cancelCameraButton"
-            class="secondary-button"
-        >
-            Cancel
-        </button>
-
-    </div>
-
-
-    <div class="image-upload-actions">
-
-        <button
-            type="button"
-            id="uploadImageButton"
-            disabled
-        >
-            Upload Image
-        </button>
-
-
-                <div
-                    id="imageList"
-                    class="image-list"
-                >
-
                 </div>
 
             </section>

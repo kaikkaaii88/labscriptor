@@ -17,6 +17,504 @@ body {
 }
 
 /* =========================
+   LEFT SIDEBAR
+   ========================= */
+
+.voice-command-menu {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    z-index: 2000;
+
+    width: 240px;
+    height: 100vh;
+
+    display: flex;
+
+    flex-direction: column;
+
+    background-color: #ffffff;
+
+    border-right: 1px solid #e5e7eb;
+
+    box-shadow:
+        4px 0 16px rgba(0, 0, 0, 0.06);
+
+    transform: translateX(0);
+
+    transition:
+        transform 0.25s ease;
+}
+
+
+/* =========================
+   SIDEBAR CLOSED
+   ========================= */
+
+.voice-command-menu.closed {
+    transform: translateX(-100%);
+}
+
+
+/* =========================
+   SIDEBAR HEADER
+   ========================= */
+
+.sidebar-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 20px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+
+.sidebar-brand {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+
+.sidebar-brand-icon {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 36px;
+    height: 36px;
+
+    flex-shrink: 0;
+
+    border-radius: 9px;
+
+    background-color: #111827;
+
+    color: white;
+
+    font-size: 16px;
+}
+
+
+.sidebar-brand-text {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+
+.sidebar-brand-name {
+    color: #111827;
+
+    font-size: 17px;
+
+    font-weight: 700;
+}
+
+
+.sidebar-brand-subtitle {
+    color: #9ca3af;
+
+    font-size: 11px;
+}
+
+
+/* =========================
+   CLOSE BUTTON
+   ========================= */
+
+.voice-command-close-button {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    padding: 0;
+
+    background-color: #f3f4f6;
+
+    color: #6b7280;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+
+.voice-command-close-button:hover {
+    background-color: #e5e7eb;
+
+    color: #111827;
+}
+
+
+/* =========================
+   SIDEBAR NAVIGATION
+   ========================= */
+
+.sidebar-navigation {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+    padding: 14px;
+}
+
+
+.sidebar-navigation-button {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    width: 100%;
+
+    padding: 11px 13px;
+
+    background-color: transparent;
+
+    color: #6b7280;
+
+    border: 1px solid transparent;
+
+    border-radius: 8px;
+
+    text-align: left;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.sidebar-navigation-button:hover {
+    background-color: #f3f4f6;
+
+    color: #111827;
+}
+
+
+.sidebar-navigation-button.active {
+    background-color: #f3f4f6;
+
+    color: #111827;
+
+    border-color: #e5e7eb;
+}
+
+
+.sidebar-navigation-button i {
+    width: 18px;
+
+    text-align: center;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   SIDEBAR DIVIDER
+   ========================= */
+
+.sidebar-divider {
+    height: 1px;
+
+    margin: 0 16px;
+
+    background-color: #e5e7eb;
+}
+
+
+/* =========================
+   VOICE STATUS CARD
+   ========================= */
+
+.voice-command-status-card {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin: 16px;
+
+    padding: 13px;
+
+    background-color: #f9fafb;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 10px;
+}
+
+
+.voice-command-status-icon {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    flex-shrink: 0;
+
+    border-radius: 8px;
+
+    background-color: #f3f4f6;
+
+    color: #6b7280;
+}
+
+
+.voice-command-status-card strong {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #374151;
+
+    font-size: 12px;
+}
+
+
+.voice-command-status-card p {
+    margin: 0;
+
+    color: #9ca3af;
+
+    font-size: 11px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================
+   VOICE STATUS ACTIVE
+   ========================= */
+
+.voice-command-status-card.active {
+    background-color: #f0fdf4;
+
+    border-color: #bbf7d0;
+}
+
+
+.voice-command-status-card.active
+.voice-command-status-icon {
+    background-color: #dcfce7;
+
+    color: #166534;
+}
+
+
+.voice-command-status-card.active strong {
+    color: #166534;
+}
+
+
+/* =========================
+   SIDEBAR CONTENT
+   ========================= */
+
+.voice-command-menu-content {
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding: 0 16px 24px;
+}
+
+
+/* =========================
+   VOICE COMMAND CATEGORY
+   ========================= */
+
+.voice-command-category {
+    padding: 16px 0;
+
+    border-bottom: 1px solid #f0f1f3;
+}
+
+
+.voice-command-category h3 {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin: 0 0 10px;
+
+    color: #374151;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.4px;
+}
+
+
+.voice-command-category h3 i {
+    width: 16px;
+
+    color: #6b7280;
+
+    text-align: center;
+}
+
+
+/* =========================
+   COMMAND ITEM
+   ========================= */
+
+.voice-command-item {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+
+    padding: 9px 10px;
+
+    border-radius: 7px;
+}
+
+
+.voice-command-item:hover {
+    background-color: #f9fafb;
+}
+
+
+.voice-command-say {
+    color: #1f2937;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+
+.voice-command-action {
+    color: #9ca3af;
+
+    font-size: 10px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================
+   SIDEBAR TOGGLE
+   ========================= */
+
+.sidebar-toggle-button {
+    position: fixed;
+
+    top: 90px;
+    left: 20px;
+
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+
+    background-color: #ffffff;
+    color: #374151;
+
+    font-size: 18px;
+
+    cursor: pointer;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+    z-index: 1500;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.sidebar-toggle-button:hover {
+    background-color: #f9fafb;
+    color: #4f46e5;
+    transform: translateY(-1px);
+}
+
+
+.sidebar-toggle-button:active {
+    transform: translateY(1px);
+}
+
+/* =========================
+   SIDEBAR OPEN LAYOUT
+   ========================= */
+
+body.sidebar-open .app-header {
+    margin-left: 240px;
+
+    width: calc(100% - 240px);
+
+    transition:
+        margin-left 0.25s ease,
+        width 0.25s ease;
+}
+
+
+body.sidebar-open .main-container {
+    margin-left: 260px;
+
+    margin-right: 20px;
+
+    width: calc(100% - 280px);
+
+    max-width: none;
+
+    transition:
+        margin-left 0.25s ease,
+        margin-right 0.25s ease,
+        width 0.25s ease;
+}
+
+
+body.sidebar-open .sidebar-toggle-button {
+    display: none;
+}
+
+/* =========================
    HEADER
    ========================= */
 
@@ -38,6 +536,10 @@ body {
     background-color: white;
 
     border-bottom: 1px solid #e5e7eb;
+
+    transition:
+        margin-left 0.25s ease,
+        width 0.25s ease;
 }
 
 
@@ -504,6 +1006,11 @@ animation: none;
     flex-direction: column;
 
     gap: 20px;
+    
+    transition:
+        margin-left 0.25s ease,
+        margin-right 0.25s ease,
+        width 0.25s ease;
 }
 
 
@@ -1118,6 +1625,24 @@ button:disabled:hover {
 
     .summary-grid {
         grid-template-columns: 1fr;
+    }
+    
+    body.sidebar-open .app-header {
+        margin-left: 0;
+
+        width: 100%;
+    }
+
+    body.sidebar-open .main-container {
+        margin-left: 12px;
+
+        margin-right: 12px;
+
+        width: calc(100% - 24px);
+    }
+
+    .voice-command-menu {
+        width: 240px;
     }
 
 }
