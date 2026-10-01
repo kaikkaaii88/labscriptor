@@ -9,14 +9,8 @@ const supabaseClient =
     );
 
 
-const registerForm =
-    document.getElementById("registerForm");
-
-const nameInput =
-    document.getElementById("name");
-
-const emailInput =
-    document.getElementById("email");
+const resetPasswordForm =
+    document.getElementById("resetPasswordForm");
 
 const passwordInput =
     document.getElementById("password");
@@ -30,16 +24,16 @@ const togglePassword =
 const toggleConfirmPassword =
     document.getElementById("toggleConfirmPassword");
 
-const registerButton =
-    document.getElementById("registerButton");
+const resetPasswordButton =
+    document.getElementById("resetPasswordButton");
 
-const registerMessage =
-    document.getElementById("registerMessage");
+const resetPasswordMessage =
+    document.getElementById("resetPasswordMessage");
 
 
 
 /* ========================================
-   PASSWORD VISIBILITY
+   SHOW / HIDE NEW PASSWORD
    ======================================== */
 
 togglePassword.addEventListener(
@@ -66,7 +60,7 @@ togglePassword.addEventListener(
 
 
 /* ========================================
-   CONFIRM PASSWORD VISIBILITY
+   SHOW / HIDE CONFIRM PASSWORD
    ======================================== */
 
 toggleConfirmPassword.addEventListener(
@@ -93,21 +87,15 @@ toggleConfirmPassword.addEventListener(
 
 
 /* ========================================
-   REGISTER ACCOUNT
+   RESET PASSWORD
    ======================================== */
 
-registerForm.addEventListener(
+resetPasswordForm.addEventListener(
     "submit",
     async function (event) {
 
         event.preventDefault();
 
-
-        const name =
-            nameInput.value.trim();
-
-        const email =
-            emailInput.value.trim();
 
         const password =
             passwordInput.value;
@@ -116,17 +104,15 @@ registerForm.addEventListener(
             confirmPasswordInput.value;
 
 
-        /* Check required fields */
+        /* Check password fields */
 
         if (
-            name === "" ||
-            email === "" ||
             password === "" ||
             confirmPassword === ""
         ) {
 
-            registerMessage.textContent =
-                "Please fill in all fields.";
+            resetPasswordMessage.textContent =
+                "Please enter and confirm your new password.";
 
             return;
         }
@@ -136,7 +122,7 @@ registerForm.addEventListener(
 
         if (password !== confirmPassword) {
 
-            registerMessage.textContent =
+            resetPasswordMessage.textContent =
                 "Passwords do not match.";
 
             confirmPasswordInput.focus();
@@ -145,67 +131,57 @@ registerForm.addEventListener(
         }
 
 
-        /* Disable button while registering */
+        /* Disable button */
 
-        registerButton.disabled = true;
+        resetPasswordButton.disabled = true;
 
-        registerMessage.textContent =
-            "Creating your account...";
+        resetPasswordMessage.textContent =
+            "Updating your password...";
 
 
         const result =
-            await supabaseClient.auth.signUp({
-                email: email,
-                password: password,
-                options: {
-                    data: {
-                        name: name
-                    }
-                }
+            await supabaseClient.auth.updateUser({
+                password: password
             });
 
-
-        const data =
-            result.data;
 
         const error =
             result.error;
 
 
-        /* Handle registration error */
-
         if (error) {
 
             console.error(
-                "Registration error:",
+                "Password reset error:",
                 error
             );
 
-            registerMessage.textContent =
-                error.message;
+            resetPasswordMessage.textContent =
+                "Unable to reset your password. Please try again.";
 
-            registerButton.disabled = false;
+            resetPasswordButton.disabled = false;
 
             return;
         }
 
 
         console.log(
-            "Registration successful:",
-            data
+            "Password updated successfully."
         );
 
 
-        registerMessage.textContent =
-            "Account created successfully. Redirecting...";
+        resetPasswordMessage.textContent =
+            "Password updated successfully. Redirecting to login...";
 
 
-        /*
-         * Redirect to the process page
-         * after successful registration.
-         */
+        setTimeout(
+            function () {
 
-        window.location.href =
-            "process.html";
+                window.location.href =
+                    "/html/login.html";
+
+            },
+            2000
+        );
     }
 );

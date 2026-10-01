@@ -26,7 +26,13 @@ const loginMessage =
 const togglePassword =
     document.getElementById("togglePassword");
 
+const forgotPassword =
+    document.getElementById("forgotPassword");
 
+/* ========================================
+   SHOW / HIDE PASSWORD
+   ======================================== */
+   
 togglePassword.addEventListener(
     "click",
     function () {
@@ -45,6 +51,67 @@ togglePassword.addEventListener(
             togglePassword.textContent =
                 "Show";
         }
+    }
+);
+
+/* ========================================
+   FORGOT PASSWORD
+   ======================================== */
+
+forgotPassword.addEventListener(
+    "click",
+    async function (event) {
+
+        event.preventDefault();
+
+        const email =
+            emailInput.value.trim();
+
+        if (email === "") {
+
+            loginMessage.textContent =
+                "Please enter your email first.";
+
+            emailInput.focus();
+
+            return;
+        }
+
+        loginMessage.textContent =
+            "Sending password reset email...";
+
+
+        const result =
+            await supabaseClient.auth.resetPasswordForEmail(
+                email,
+                {
+                    redirectTo:
+                        window.location.origin +
+                        "/html/reset-password.html"
+                }
+            );
+
+
+        const error =
+            result.error;
+
+
+        if (error) {
+
+            console.error(
+                "Password reset error:",
+                error
+            );
+
+            loginMessage.textContent =
+                "Unable to send password reset email. Please try again.";
+
+            return;
+        }
+
+
+        loginMessage.textContent =
+            "Password reset email sent. Please check your inbox.";
     }
 );
 
