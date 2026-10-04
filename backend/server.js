@@ -137,17 +137,26 @@ app.use(
 );
 
 
-// START SERVER
+// START SERVER LOCALLY
 
-const PORT = 3000;
+if (require.main === module) {
 
-app.listen(
-    PORT,
-    function () {
+    const PORT = 3000;
 
-        console.log(
-            "LabScriptor running on port " + PORT
-        );
+    app.listen(
+        PORT,
+        function () {
 
-    }
-);
+            console.log(
+                "LabScriptor running on port " + PORT
+            );
+
+        }
+    );
+
+}
+
+
+// EXPORT APP
+
+module.exports = app;

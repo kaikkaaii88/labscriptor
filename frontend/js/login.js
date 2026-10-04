@@ -87,7 +87,7 @@ forgotPassword.addEventListener(
                 {
                     redirectTo:
                         window.location.origin +
-                        "/html/reset-password.html"
+                        "/html/resetPassword.html"
                 }
             );
 
