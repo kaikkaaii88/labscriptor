@@ -415,7 +415,7 @@ async function saveExperimentName() {
 
         const response =
             await fetch(
-                "http://localhost:3000/api/process-sessions/" +
+                "/api/process-sessions/" +
                 sessionId,
                 {
                     method: "PATCH",
@@ -605,7 +605,7 @@ async function loadExperiment() {
 
         const response =
             await fetch(
-                "http://localhost:3000/api/process-sessions/" +
+                "/api/process-sessions/" +
                 sessionId
             );
 
@@ -826,7 +826,7 @@ async function loadAIAnalysis(
 
         const response =
             await fetch(
-                "http://localhost:3000/api/ai/" +
+                "/api/ai/" +
                 sessionId
             );
 
@@ -1646,7 +1646,7 @@ async function createObservation(
 
         const response =
             await fetch(
-                "http://localhost:3000/api/observations",
+                "/api/observations",
                 {
                     method: "POST",
 
@@ -1732,7 +1732,7 @@ async function loadObservations(
 
         const response =
             await fetch(
-                "http://localhost:3000/api/observations/" +
+                "/api/observations/" +
                 sessionId
             );
 
@@ -2546,7 +2546,7 @@ async function updateObservation(
 
         const response =
             await fetch(
-                "http://localhost:3000/api/observations/" +
+                "/api/observations/" +
                 observationId,
                 {
                     method: "PATCH",
@@ -2655,7 +2655,7 @@ async function deleteObservation(
 
         const response =
             await fetch(
-                "http://localhost:3000/api/observations/" +
+                "/api/observations/" +
                 observationId,
                 {
                     method: "DELETE"
@@ -2729,7 +2729,7 @@ async function loadExperimentImages(
 
         const response =
             await fetch(
-                "http://localhost:3000/api/images/" +
+                "/api/images/" +
                 sessionId
             );
 
@@ -3124,7 +3124,7 @@ if (uploadImageButton) {
 
                 const response =
                     await fetch(
-                        "http://localhost:3000/api/images",
+                        "/api/images",
                         {
                             method: "POST",
                             body: formData
@@ -3229,7 +3229,7 @@ async function deleteImage(
 
         const response =
             await fetch(
-                "http://localhost:3000/api/images/" +
+                "/api/images/" +
                 imageId,
                 {
                     method: "DELETE"

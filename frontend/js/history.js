@@ -178,7 +178,7 @@ async function loadUserId(user) {
 
         const response =
             await fetch(
-                "http://localhost:3000/api/users/" +
+                "/api/users/" +
                 encodeURIComponent(
                     user.email
                 )
@@ -221,7 +221,7 @@ async function loadExperiments(
 
         const response =
             await fetch(
-                "http://localhost:3000/api/process-sessions"
+                "/api/process-sessions"
             );
 
         const data =
@@ -539,7 +539,7 @@ async function loadAllHistoryImages(
 
             const response =
                 await fetch(
-                    "http://localhost:3000/api/images/" +
+                    "/api/images/" +
                     experiment.session_id
                 );
 

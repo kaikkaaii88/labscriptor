@@ -1789,7 +1789,7 @@ async function uploadSelectedImage() {
 
         const response =
             await fetch(
-                "http://localhost:3000/api/images",
+                "/api/images",
                 {
                     method: "POST",
                     body: formData
@@ -1887,7 +1887,7 @@ async function loadExperimentImages(sessionId) {
 
         const response =
             await fetch(
-                "http://localhost:3000/api/images/" +
+                "/api/images/" +
                 sessionId
             );
 
@@ -3506,7 +3506,7 @@ async function createProcessSession() {
 
         const response =
             await fetch(
-                "http://localhost:3000/api/process-sessions",
+                "/api/process-sessions",
                 {
                     method: "POST",
 
@@ -3639,7 +3639,7 @@ async function createTimerEvent(eventType) {
 
         const response =
             await fetch(
-                "http://localhost:3000/api/timer-events",
+                "/api/timer-events",
                 {
                     method: "POST",
 
@@ -3734,7 +3734,7 @@ async function completeProcessSession() {
 
         const response =
             await fetch(
-                "http://localhost:3000/api/process-sessions/" +
+                "/api/process-sessions/" +
                 currentSessionId,
                 {
                     method: "PATCH",
@@ -3837,7 +3837,7 @@ async function triggerAIAnalysis() {
 
         const response =
             await fetch(
-                "http://localhost:3000/api/ai/analyse/" +
+                "/api/ai/analyse/" +
                 currentSessionId,
                 {
                     method: "POST",
@@ -3915,7 +3915,7 @@ async function createObservation(observation) {
 
         const response =
             await fetch(
-                "http://localhost:3000/api/observations",
+                "/api/observations",
                 {
                     method: "POST",
 
@@ -4012,7 +4012,7 @@ async function loadObservations() {
 
         const response =
             await fetch(
-                "http://localhost:3000/api/observations/" +
+                "/api/observations/" +
                 currentSessionId
             );
 
@@ -4114,7 +4114,7 @@ async function loadProcessSession(sessionId) {
 
         const response =
             await fetch(
-                "http://localhost:3000/api/process-sessions/" +
+                "/api/process-sessions/" +
                 sessionId
             );
 
@@ -4273,7 +4273,7 @@ async function loadCurrentUser() {
 
         const response =
             await fetch(
-                "http://localhost:3000/api/users/" +
+                "\/api/users/" +
                 encodeURIComponent(user.email)
             );
 
